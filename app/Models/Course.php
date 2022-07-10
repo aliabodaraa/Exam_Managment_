@@ -11,14 +11,15 @@ class Course extends Model
 
     protected $fillable=[
         'course_name',
-        'studing_year'
+        'studing_year',
+        'semester',
     ];
 
     public function users(){//many to many between course & user
-        return $this->belongsToMany(User::class,'course_room_user')->withPivot('course_id','room_id','date','time');
+        return $this->belongsToMany(User::class,'course_room_user')->withPivot('course_id','room_id','date','time','roleIn');
     }
     public function rooms(){//many to many between course & user
-        return $this->belongsToMany(Room::class,'course_room_user')->withPivot('user_id','course_id','date','time');
+        return $this->belongsToMany(Room::class,'course_room_user')->withPivot('user_id','course_id','date','time','roleIn');
     }
 
 }

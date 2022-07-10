@@ -40,12 +40,7 @@ class CoursesController extends Controller
      */
     public function store(Request $request)
     {
-        $course = Course::create(
-            [
-                'course_name'=> $request->course_name,
-                'studing_year'=> $request->studing_year
-            ]
-        );
+         $enterCourse=true;
          $selected_room_id = 0;
           $date=$request->date;
           $time=Carbon::parse($request->time, 'UTC')->isoFormat('h:m');
@@ -65,19 +60,19 @@ class CoursesController extends Controller
                         }
                     }
                     if($is_available_room){
-                        //$last_prev_room_time_taken = $room->users->last()->pivot->time;
                         $selected_room_id = $room->id;
                         break;
                     }
             }
             if($selected_room_id == 0){
+                $enterCourse=false;
                  return redirect()->back()
                  ->with('retryEntering',"all Room not available with this Date: ".$date .' and Time '.$time.' change them and Try Again');
             }
           //assign Room-Head To the Room for a new Course
           $selected_room_head_id = 0;
           foreach (User::all() as $user) {
-            if($user->hasRole('Room-Head')){
+            // if($user->hasRole('Room-Head')){
                 $is_available_room_head = true;
                 foreach ($user->rooms as $room) {
                     if(($room->pivot->date == $date) && (Carbon::parse($room->pivot->time, 'UTC')->isoFormat('h:m') == $time)){
@@ -95,16 +90,19 @@ class CoursesController extends Controller
                     $selected_room_head_id = $user->id;
                     break;
                 }
-            }
+         //   }
           }
           if($selected_room_head_id == 0){
+                $enterCourse=false;
                 return redirect()->back()
                 ->with('retryEntering',"There is no Room-Head available Now: ".$date .' and Time '.$time.' change them and Try Again');
           }
           //assign Secertary To the Room for a new Course
           $selected_secertary_id = 0;
           foreach (User::all() as $user) {
-            if($user->hasRole('Secertary')){
+            // if($user->hasRole('Secertary')){
+                if($user->id == $selected_room_head_id )
+                continue;
                 $is_available_secertary = true;
                 foreach ($user->rooms as $room) {
                     if(($room->pivot->date == $date) && (Carbon::parse($room->pivot->time, 'UTC')->isoFormat('h:m') == $time)){
@@ -122,16 +120,19 @@ class CoursesController extends Controller
                     $selected_secertary_id = $user->id;
                     break;
                 }
-            }
-          }
+        //    }
+           }
           if($selected_secertary_id == 0){
+                $enterCourse=false;
                 return redirect()->back()
                 ->with('retryEntering',"There is no Secertary available Now: ".$date .' and Time '.$time.' change them and Try Again');
           }
           //assign Observer To the Room for a new Course
           $selected_observer_id = 0;
           foreach (User::all() as $user) {
-            if($user->hasRole('Employee')){
+            // if($user->hasRole('Employee')){
+                if($user->id == $selected_room_head_id || $user->id == $selected_secertary_id )
+                continue;
                 $is_available_observer = true;
                 foreach ($user->rooms as $room) {
                     if(($room->pivot->date == $date) && (Carbon::parse($room->pivot->time, 'UTC')->isoFormat('h:m') == $time)){
@@ -149,18 +150,42 @@ class CoursesController extends Controller
                     $selected_observer_id = $user->id;
                     break;
                 }
-            }
+            // }
           }
           if($selected_observer_id == 0){
+                $enterCourse=false;
                 return redirect()->back()
                 ->with('retryEntering',"There is no Observer available Now: ".$date .' and Time '.$time.' change them and Try Again');
           }
 
-        $course->users()->attach($selected_room_head_id,['room_id'=>$selected_room_id ,'date'=>$date,'time'=>$time]);
-        $course->users()->attach($selected_secertary_id,['room_id'=>$selected_room_id ,'date'=>$date,'time'=>$time]);
-        $course->users()->attach($selected_observer_id,['room_id'=>$selected_room_id ,'date'=>$date,'time'=>$time]);
-         return redirect()->route('courses.index')
-             ->with('message','You have successfully create a new course to the room Room'.$selected_room_id);
+          if($enterCourse){
+                $this->validate($request,[
+                    'course_name' => 'required|min:1|max:20|unique:courses,course_name',
+                ],[
+                    'course_name.unique' => 'the name of course already exist'
+                ]);
+                $course = Course::create(
+                    [
+                        'course_name'=> $request->course_name,
+                        'studing_year'=> $request->studing_year,
+                        'semester' => $request->semester,
+                    ]
+                );
+                //enter two courses in the same year , same date
+                if(Course::with('users')
+                ->whereHas('users', function($query) use($date){
+                $query->where('date',$date);
+                    })->where('studing_year',$course->studing_year)->get()){
+                        $course->delete();
+                        return redirect()->back()
+                        ->with('retryEntering',"You çan't create Two courses in the smae year ,same date");
+                    }
+                    $course->users()->attach($selected_room_head_id,['room_id'=>$selected_room_id ,'date'=>$date,'time'=>$time,'roleIn'=>'Room-Head']);
+                    $course->users()->attach($selected_secertary_id,['room_id'=>$selected_room_id ,'date'=>$date,'time'=>$time,'roleIn'=>'Secertary']);
+                    $course->users()->attach($selected_observer_id,['room_id'=>$selected_room_id ,'date'=>$date,'time'=>$time,'roleIn'=>'Observer']);
+                    return redirect()->route('courses.index')
+                        ->with('message','You have successfully create a new course to the room Room'.$selected_room_id);
+            }
     }
 
     /**
@@ -182,7 +207,51 @@ class CoursesController extends Controller
      */
     public function edit(Course $course)
     {
-        return view('courses.edit', ['course' => $course]);
+        $roomHeadArr=[];
+        $disabled_roomHeadArr=[];
+        $secertaryArr=[];
+        $disabled_secertaryArr=[];
+        $observerArr=[];
+        $disabled_observerArr=[];
+        $roomsArr=[];
+        $disabled_roomsArr=[];
+        foreach ($course->users as $user) {
+            if($user->pivot->roleIn=="Secertary"){
+                array_push($secertaryArr,$user->id);
+            }elseif($user->pivot->roleIn=="Room-Head"){
+                array_push($roomHeadArr,$user->id);
+            }else{
+                array_push($observerArr,$user->id);
+            }
+            //array_push($roomsArr,$user->pivot->room_id);
+        }
+       // dd($roomsArr);
+        $date = $course->users[0]->pivot->date;
+        $time = $course->users[0]->pivot->time;
+        foreach (Course::with('users')
+        ->whereHas('users', function($query) use($date){
+        $query->where('date',$date);
+            })->get() as $courseN) {
+            if($courseN->id == $course->id)
+                continue;
+            foreach ($courseN->users as $user) {
+                if( (($user->pivot->time >=  gmdate('H:i',strtotime($time))) && ($user->pivot->time <= gmdate('H:i',strtotime($time)+strtotime("02:00"))))
+                || (($user->pivot->time <=  gmdate('H:i',strtotime($time))) && ($user->pivot->time >= gmdate('H:i',strtotime($time)-strtotime("02:00")))) ){
+                    if($user->pivot->roleIn=="Room-Head")
+                        array_push($disabled_roomHeadArr,$user->id);
+                    elseif($user->pivot->roleIn=="Secertary")
+                        array_push($disabled_secertaryArr,$user->id);
+                    elseif($user->pivot->roleIn=="Observer")
+                        array_push($disabled_observerArr,$user->id);
+                }
+            }
+        }
+        print_r($disabled_roomHeadArr);
+        print_r($disabled_secertaryArr);
+        print_r($disabled_observerArr);
+        //dd(array_diff($disabled_observerArr,$disabled_secertaryArr));
+
+        return view('courses.edit', compact('course','secertaryArr','disabled_secertaryArr','roomHeadArr','disabled_roomHeadArr','observerArr','disabled_observerArr'));
     }
 
     /**
@@ -194,23 +263,29 @@ class CoursesController extends Controller
      */
     public function update(Request $request, Course $course)
     {
-        $course->update($request->all());
+            //   $course->users[0]->courses()->detach($course); //for selest form
+            //   $course->users[1]->courses()->detach($course);
+            //   $course->users[2]->courses()->detach($course);
+            //   $course->users[0]->courses()->attach($course,['room_id'=>$request->room_id,'user_id'=>$request->observer_id ,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Observer']);
+            //   $course->users[1]->courses()->attach($course,['room_id'=>$request->room_id,'user_id'=>$request->secertary_id ,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Secertary']);
+            //   $course->users[2]->courses()->attach($course,['room_id'=>$request->room_id,'user_id'=>$request->roomHead_id ,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Room-Head']);
+            //   $course->update($request->all());
+            //dd(array_keys($request->get('observers')));
 
+            $course->update($request->only('course_name','studing_year','semester'));
+            //dd($request->get('observers'));
+                for ($i=0; $i < $course->users->count() ; $i++) {
+                    $course->users[$i]->courses()->detach($course);
+                }
 
-// dd(User::doesntHave('courses')->get());
+                //solve conflict when there are the same users after change time
+                foreach ($course->users as $user) {
 
-             //$courseWithUsers=Course::where('id',$course->id)->with('users')->get();
-             //dd($courseWithUsers);
-                 foreach ($course->users as $user) {
-                    if($user->hasRole('Room-Head')){
-                            $user->courses()->updateExistingPivot($course,['room_id'=>$request->room_id,'user_id'=>$request->roomHead_id ,'date'=>$request->date,'time'=>$request->time]);
-                    }elseif($user->hasRole('Secertary')){
-                            $user->courses()->updateExistingPivot($course,['room_id'=>$request->room_id,'user_id'=>$request->secertary_id ,'date'=>$request->date,'time'=>$request->time]);
-                    }elseif($user->hasRole('Employee')){
-                            $user->courses()->updateExistingPivot($course,['room_id'=>$request->room_id,'user_id'=>$request->observer_id ,'date'=>$request->date,'time'=>$request->time]);
-                        }
-                 }
-                 $course->save();
+                }
+
+                $course->users()->attach($request->get('roomheads'),['room_id'=>$request->room_id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Room-Head']);
+                $course->users()->attach($request->get('secertaries'),['room_id'=>$request->room_id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Secertary']);
+                $course->users()->attach($request->get('observers'),['room_id'=>$request->room_id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Observer']);
 
 
         return redirect()->route('courses.index')->with('user-update','Course update successfully');

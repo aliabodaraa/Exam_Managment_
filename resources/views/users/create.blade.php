@@ -41,30 +41,17 @@
                 </div>
                 <div class="mb-3">
                     <label for="role" class="form-label">Role</label>
-                    <select class="form-control" name="role" required>
+                    <select class="form-control"
+                        name="role" required>
                         <option value="">Select role</option>
-                        @foreach($roles as $role)
-                            <option value="{{ $role->id }}">{{ $role->name }}</option>
-                        @endforeach
+                        <option value="Doctor">Doctor</option>
+                        <option value="Master's student">Master's student</option>
+                        <option value="administrative employee">administrative employee</option>
                     </select>
                     @if ($errors->has('role'))
                         <span class="text-danger text-left">{{ $errors->first('role') }}</span>
                     @endif
                 </div>
-                <div class="mb-3">
-                    <label for="department" class="form-label">Studing Year :</label>
-                    <select class="form-control" name="studing_year" class="form-control" required>
-                            <option value='1'>First Year</option>
-                            <option value='2'>Secound Year</option>
-                            <option value='3'>Third Year</option>
-                            <option value='4'>Fourth Year</option>
-                            <option value='5'>Fifth Year</option>
-                    </select>
-                    @if ($errors->has('studing_year'))
-                        <span class="text-danger text-left">{{ $errors->first('studing_year') }}</span>
-                    @endif
-                </div>
-
                 <button type="submit" class="btn btn-primary">Save user</button>
                 <a href="{{ route('users.index') }}" class="btn btn-default">Back</a>
             </form>

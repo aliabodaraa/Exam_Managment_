@@ -47,11 +47,9 @@ class UsersController extends Controller
                 'username'=> $request->username,
                 'email'=> $request->email,
                 'password' => $request['password'],
-                'studing_year' => $request['studing_year']
-                //'password_confirmation' =>$request['password'] //you can add
+                'role' => $request['role']
             ]
         );
-        $user->syncRoles($request->get('role'));
         return redirect()->route('users.index')
             ->withSuccess(__('User created successfully.'));
     }

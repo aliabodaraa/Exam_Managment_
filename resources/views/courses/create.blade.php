@@ -39,6 +39,16 @@
                     @endif
                 </div>
                 <div class="mb-3">
+                    <label for="department" class="form-label">Semester :</label>
+                    <select class="form-control" name="semester" class="form-control" required>
+                            <option value='1'>First Semester</option>
+                            <option value='2'>Secound Semester</option>
+                    </select>
+                    @if ($errors->has('semester'))
+                        <span class="text-danger text-left">{{ $errors->first('semester') }}</span>
+                    @endif
+                </div>
+                <div class="mb-3">
                     <label for="date" class="form-label">date</label>
                     <input value="{{ old('date') }}"
                         type="date"

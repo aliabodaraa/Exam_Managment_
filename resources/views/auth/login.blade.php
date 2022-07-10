@@ -37,7 +37,6 @@
         </div>
 
         <button class="w-100 btn btn-lg btn-primary mb-3" type="submit">Login</button>
-        <a href="{{ route('register.perform') }}" class="w-100 btn btn-lg btn-danger">Go To Register Page</a>
         @include('auth.partials.copy')
     </form>
 @endsection

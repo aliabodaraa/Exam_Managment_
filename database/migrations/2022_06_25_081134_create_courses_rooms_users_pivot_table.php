@@ -16,6 +16,7 @@ class CreateCoursesRoomsUsersPivotTable extends Migration
         Schema::create('course_room_user', function (Blueprint $table) {
             $table->date('date');
             $table->time('time');
+            $table->string('roleIn');
             $table->unsignedBigInteger('course_id');
             $table->foreign('course_id')->references('id')->on('courses')->onDelete('cascade')->onUpdate('cascade');
             $table->unsignedBigInteger('room_id');

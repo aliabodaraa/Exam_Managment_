@@ -36,23 +36,31 @@
                     @endif
                 </div>
                 <div class="mb-3">
+                    <label for="department" class="form-label">Semester :</label>
+                    <select class="form-control" name="semester" class="form-control" required>
+                            <option value='1'  {{ ($course->semester == 1) ? 'selected': '' }}>First Semester</option>
+                            <option value='2'  {{ ($course->semester == 2) ? 'selected': '' }}>Secound Semester</option>
+                    </select>
+                    @if ($errors->has('semester'))
+                        <span class="text-danger text-left">{{ $errors->first('semester') }}</span>
+                    @endif
+                </div>
+                <div class="mb-3">
                     <label for="room_id" class="form-label">room name :</label>
                     <select class="form-control" name="room_id" class="form-control" required>
                         @foreach(App\Models\Room::all() as $room)
-                            <option value="{{$room->id}}" {{ ($course->rooms[0]->pivot->room_id == $room->id) ? 'selected': '' }}>{{$room->name}}</option>
+                            <option value="{{$room->id}}" {{ ($course->rooms[0]->pivot->room_id == $room->id) ? 'selected': '' }}>{{$room->room_name}}</option>
                         @endforeach
                     </select>
                     @if ($errors->has('room_id'))
                         <span class="text-danger text-left">{{ $errors->first('room_id') }}</span>
                     @endif
                 </div>
-                <div class="mb-3">
+                {{-- <div class="mb-3">
                     <label for="roomHead_id" class="form-label">roomHead name :</label>
                     <select class="form-control" name="roomHead_id" class="form-control" required>
                         @foreach(App\Models\User::all() as $user)
-                        @if($user->hasRole('Room-Head'))
-                            <option value="{{$user->id}}" {{ ($course->rooms[2]->pivot->user_id == $user->id) ? 'selected': '' }}>{{$user->username}}</option>
-                        @endif
+                            <option value="{{$user->id}}" {{ ($course->rooms[0]->pivot->user_id == $user->id) ? 'selected': '' }}>{{$user->username}}</option>
                         @endforeach
                     </select>
                     @if ($errors->has('roomHead_id'))
@@ -63,27 +71,93 @@
                     <label for="secertary_id" class="form-label">secertary name :</label>
                     <select class="form-control" name="secertary_id" class="form-control" required>
                         @foreach(App\Models\User::all() as $user)
-                        @if($user->hasRole('Secertary'))
-                            <option value="{{$user->id}}" {{ ($course->rooms[0]->pivot->user_id == $user->id) ? 'selected': '' }}>{{$user->username}}</option>
-                        @endif
+                            <option value="{{$user->id}}" {{ ($course->rooms[1]->pivot->user_id == $user->id) ? 'selected': '' }}>{{$user->username}}</option>
                         @endforeach
                     </select>
                     @if ($errors->has('secertary_id'))
-                        <span class="text-danger text-left">{{ $errors->first('secertary_id') }}</span>
+                    <span class="text-danger text-left">{{ $errors->first('secertary_id') }}</span>
                     @endif
                 </div>
                 <div class="mb-3">
                     <label for="observer_id" class="form-label">observer name :</label>
                     <select class="form-control" name="observer_id" class="form-control" required>
                         @foreach(App\Models\User::all() as $user)
-                        @if($user->hasRole('Employee'))
-                            <option value="{{$user->id}}" {{ ($course->rooms[1]->pivot->user_id == $user->id) ? 'selected': '' }}>{{$user->username}}</option>
-                        @endif
+                            <option value="{{$user->id}}" {{ ($course->rooms[2]->pivot->user_id == $user->id) ? 'selected': '' }}>{{$user->username}}</option>
                         @endforeach
                     </select>
                     @if ($errors->has('observer_id'))
                         <span class="text-danger text-left">{{ $errors->first('observer_id') }}</span>
                     @endif
+                </div>  --}}
+                <div class="mb-3">
+                    <label for="members" class="form-label">members :</label>
+                    <table class="table">
+                        <thead>
+                            <th scope="col" width="1%"><input type="checkbox" name="all_roomheads"></th>
+                            <th scope="col" width="30%">Room-Heads</th>
+                            <th scope="col" width="1%"><input type="checkbox" name="all_secertaries"></th>
+                            <th scope="col" width="30%">Secertaries</th>
+                            <th scope="col" width="1%"><input type="checkbox" name="all_observers"></th>
+                            <th scope="col" width="30%">Observers</th>
+                        </thead>
+
+                        @foreach(App\Models\User::all() as $user)
+                            <tr>
+                                <td>
+                                    <input type="checkbox"
+                                    name="roomheads[{{ $user->id }}]"
+                                    value="{{ $user->id }}"
+                                    class='roomheads'
+                                    {{ (in_array($user->id, $roomHeadArr) &&
+                                     !in_array($user->id, $disabled_roomHeadArr) &&
+                                     !in_array($user->id, $disabled_secertaryArr) &&
+                                     !in_array($user->id, $disabled_observerArr))
+                                        ? 'checked'
+                                        : '' }}
+                                    {{-- {{ array_diff($roomHeadArr,$disabled_roomHeadArr)
+                                        ? ''
+                                        : 'checked' }} --}}
+                                    {{ (in_array($user->id, $disabled_secertaryArr) || in_array($user->id, $disabled_roomHeadArr) || in_array($user->id, $disabled_observerArr))
+                                        ? 'disabled'
+                                        : '' }}>
+                                </td>
+                                <td>{{ $user->username }}</td>
+                                <td>
+                                    <input type="checkbox"
+                                    name="secertaries[{{ $user->id }}]"
+                                    value="{{ $user->id }}"
+                                    class='secertaries'
+                                    {{ (in_array($user->id, $secertaryArr)&&
+                                        !in_array($user->id, $disabled_secertaryArr) &&
+                                        !in_array($user->id, $disabled_roomHeadArr) &&
+                                        !in_array($user->id, $disabled_observerArr))
+                                           ? 'checked'
+                                           : '' }}
+                                    {{ (in_array($user->id, $disabled_secertaryArr) || in_array($user->id, $disabled_roomHeadArr) || in_array($user->id, $disabled_observerArr))
+                                        ? 'disabled'
+                                        : '' }}>
+                                </td>
+                                {{-- 'course','secertaryArr','disabled_secertaryArr','roomHeadArr','disabled_roomHeadArr','observerArr','disabled_observerArr' --}}
+                                <td>{{ $user->username }}</td>
+                                <td>
+                                    <input type="checkbox"
+                                    name="observers[{{ $user->id }}]"
+                                    value="{{ $user->id }}"
+                                    class='observers'
+                                    {{ (in_array($user->id, $observerArr)&&
+                                        !in_array($user->id, $disabled_observerArr))&&
+                                        !in_array($user->id, $disabled_roomHeadArr) &&
+                                        !in_array($user->id, $disabled_secertaryArr)
+                                           ? 'checked'
+                                           : '' }}
+                                    {{ (in_array($user->id, $disabled_secertaryArr) || in_array($user->id, $disabled_roomHeadArr) || in_array($user->id, $disabled_observerArr))
+                                        ? 'disabled'
+                                        : '' }}>
+                                </td>
+                                <td>{{ $user->username }}</td>
+                            </tr>
+                        @endforeach
+                    </table>
                 </div>
                 <div class="mb-3">
                     <label for="date" class="form-label">date</label>
@@ -113,4 +187,49 @@
         </div>
 
     </div>
+@endsection
+@section('scripts')
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('[name="all_roomheads"]').on('click', function() {
+
+                if($(this).is(':checked')) {
+                    $.each($('.roomheads'), function() {
+                        $(this).prop('checked',true);
+                    });
+                } else {
+                    $.each($('.roomheads'), function() {
+                        $(this).prop('checked',false);
+                    });
+                }
+
+            });
+            $('[name="all_secertaries"]').on('click', function() {
+
+            if($(this).is(':checked')) {
+                $.each($('.secertaries'), function() {
+                    $(this).prop('checked',true);
+                });
+            } else {
+                $.each($('.secertaries'), function() {
+                    $(this).prop('checked',false);
+                });
+            }
+
+            });
+            $('[name="all_observers"]').on('click', function() {
+
+            if($(this).is(':checked')) {
+                $.each($('.observers'), function() {
+                    $(this).prop('checked',true);
+                });
+            } else {
+                $.each($('.observers'), function() {
+                    $(this).prop('checked',false);
+                });
+            }
+
+            });
+        });
+    </script>
 @endsection

@@ -17,6 +17,9 @@
             <div>
                 Username: {{ $user->username }}
             </div>
+            <div>
+                Role: {{ $user->role }}
+            </div>
         </div>
 
     </div>

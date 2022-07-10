@@ -14,16 +14,7 @@
             </div>
         </h1>
         <div class="lead">
-            {{-- @if(Auth::user()->hasRole('Admin'))
-            Manage your users For All Departments here.
-            @elseif(Auth::user()->hasRole('Teacher'))
-            Manage your users For <mark>{{Auth::user()->department->dept_name}}</mark> Department here.
-            @else
-            Show your Colleagues For <mark>{{Auth::user()->department->dept_name}}</mark> Department here.
-            @endif --}}
-            @can('user-create')
             <a href="{{ route('users.create') }}" class="btn btn-success btn-sm float-right">Add new user</a>
-            @endcan
         </div>
 
         <div class="mt-2">
@@ -36,7 +27,7 @@
                 <th scope="col" width="3%">#</th>
                 <th scope="col" width="15%">Email</th>
                 <th scope="col" width="15%">Username</th>
-                <th scope="col" width="10%">Roles</th>
+                <th scope="col" width="10%">Role</th>
                 <th scope="col" width="1%" colspan="3">Actions</th>
             </tr>
             </thead>
@@ -47,28 +38,15 @@
                             <td>{{ $user->email }}</td>
                             <td>{{ $user->username }}</td>
                             <td>
-                                @foreach($user->roles as $role)
-                                    <span class="badge {{$user->hasRole('Admin')? 'bg-success':''}} {{$user->hasRole('Secertary')? 'bg-primary':''}} {{$user->hasRole('Room-Head')? 'bg-danger':''}}  {{$user->hasRole('Employee')? 'bg-info':''}}">{{ $role->name }}</span>
-                                @endforeach
+                                <span class="badge bg-danger">{{$user->role}}</span>
                             </td>
                             <td><a href="{{ route('users.show', $user->id) }}" class="btn btn-warning btn-sm">Show</a></td>
-                            @can('user-edit')
                             <td><a href="{{ route('users.edit', $user->id) }}" class="btn btn-info btn-sm">Edit</a></td>
-                            @endcan
-                            @if(!$user->hasRole('Admin'))
-                                @can('user-delete')
-                                    <td>
-                                        {!! Form::open(['method' => 'DELETE','route' => ['users.destroy', $user->id],'style'=>'display:inline']) !!}
-                                        {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
-                                        {!! Form::close() !!}
-                                    </td>
-                                @endcan
-                                @else
-                            {{-- <td><span class="badge bg-success">Active User</span></td> --}}
-                                @if(Auth::user()->hasRole('Admin'))
-                                    <td></td>
-                                @endif
-                            @endif
+                            <td>
+                                {!! Form::open(['method' => 'DELETE','route' => ['users.destroy', $user->id],'style'=>'display:inline']) !!}
+                                {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
+                                {!! Form::close() !!}
+                            </td>
                         </tr>
                     @endforeach
             </tbody>

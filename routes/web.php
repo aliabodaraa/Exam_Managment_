@@ -22,12 +22,6 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
 
     Route::group(['middleware' => ['guest']], function() {
         /**
-         * Register Routes
-         */
-        Route::get('/register', 'RegisterController@show')->name('register.show');
-        Route::post('/register', 'RegisterController@register')->name('register.perform');
-
-        /**
          * Login Routes
          */
         Route::get('/login', 'LoginController@show')->name('login.show');
@@ -35,7 +29,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
 
     });
 
-    Route::group(['middleware' => ['auth'/*, 'permission'*/]], function() {
+    Route::group(['middleware' => ['auth']], function() {
             /**
              * Logout Routes
              */
@@ -54,7 +48,6 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
                 Route::delete('/{user}/delete', 'UsersController@destroy')->name('users.destroy');
             });
 
-
             /**
              * Course Routes
              */
@@ -68,7 +61,17 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
                 Route::delete('/{course}/delete', 'CoursesController@destroy')->name('courses.destroy');
             });
 
-            Route::resource('roles', RolesController::class);
-            Route::resource('permissions', PermissionsController::class);
+            /**
+             * Room Routes
+             */
+            Route::group(['prefix' => 'rooms'], function() {
+                Route::get('/index', 'RoomsController@index')->name('rooms.index');
+                Route::get('/create', 'RoomsController@create')->name('rooms.create');
+                Route::post('/create', 'RoomsController@store')->name('rooms.store');
+                Route::get('/{room}/edit', 'RoomsController@edit')->name('rooms.edit');
+                Route::patch('/{room}/update', 'RoomsController@update')->name('rooms.update');
+                Route::get('/{room}/show', 'RoomsController@show')->name('rooms.show');
+                Route::delete('/{room}/delete', 'RoomsController@destroy')->name('rooms.destroy');
+            });
     });
 });

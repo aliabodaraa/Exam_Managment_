@@ -38,12 +38,9 @@
                     <select class="form-control"
                         name="role" required>
                         <option value="">Select role</option>
-                        @foreach($roles as $role)
-                            <option value="{{ $role->id }}"
-                                {{ in_array($role->name, $userRole)
-                                    ? 'selected'
-                                    : '' }}>{{ $role->name }}</option>
-                        @endforeach
+                        <option value="Doctor" {{ ($user->role == 'Doctor') ? 'selected': '' }}>Doctor</option>
+                        <option value="Master's student" {{ ($user->role == "Master's student") ? 'selected': '' }}>Master's student</option>
+                        <option value="administrative employee" {{ ($user->role == 'administrative employee') ? 'selected': '' }}>administrative employee</option>
                     </select>
                     @if ($errors->has('role'))
                         <span class="text-danger text-left">{{ $errors->first('role') }}</span>
