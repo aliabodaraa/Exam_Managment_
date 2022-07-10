@@ -17,7 +17,7 @@
             <div class="alert alert-success alert-block">
                 <strong>{{ $message }}</strong>
             </div>
-        @endif
+            @endif
             @if ($messageDelete = Session::get('user-delete'))
             <div class="alert alert-success alert-block">
                 <strong>{{ $messageDelete }}</strong>

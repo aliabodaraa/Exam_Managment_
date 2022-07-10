@@ -55,10 +55,12 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
                 Route::get('/index', 'CoursesController@index')->name('courses.index');
                 Route::get('/create', 'CoursesController@create')->name('courses.create');
                 Route::post('/create', 'CoursesController@store')->name('courses.store');
-                Route::get('/{course}/edit', 'coursesController@edit')->name('courses.edit');
-                Route::patch('/{course}/update', 'coursesController@update')->name('courses.update');
+                Route::get('/{course}/edit', 'CoursesController@edit')->name('courses.edit');
+                Route::patch('/{course}/update', 'CoursesController@update')->name('courses.update');
                 Route::get('/{course}/show', 'CoursesController@show')->name('courses.show');
                 Route::delete('/{course}/delete', 'CoursesController@destroy')->name('courses.destroy');
+                Route::get('/{course}/room/{specific_room}', 'CoursesController@get_room_for_course')->name('courses.room_for_course');
+                Route::patch('/{course}/room/{specific_room}', 'CoursesController@customize_room_for_course')->name('courses.room_for_course');
             });
 
             /**
@@ -73,5 +75,5 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
                 Route::get('/{room}/show', 'RoomsController@show')->name('rooms.show');
                 Route::delete('/{room}/delete', 'RoomsController@destroy')->name('rooms.destroy');
             });
+        });
     });
-});

@@ -13,31 +13,167 @@ use Carbon\Carbon;
 
 class CoursesController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public function get_room_for_course(Course $course, Room $specific_room){
+    //     $roomHeadArr=[];
+    //     $disabled_roomHeadArr=[];
+    //     $secertaryArr=[];
+    //     $disabled_secertaryArr=[];
+    //     $observerArr=[];
+    //     $disabled_observerArr=[];
+    //     $roomsArr=[];
+    //     $disabled_roomsArr=[];
+    //     foreach ($course->users as $user) {
+    //         if($user->pivot->roleIn=="Secertary"){
+    //             array_push($secertaryArr,$user->id);
+    //         }elseif($user->pivot->roleIn=="Room-Head"){
+    //             array_push($roomHeadArr,$user->id);
+    //         }else{
+    //             array_push($observerArr,$user->id);
+    //         }
+    //         //array_push($roomsArr,$user->pivot->room_id);
+    //     }
+    //    // dd($roomsArr);
+
+
+
+
+
+       $roomHeadArr=[];
+       $disabled_roomHeadArr=[];
+       $secertaryArr=[];
+       $disabled_secertaryArr=[];
+       $observerArr=[];
+       $disabled_observerArr=[];
+       $roomsArr=[];
+       $disabled_roomsArr=[];
+       $room_Distinct=[];
+       $users_in_rooms=[];
+       foreach ($course->rooms as $room) {
+            $secertaryArr=[];
+            $roomHeadArr=[];
+            $observerArr=[];
+            array_push($room_Distinct,$room->id);
+            foreach ($room->users as $user) {
+                 if($user->pivot->course_id==$course->id){
+                    if($user->pivot->roleIn=="Secertary"){
+                        array_push($secertaryArr,$user->pivot->user_id);
+                    }elseif($user->pivot->roleIn=="Room-Head"){
+                        array_push($roomHeadArr,$user->pivot->user_id);
+                    }else{
+                        array_push($observerArr,$user->pivot->user_id);
+                    }
+                 }
+               }
+            $users_in_rooms[$room->id]['roomHeads']=$roomHeadArr;
+            $users_in_rooms[$room->id]['secertaries']=$secertaryArr;
+            $users_in_rooms[$room->id]['observers']=$observerArr;
+       }
+       foreach (Room::all() as $roomN) {
+        if(! in_array($roomN->id,$room_Distinct)){
+            $users_in_rooms[$roomN->id]['roomHeads']=[];
+            $users_in_rooms[$roomN->id]['secertaries']=[];
+            $users_in_rooms[$roomN->id]['observers']=[];
+        }
+    }
+       //dd($a);
+       //dd(array_unique($room_Distinct),$users_in_rooms);
+
+
+
+
+
+
+        $date = $course->users[0]->pivot->date;
+        $time = $course->users[0]->pivot->time;
+        foreach (Course::with('users')
+        ->whereHas('users', function($query) use($date){
+        $query->where('date',$date);
+            })->get() as $courseN) {
+            if($courseN->id == $course->id)
+                continue;
+            foreach ($courseN->users as $user) {
+                if( (($user->pivot->time >=  gmdate('H:i',strtotime($time))) && ($user->pivot->time <= gmdate('H:i',strtotime($time)+strtotime("02:00"))))
+                || (($user->pivot->time <=  gmdate('H:i',strtotime($time))) && ($user->pivot->time >= gmdate('H:i',strtotime($time)-strtotime("02:00")))) ){
+                    if($user->pivot->roleIn=="Room-Head")
+                        array_push($disabled_roomHeadArr,$user->id);
+                    elseif($user->pivot->roleIn=="Secertary")
+                        array_push($disabled_secertaryArr,$user->id);
+                    elseif($user->pivot->roleIn=="Observer")
+                        array_push($disabled_observerArr,$user->id);
+                }
+            }
+        }
+        // print_r($disabled_roomHeadArr);
+        // print_r($disabled_secertaryArr);
+        // print_r($disabled_observerArr);
+        //dd(array_diff($disabled_observerArr,$disabled_secertaryArr));
+        return view('courses.edit_course_room',compact('course','specific_room','users_in_rooms','room_Distinct','disabled_secertaryArr','disabled_roomHeadArr','disabled_observerArr'));
+    }
+
+    public function customize_room_for_course(Request $request, Course $course, Room $specific_room){
+        //the same code privous for store observers and secertaries and roomheads for each room
+        $roomHeadArr=[];
+        $secertaryArr=[];
+        $observerArr=[];
+        $room_Distinct=[];
+        $users_in_rooms=[];
+        foreach ($course->rooms as $room) {
+            $secertaryArr=[];
+            $roomHeadArr=[];
+            $observerArr=[];
+            array_push($room_Distinct,$room->id);
+            foreach ($room->users as $user) {
+                if($user->pivot->course_id==$course->id){
+                    if($user->pivot->roleIn=="Secertary"){
+                        array_push($secertaryArr,$user->pivot->user_id);
+                    }elseif($user->pivot->roleIn=="Room-Head"){
+                        array_push($roomHeadArr,$user->pivot->user_id);
+                    }else{
+                        array_push($observerArr,$user->pivot->user_id);
+                    }
+                }
+                }
+            $users_in_rooms[$room->id]['roomHeads']=$roomHeadArr;
+            $users_in_rooms[$room->id]['secertaries']=$secertaryArr;
+            $users_in_rooms[$room->id]['observers']=$observerArr;
+        }
+        foreach (Room::all() as $roomN) {
+            if(! in_array($roomN->id,$room_Distinct)){
+                $users_in_rooms[$roomN->id]['roomHeads']=[];
+                $users_in_rooms[$roomN->id]['secertaries']=[];
+                $users_in_rooms[$roomN->id]['observers']=[];
+            }
+        }
+//dd($users_in_rooms);
+        //remove all rows that owns the course
+        //dd($room_Distinct);
+        for ($i=0; $i < $course->users->count() ; $i++) {
+            $course->users[$i]->courses()->detach($course);
+        }
+        foreach (Room::all() as $roomD) {
+            if($roomD->id == $specific_room->id && (!in_array($specific_room->id,array_unique($room_Distinct)) || in_array($specific_room->id,array_unique($room_Distinct)))){
+                $course->users()->attach($request->get('roomheads'),['room_id'=>$roomD->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Room-Head']);
+                $course->users()->attach($request->get('secertaries'),['room_id'=>$roomD->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Secertary']);
+                $course->users()->attach($request->get('observers'),['room_id'=>$roomD->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Observer']);
+            }else{
+                $course->users()->attach($users_in_rooms[$roomD->id]['roomHeads'],['room_id'=>$roomD->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Room-Head']);
+                $course->users()->attach($users_in_rooms[$roomD->id]['secertaries'],['room_id'=>$roomD->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Secertary']);
+                $course->users()->attach($users_in_rooms[$roomD->id]['observers'],['room_id'=>$roomD->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Observer']);
+            }
+        }
+        return redirect()->route('courses.edit',[$course->id,$specific_room->id])->with('update-course-room','Room '.$specific_room->room_name.' in Course '.$course->course_name.' updated successfully');
+    }
+
     public function index()
     {
         return view('courses.index');
     }
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function create()
     {
         return view('courses.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
          $enterCourse=true;
@@ -172,10 +308,10 @@ class CoursesController extends Controller
                     ]
                 );
                 //enter two courses in the same year , same date
-                if(Course::with('users')
+                if(count(Course::with('users')
                 ->whereHas('users', function($query) use($date){
                 $query->where('date',$date);
-                    })->where('studing_year',$course->studing_year)->get()){
+                    })->where('studing_year',$course->studing_year)->get())>1 ){
                         $course->delete();
                         return redirect()->back()
                         ->with('retryEntering',"You çan't create Two courses in the smae year ,same date");
@@ -188,81 +324,43 @@ class CoursesController extends Controller
             }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Course  $course
-     * @return \Illuminate\Http\Response
-     */
     public function show(Course $course)
     {
         return view('courses.show',compact('course'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Course  $course
-     * @return \Illuminate\Http\Response
-     */
     public function edit(Course $course)
     {
-        $roomHeadArr=[];
-        $disabled_roomHeadArr=[];
-        $secertaryArr=[];
-        $disabled_secertaryArr=[];
-        $observerArr=[];
-        $disabled_observerArr=[];
         $roomsArr=[];
         $disabled_roomsArr=[];
-        foreach ($course->users as $user) {
-            if($user->pivot->roleIn=="Secertary"){
-                array_push($secertaryArr,$user->id);
-            }elseif($user->pivot->roleIn=="Room-Head"){
-                array_push($roomHeadArr,$user->id);
-            }else{
-                array_push($observerArr,$user->id);
-            }
-            //array_push($roomsArr,$user->pivot->room_id);
+        foreach ($course->rooms as $room) {
+            array_push($roomsArr,$room->pivot->room_id);
         }
        // dd($roomsArr);
-        $date = $course->users[0]->pivot->date;
-        $time = $course->users[0]->pivot->time;
-        foreach (Course::with('users')
-        ->whereHas('users', function($query) use($date){
+      if(count($course->rooms)){
+         $date = $course->rooms[0]->pivot->date;
+        $time = $course->rooms[0]->pivot->time;
+        foreach (Course::with('rooms')
+        ->whereHas('rooms', function($query) use($date){
         $query->where('date',$date);
             })->get() as $courseN) {
-            if($courseN->id == $course->id)
-                continue;
-            foreach ($courseN->users as $user) {
-                if( (($user->pivot->time >=  gmdate('H:i',strtotime($time))) && ($user->pivot->time <= gmdate('H:i',strtotime($time)+strtotime("02:00"))))
-                || (($user->pivot->time <=  gmdate('H:i',strtotime($time))) && ($user->pivot->time >= gmdate('H:i',strtotime($time)-strtotime("02:00")))) ){
-                    if($user->pivot->roleIn=="Room-Head")
-                        array_push($disabled_roomHeadArr,$user->id);
-                    elseif($user->pivot->roleIn=="Secertary")
-                        array_push($disabled_secertaryArr,$user->id);
-                    elseif($user->pivot->roleIn=="Observer")
-                        array_push($disabled_observerArr,$user->id);
+               if($courseN->id == $course->id)
+                        continue;
+                    foreach ($courseN->rooms as $room) {
+                        if( (($room->pivot->time >=  gmdate('H:i',strtotime($time))) && ($room->pivot->time <= gmdate('H:i',strtotime($time)+strtotime("02:00"))))
+                        || (($room->pivot->time <=  gmdate('H:i',strtotime($time))) && ($room->pivot->time >= gmdate('H:i',strtotime($time)-strtotime("02:00")))) ){
+                                array_push($disabled_roomsArr,$room->id);
+                    }
                 }
+                // print_r($roomsArr);
+                // print_r($disabled_roomsArr);
             }
         }
-        print_r($disabled_roomHeadArr);
-        print_r($disabled_secertaryArr);
-        print_r($disabled_observerArr);
-        //dd(array_diff($disabled_observerArr,$disabled_secertaryArr));
-
-        return view('courses.edit', compact('course','secertaryArr','disabled_secertaryArr','roomHeadArr','disabled_roomHeadArr','observerArr','disabled_observerArr'));
+        return view('courses.edit', compact('course','roomsArr','disabled_roomsArr'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Course  $course
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, Course $course)
-    {
+    {//update the following attributes : course_name, studing_year, semester, rooms[], date, time
             //   $course->users[0]->courses()->detach($course); //for selest form
             //   $course->users[1]->courses()->detach($course);
             //   $course->users[2]->courses()->detach($course);
@@ -273,30 +371,115 @@ class CoursesController extends Controller
             //dd(array_keys($request->get('observers')));
 
             $course->update($request->only('course_name','studing_year','semester'));
-            //dd($request->get('observers'));
+
+            foreach ($course->users as $user) {
+                $course->users()->updateExistingPivot($user,['date'=>$request->date,'time'=>$request->time]);
+            }
+            //when disabled a checkbox for specific room
+            $users_in_room=[];
+            foreach ($course->rooms as $room) {
+                if($request->rooms && !in_array($room->id,$request->rooms)){
+                    foreach ($room->users as $user) {
+                        array_push($users_in_room,$user->id);
+                        }
+                    $room->users()->detach($users_in_room,['date'=>$request->date,'time'=>$request->time]);
+                }
+            }
+            //when enabled a checkbox for specific room
+            $roomHeadArr=[];
+            $secertaryArr=[];
+            $observerArr=[];
+            $room_Distinct=[];
+            $users_in_rooms=[];
+            foreach ($course->rooms as $room) {
+                $secertaryArr=[];
+                $roomHeadArr=[];
+                $observerArr=[];
+                array_push($room_Distinct,$room->id);
+                foreach ($room->users as $user) {
+                    if($user->pivot->course_id==$course->id){
+                        if($user->pivot->roleIn=="Secertary"){
+                            array_push($secertaryArr,$user->pivot->user_id);
+                        }elseif($user->pivot->roleIn=="Room-Head"){
+                            array_push($roomHeadArr,$user->pivot->user_id);
+                        }else{
+                            array_push($observerArr,$user->pivot->user_id);
+                        }
+                    }
+                    }
+                $users_in_rooms[$room->id]['roomHeads']=$roomHeadArr;
+                $users_in_rooms[$room->id]['secertaries']=$secertaryArr;
+                $users_in_rooms[$room->id]['observers']=$observerArr;
+            }
+            foreach (Room::all() as $roomN) {
+                if(! in_array($roomN->id,$room_Distinct)){
+                    $users_in_rooms[$roomN->id]['roomHeads']=[];
+                    $users_in_rooms[$roomN->id]['secertaries']=[];
+                    $users_in_rooms[$roomN->id]['observers']=[];
+                }
+            }
+            //dd($users_in_rooms);
+
+
+
+        $disabled_rooms=[];
+        $date = $course->users[0]->pivot->date;
+        $time = $course->users[0]->pivot->time;
+        foreach (Course::with('users')
+        ->whereHas('users', function($query) use($date){
+        $query->where('date',$date);
+            })->get() as $courseN) {
+            if($courseN->id == $course->id)
+                continue;
+            foreach ($courseN->rooms as $room) {
+                if( (($room->pivot->time >=  gmdate('H:i',strtotime($time))) && ($room->pivot->time <= gmdate('H:i',strtotime($time)+strtotime("02:00"))))
+                || (($room->pivot->time <=  gmdate('H:i',strtotime($time))) && ($room->pivot->time >= gmdate('H:i',strtotime($time)-strtotime("02:00")))) ){
+                        array_push($disabled_rooms,$room->id);
+                }
+            }
+        }
+        $rooms_after_reject_disabled_rooms=[];
+        if($request->rooms)
+        foreach ($request->rooms as $room) {
+            if( in_array($room, array_unique($disabled_rooms)) ){
+                array_push($rooms_after_reject_disabled_rooms,$room);
+            }
+        }
+        //dd($request->rooms,array_unique($rooms_after_reject_disabled_rooms));
+
+
+
+
+
+
+
+
+
+
+
+
+
+            //remove all rows that owns the course
+            //dd($room_Distinct);
+            if($request->rooms){
                 for ($i=0; $i < $course->users->count() ; $i++) {
                     $course->users[$i]->courses()->detach($course);
                 }
+                foreach (array_unique($request->rooms) as $roomD) {
+                        if(in_array($roomD, array_unique($rooms_after_reject_disabled_rooms)))
+                            continue;
+                        $course->users()->attach($users_in_rooms[$roomD]['roomHeads'],['room_id'=>$roomD,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Room-Head']);
+                        $course->users()->attach($users_in_rooms[$roomD]['secertaries'],['room_id'=>$roomD,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Secertary']);
+                        $course->users()->attach($users_in_rooms[$roomD]['observers'],['room_id'=>$roomD,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Observer']);
+                    }
+            }else
+                return redirect()->back()->with('detemine-rooms',"the Course has'nt belong to any rooms, Please detemine rooms that the course need");
 
-                //solve conflict when there are the same users after change time
-                foreach ($course->users as $user) {
-
-                }
-
-                $course->users()->attach($request->get('roomheads'),['room_id'=>$request->room_id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Room-Head']);
-                $course->users()->attach($request->get('secertaries'),['room_id'=>$request->room_id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Secertary']);
-                $course->users()->attach($request->get('observers'),['room_id'=>$request->room_id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Observer']);
 
 
         return redirect()->route('courses.index')->with('user-update','Course update successfully');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Course  $course
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Course $course)
     {
         $course->delete();
