@@ -8,6 +8,11 @@
         </div>
 
         <div class="container mt-4">
+            @if(in_array($specific_room->id, $common_rooms)) <h5>notes These rooms are common with
+                @foreach ($all_common_courses as $course_common)
+                {{$course_common}} ,
+                @endforeach ,{{$course->course_name}} any user you choose withh assign in this room for all previous courses</h5>
+            @endif
             <form method="post" action="{{ route('courses.room_for_course', [$course->id,$specific_room->id]) }}">
                 @method('patch')
                 @csrf
@@ -23,6 +28,7 @@
                             <th scope="col" width="30%">Observers</th>
                         </thead>
                         @foreach(App\Models\User::all() as $user)
+                         @if(!in_array($specific_room->id, $common_rooms))
                             <tr>
                                 <td>
                                     <input type="checkbox"
@@ -94,7 +100,84 @@
                                 </td>
                                 <td>{{ $user->username }}</td>
                             </tr>
-                        @endforeach
+                       @else
+
+                       <?php
+                       //code 1 falsy
+                    //    $users_common=[];
+                    //    $coos=User::whereIn('íd',$users_commom_courses['roomHeads'])->where('id',$user->id)->get();
+                    //    foreach (App\Models\User::whereIn('íd',$users_commom_courses['roomHeads'])->where('id',$user->id)->get() as $user_common) {
+                    //     array_push($users_common,$user_common->id);//Why??????????
+                    //    }
+                    //code 2 truely
+                        // $users_common=[];
+                        // foreach (App\Models\User::all() as $user) {
+                        //  if(in_array($user->id, $users_commom_courses['roomHeads']) ||in_array($user->id, $users_commom_courses['secertaries'])||in_array($user->id, $users_commom_courses['observers']) )
+                        //  array_push($users_common,$user->id);//True :)
+                        // }
+                       ?>
+                            <tr>
+                                <td>
+                                    <input type="checkbox"
+                                    name="roomheads[{{ $user->id }}]"
+                                    value="{{ $user->id }}"
+                                    class='roomheads'
+                                    {{ in_array($user->id, $users_commom_courses['roomHeads'])
+                                    ? 'checked'
+                                    : '' }}
+                                    {{ !in_array($user->id, $users_commom_courses['roomHeads'])&&(in_array($user->id, $disabled_observerArr) || in_array($user->id, $disabled_roomHeadArr) || in_array($user->id, $disabled_secertaryArr))
+                                        ? 'disabled'
+                                        : '' }}
+                                    @foreach ( App\Models\Room::all() as  $room_D )
+                                        {{($room_D->id != $specific_room->id &&
+                                        (in_array($user->id, $users_in_rooms[$room_D->id]['roomHeads'])
+                                        || in_array($user->id, $users_in_rooms[$room_D->id]['secertaries'])
+                                        || in_array($user->id, $users_in_rooms[$room_D->id]['observers']))) ? 'disabled' : ''}}
+                                    @endforeach>
+                                </td>
+                                <td>{{ $user->username }}</td>
+                                <td>
+                                    <input type="checkbox"
+                                    name="secertaries[{{ $user->id }}]"
+                                    value="{{ $user->id }}"
+                                    class='secertaries'
+                                    {{ in_array($user->id, $users_commom_courses['secertaries'])
+                                    ? 'checked'
+                                    : '' }}
+                                    {{ !in_array($user->id, $users_commom_courses['secertaries'])&&(in_array($user->id, $disabled_observerArr) || in_array($user->id, $disabled_roomHeadArr) || in_array($user->id, $disabled_secertaryArr))
+                                    ? 'disabled'
+                                    : '' }}
+                                    @foreach ( App\Models\Room::all() as  $room_D )
+                                        {{($room_D->id != $specific_room->id &&
+                                        (in_array($user->id, $users_in_rooms[$room_D->id]['roomHeads'])
+                                        || in_array($user->id, $users_in_rooms[$room_D->id]['secertaries'])
+                                        || in_array($user->id, $users_in_rooms[$room_D->id]['observers']))) ? 'disabled' : ''}}
+                                    @endforeach>
+                                </td>
+                                {{-- 'course','secertaryArr','disabled_secertaryArr','roomHeadArr','disabled_roomHeadArr','observerArr','disabled_observerArr' --}}
+                                <td>{{ $user->username }}</td>
+                                <td>
+                                    <input type="checkbox"
+                                    name="observers[{{ $user->id }}]"
+                                    value="{{ $user->id }}"
+                                    class='observers'
+                                    {{ in_array($user->id, $users_commom_courses['observers'])
+                                    ? 'checked'
+                                    : '' }}
+                                    {{ !in_array($user->id, $users_commom_courses['observers'])&&(in_array($user->id, $disabled_observerArr) || in_array($user->id, $disabled_roomHeadArr) || in_array($user->id, $disabled_secertaryArr))
+                                        ? 'disabled'
+                                        : '' }}
+                                    @foreach (App\Models\Room::all() as  $room_D )
+                                        {{($room_D->id != $specific_room->id &&
+                                        (in_array($user->id, $users_in_rooms[$room_D->id]['roomHeads'])
+                                        || in_array($user->id, $users_in_rooms[$room_D->id]['secertaries'])
+                                        || in_array($user->id, $users_in_rooms[$room_D->id]['observers']))) ? 'disabled' : ''}}
+                                    @endforeach>
+                                </td>
+                                <td>{{ $user->username }}</td>
+                            </tr>
+                       @endif
+                       @endforeach
                     </table>
                 </div>
                 <div class="mb-3">

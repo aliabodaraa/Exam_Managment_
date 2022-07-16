@@ -125,7 +125,7 @@
 
     @include('layouts.partials.navbar')
 
-    <main class="container mt-5">
+    <main class="container-fluid px-5 mt-5">
         @yield('content')
     </main>
 

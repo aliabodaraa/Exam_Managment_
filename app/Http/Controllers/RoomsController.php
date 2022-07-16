@@ -1,10 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Room;
+use App\Models\room;
 use Illuminate\Http\Request;
 
-class RoomsController extends Controller
+class roomsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -13,7 +13,7 @@ class RoomsController extends Controller
      */
     public function index()
     {
-        $rooms = Room::all();
+        $rooms = room::all();
         return view('rooms.index', compact('rooms'));
     }
     /**
@@ -23,7 +23,7 @@ class RoomsController extends Controller
      */
     public function create()
     {
-        return view('Rooms.create');
+        return view('rooms.create');
     }
 
     /**
@@ -35,86 +35,68 @@ class RoomsController extends Controller
     public function store(Request $request)
     {
         $this->validate($request,[
-            'room_name' => 'required|min:1|max:5|unique:rooms,room_name',
+            'room_name' => 'required|min:1|max:10|unique:rooms,room_name',
             'capacity' => 'required|min:1|max:1000',
         ],[
             'room_name.unique'=>'the name of room already exist'
         ]);
-        Room::create(
+        room::create(
             [
                 'room_name'=> $request->room_name,
                 'capacity'=> $request->capacity,
             ]
         );
         return redirect()->route('rooms.index')
-            ->withSuccess(__('Room created successfully.'));
+            ->withSuccess(__('room created successfully.'));
     }
-//     function create(Request $request){
-//         $rules=[
-//            "name"=>"required|min:4",
-//            "email"=>"required|email|unique:users,email",
-//            "password"=>"required|min:5|max:30",
-//            "confirmPassword"=>"required|same:password|min:5|max:30",
-//        ];
-//        $this->validate($request,$rules);
-//        //dd($validate);
-//                $create=User::create([
-//               'name'=> $request->name,
-//               'email'=> $request->email,
-//               'password' => Hash::make($request['password']),
-//               'confirmPassword' => Hash::make($request->get('password'))
-//            ]);
-//           //  dd($create);
-//                if($create)
-//                    return redirect()->route('user.home')->with("success","User succussfully Creates.");
-//                else
-//                    return redirect()->back()->with("fail","Try to Create this User Again.");
 
-//   }
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Room  $Room
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Room $Room)
+    public function show(Room $room)
     {
-        return view('Rooms.show',compact('Room'));
+        return view('rooms.show',compact('room'));
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Room  $Room
+     * @param  \App\Models\room  $room
      * @return \Illuminate\Http\Response
      */
-    public function edit(Room $Room)
+    public function edit(Room $room)
     {
-        return view('Rooms.edit', ['Room' => $Room]);
+        return view('rooms.edit', ['room' => $room]);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Room  $Room
+     * @param  \App\Models\room  $room
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Room $Room)
+    public function update(Request $request, Room $room)
     {
+        $this->validate($request,[
+            'room_name' => 'required|min:1|max:10|exists:rooms,room_name',
+            'capacity' => 'required|min:1|max:1000',
+        ],[
+            'room_name.exists'=>'the name of room does not exist'
+        ]);
+        $room->update($request->all());
+        return redirect()->route('rooms.index')
+            ->withSuccess(__('room updated successfully.'));
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Room  $Room
+     * @param  \App\Models\room  $room
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Room $Room)
+    public function destroy(Room $room)
     {
-        $Room->delete();
+        $room->delete();
 
-        return redirect()->route('Rooms.index')
-            ->with('user-delete','Room deleted successfully.');
+        return redirect()->back()
+            ->with('room-delete','room deleted successfully.');
     }
 }

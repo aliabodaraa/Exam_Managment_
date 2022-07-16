@@ -55,13 +55,15 @@
                         <span class="text-danger text-left">{{ $errors->first('semester') }}</span>
                     @endif
                 </div>
-                <div class="mb-3">
-                    <label for="rooms" class="form-label">rooms :</label>
+                <label for="rooms" class="form-label">rooms :</label>
+                <div class="mb-3" style="height: 300px;
+                overflow: scroll;">
                     <table class="table">
                         <thead>
                             <th scope="col" width="1%"><input type="checkbox" name="all_rooms"></th>
                             <th scope="col" width="2%">Rooms</th>
-                            <th scope="col" width="44%">Action</th>
+                            @if($courses_common_rooms)<th scope="col" width="20%">common with</th>@endif
+                            <th scope="col" width="30%">Action</th>
                         </thead>
                         @foreach(App\Models\Room::all() as $room)
                             <tr>
@@ -73,14 +75,28 @@
                                     {{ in_array($room->id, array_unique($roomsArr))
                                            ? 'checked'
                                            : '' }}
-                                    {{ in_array($room->id, array_unique($disabled_roomsArr))
+                                    {{ (in_array($room->id, array_unique($disabled_rooms)) && !in_array($room->id, array_unique($common_rooms)))
                                            ? 'disabled'
                                            : '' }}>
                                 </td>
                                 <td>{{ $room->room_name }}</td>
+                                @if($courses_common_rooms)
+                                <td>
+                                    <div class="common-courses">
+                                        @if(( in_array($room->id, array_unique($common_rooms))))
+                                        @foreach ($courses_common_rooms as $course_common)
+                                        <span>
+                                            <span class="badge bg-secondary">{{$course_common}}</span>
+                                        </span>
+                                        @endforeach
+                                        @endif
+                                    </div>
+                                </td>
+                                @endif
                                 <td>
                                     <a href="{{ route('courses.room_for_course', ['course'=>$course->id,'specific_room'=>$room->id]) }}" class="btn1 btn btn-danger btn-sm"
-                                    style="{{ in_array($room->id, $disabled_roomsArr) ? 'pointer-events: none;background-color:#999' : '' }} ;display:none;">specify members</a>
+                                    style="{{ (!in_array($room->id, array_unique($common_rooms)) && in_array($room->id, $disabled_rooms)) ? 'pointer-events: none;background-color:#999' : '' }} ;display:none;">{{(( !in_array($room->id, array_unique($common_rooms))))?'specify members':'Manage members in common room'}}
+                                </a>
                                 </td>
                             </tr>
                         @endforeach
@@ -142,10 +158,12 @@
                     if($(this).is(':checked')){
                         $.each($(this), function() {
                             $(this).parent().siblings().last().children(":last-child").css({'display': 'initial'});
+                            $(this).parent().siblings().next().children(".common-courses").css({'display': 'initial'});
                             });
                     } else {
                         $.each($(this), function() {
                             $(this).parent().siblings().last().children(":last-child").css({'display': 'none'});
+                            $(this).parent().siblings().next().children(".common-courses").css({'display': 'none'});
                         });
                     }
             });

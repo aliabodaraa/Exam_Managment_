@@ -18,6 +18,7 @@ class CreateCoursesTable extends Migration
             $table->string('course_name');
             $table->string('semester');
             $table->integer('studing_year');
+            $table->string('duration',5)->default("1:30");
             $table->timestamps();
         });
     }

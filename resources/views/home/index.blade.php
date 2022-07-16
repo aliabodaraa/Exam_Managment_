@@ -16,8 +16,8 @@
                 <a href="{{route('courses.create')}}" class="btn btn-warning">new course</a>
                 all your courses that you will atend them
                 <div class="row">
-                    "@foreach (Auth::user()->courses as $item)
-                {{$item}}
+                    "@foreach (Auth::user()->courses as $course)
+                {{$course->course_name}}<br>
                     @endforeach"
                 </div>
         @endauth
