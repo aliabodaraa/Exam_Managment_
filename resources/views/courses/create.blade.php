@@ -70,6 +70,33 @@
                         <span class="text-danger text-left">{{ $errors->first('time') }}</span>
                     @endif
                 </div>
+
+                <div class="mb-3">
+                    <label for="students_number" class="form-label">students_number</label>
+                    <input value="{{ old('students_number') }}"
+                        type="number"
+                        class="form-control"
+                        name="students_number"
+                        placeholder="students_number" required>
+                    @if ($errors->has('students_number'))
+                        <span class="text-danger text-left">{{ $errors->first('students_number') }}</span>
+                    @endif
+                </div>
+                <div class="mb-3">
+                    <label for="duration" class="form-label">duration</label>
+                    <select class="form-control" name="duration" class="form-control" required>
+                        <option value='01:00'>1 hours</option>
+                        <option value='01:30'>1:30 hours</option>
+                        <option value='02:00'>2 hours</option>
+                        <option value='02:30'>2:30 hours</option>
+                        <option value='03:00'>3 hours</option>
+                        <option value='03:30'>3:30 hours</option>
+                        <option value='04:00'>4 hours</option>
+                    </select>
+                    @if ($errors->has('duration'))
+                        <span class="text-danger text-left">{{ $errors->first('duration') }}</span>
+                    @endif
+                </div>
                 <button type="submit" class="btn btn-primary">Save course</button>
                 {{-- <a href="{{ route('courses.index') }}" class="btn btn-default">Back</a> --}}
             </form>

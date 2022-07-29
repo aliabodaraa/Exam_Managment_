@@ -13,6 +13,11 @@
                 <strong>{{ $message_update_course_room }}</strong>
             </div>
             @endif
+            {{-- @if ($ss = Session::get('disabled_rooms'))
+            <div class="alert alert-success alert-block">
+                <strong> @dd($ss) </strong>
+            </div>
+            @endif --}}
             @if ($message_detemine_rooms = Session::get('detemine-rooms'))
             <div class="alert alert-success alert-block">
                 <strong>{{ $message_detemine_rooms }}</strong>
@@ -61,12 +66,13 @@
                     <table class="table">
                         <thead>
                             <th scope="col" width="1%"><input type="checkbox" name="all_rooms"></th>
-                            <th scope="col" width="2%">Rooms</th>
+                            <th scope="col" width="9%">Rooms</th>
                             @if($courses_common_rooms)<th scope="col" width="20%">common with</th>@endif
+                            <th scope="col" width="40%">Occupied/Capacity</th>
                             <th scope="col" width="30%">Action</th>
                         </thead>
                         @foreach(App\Models\Room::all() as $room)
-                            <tr>
+                            <tr style="position: relative;top:-2px;">
                                 <td>
                                     <input type="checkbox"
                                     name="rooms[{{ $room->id }}]"
@@ -81,22 +87,35 @@
                                 </td>
                                 <td>{{ $room->room_name }}</td>
                                 @if($courses_common_rooms)
-                                <td>
-                                    <div class="common-courses">
-                                        @if(( in_array($room->id, array_unique($common_rooms))))
-                                        @foreach ($courses_common_rooms as $course_common)
-                                        <span>
-                                            <span class="badge bg-secondary">{{$course_common}}</span>
-                                        </span>
-                                        @endforeach
-                                        @endif
-                                    </div>
-                                </td>
+                                    <td>
+                                        <div class="common-courses">
+                                            @php $courses_common_with_this_room=App\Models\Course::with('rooms')->whereHas('rooms', function($query) use($course,$room){$query->where('date',$course->rooms[0]->pivot->date)->where('time',$course->rooms[0]->pivot->time)->where('room_id',$room->id)->where('course_id','!=',$course->id);})->get(); @endphp
+                                            @if(( in_array($room->id, array_unique($common_rooms))))
+                                                @foreach ($courses_common_with_this_room as $course_common)
+                                                    <span>
+                                                        <span class="badge bg-secondary">{{$course_common->course_name}}</span>
+                                                    </span>
+                                                @endforeach
+                                            @else
+                                                @foreach ($courses_common_with_this_room as $course_will)
+                                                <span class="badge bg-secondary">{{$course_will->course_name}}</span>
+                                                @endforeach
+                                            @endif
+                                        </div>
+                                    </td>
                                 @endif
                                 <td>
-                                    <a href="{{ route('courses.room_for_course', ['course'=>$course->id,'specific_room'=>$room->id]) }}" class="btn1 btn btn-danger btn-sm"
-                                    style="{{ (!in_array($room->id, array_unique($common_rooms)) && in_array($room->id, $disabled_rooms)) ? 'pointer-events: none;background-color:#999' : '' }} ;display:none;">{{(( !in_array($room->id, array_unique($common_rooms))))?'specify members':'Manage members in common room'}}
-                                </a>
+                                    {{$room->capacity}}
+                                </td>
+                                <td>
+                                    @if(in_array($room->id, array_unique($joining_rooms)))
+                                        <a href="{{ route('courses.room_for_course', ['course'=>$course->id,'specific_room'=>$room->id]) }}" class="btn btn-warning">
+                                                Joining
+                                        </a>
+                                    @endif
+                                    <a href="{{ route('courses.room_for_course', ['course'=>$course->id,'specific_room'=>$room->id]) }}" class="btn @php echo (in_array($room->id,array_unique($accual_common_rooms)))? 'btn-success':'btn-danger'; @endphp"
+                                    style="{{ (!in_array($room->id, array_unique($common_rooms)) && in_array($room->id, $disabled_rooms)) ? 'pointer-events: none;background-color:#999' : '' }} ;display:none;">{{(in_array($room->id,array_unique($accual_common_rooms))) ?'Manage':'specify members'}}
+                                    </a>
                                 </td>
                             </tr>
                         @endforeach
@@ -122,6 +141,32 @@
                         placeholder="time" required>
                     @if ($errors->has('time'))
                         <span class="text-danger text-left">{{ $errors->first('time') }}</span>
+                    @endif
+                </div>
+                <div class="mb-3">
+                    <label for="students_number" class="form-label">students_number</label>
+                    <input value="{{ $course->students_number }}"
+                        type="number"
+                        class="form-control"
+                        name="students_number"
+                        placeholder="students_number" required>
+                    @if ($errors->has('students_number'))
+                        <span class="text-danger text-left">{{ $errors->first('students_number') }}</span>
+                    @endif
+                </div>
+                <div class="mb-3">
+                    <label for="duration" class="form-label">duration</label>
+                    <select class="form-control" name="duration" class="form-control" required>
+                        <option value="01:00" {{ ($course->duration == "01:00") ? "selected": "" }}>01:00 hours</option>
+                        <option value="01:30" {{ ($course->duration == "01:30") ? "selected": "" }}>01:30 hours</option>
+                        <option value="02:00" {{ ($course->duration == "02:00") ? "selected": "" }}>2 hours</option>
+                        <option value="02:30" {{ ($course->duration == "02:30") ? "selected": ""}}>02:30 hours</option>
+                        <option value="03:00" {{ ($course->duration == "03:00") ? "selected": "" }}>03:00 hours</option>
+                        <option value="03:30" {{ ($course->duration == "03:30") ? "selected": "" }}>03:30 hours</option>
+                        <option value="04:00" {{ ($course->duration == "04:00") ? "selected": "" }}>04:00 hours</option>
+                    </select>
+                    @if ($errors->has('duration'))
+                        <span class="text-danger text-left">{{ $errors->first('duration') }}</span>
                     @endif
                 </div>
                 <button type="submit" class="btn btn-primary">Update Course</button>
