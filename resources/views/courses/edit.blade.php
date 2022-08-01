@@ -2,7 +2,9 @@
 
 @section('content')
     <div class="bg-light p-4 rounded">
-        <h1>Update Course</h1>
+        <h5 style="float: right;"><span class="{{($all_category_rooms['final_remining_student_in_course_not_taken']) ? 'badge bg-warning':'badge bg-danger'}}">remaining students:{{$all_category_rooms['final_remining_student_in_course_not_taken']}}</span></h5>
+        <h5 style="float: right;"><span class="badge bg-success">students number:{{$course->students_number}}</span></h5>
+        <h1>Update Course <span class="badge bg-danger">{{(!$all_category_rooms['final_remining_student_in_course_not_taken'])?'Full':''}}</span></h1>
         <div class="lead">
 
         </div>
@@ -67,8 +69,9 @@
                         <thead>
                             <th scope="col" width="1%"><input type="checkbox" name="all_rooms"></th>
                             <th scope="col" width="9%">Rooms</th>
-                            @if($courses_common_rooms)<th scope="col" width="20%">common with</th>@endif
-                            <th scope="col" width="40%">Occupied/Capacity</th>
+                            @if($accual_common_rooms)<th scope="col" width="20%">common with</th>@endif
+                            <th scope="col" width="10%">Capacity/Occupied</th>
+                            <th scope="col" width="10%">status</th>
                             <th scope="col" width="30%">Action</th>
                         </thead>
                         @foreach(App\Models\Room::all() as $room)
@@ -81,12 +84,12 @@
                                     {{ in_array($room->id, array_unique($roomsArr))
                                            ? 'checked'
                                            : '' }}
-                                    {{ (in_array($room->id, array_unique($disabled_rooms)) && !in_array($room->id, array_unique($common_rooms)))
+                                    {{ (in_array($room->id, array_unique($disabled_rooms)) && !in_array($room->id, array_unique($common_rooms))) || (! in_array($room->id,$all_category_rooms['single_rooms_in_this_course']) && ! $all_category_rooms['final_remining_student_in_course_not_taken'])
                                            ? 'disabled'
                                            : '' }}>
                                 </td>
                                 <td>{{ $room->room_name }}</td>
-                                @if($courses_common_rooms)
+                                @if($accual_common_rooms)
                                     <td>
                                         <div class="common-courses">
                                             @php $courses_common_with_this_room=App\Models\Course::with('rooms')->whereHas('rooms', function($query) use($course,$room){$query->where('date',$course->rooms[0]->pivot->date)->where('time',$course->rooms[0]->pivot->time)->where('room_id',$room->id)->where('course_id','!=',$course->id);})->get(); @endphp
@@ -105,11 +108,32 @@
                                     </td>
                                 @endif
                                 <td>
-                                    {{$room->capacity}}
+                                    {{(in_array($room->id,$all_category_rooms['single_rooms_in_this_course']) ? $room->capacity : '')}}
+                                    @foreach ($all_category_rooms['info'] as $info)
+                                        @foreach ($info as $sub_info)
+                                        @if($sub_info['number_room']==$room->id)
+                                            /{{$sub_info['room_take']}}
+                                            @endif
+                                        @endforeach
+                                    @endforeach
+                                </td>
+                                <td>
+                                    {{-- status --}}
+                                @foreach ($all_category_rooms['info'] as $info)
+                                    @foreach ($info as $sub_info)
+                                    @if($sub_info['number_room']==$room->id)
+                                        @if($sub_info['capacity']-$sub_info['room_take'] == 0)
+                                            <span class="badge bg-success">Full</span>
+                                        @else
+                                            <span class="badge bg-warning">{{$sub_info['capacity']-$sub_info['room_take']}} Free</span>
+                                        @endif
+                                    @endif
+                                    @endforeach
+                                @endforeach
                                 </td>
                                 <td>
                                     @if(in_array($room->id, array_unique($joining_rooms)))
-                                        <a href="{{ route('courses.room_for_course', ['course'=>$course->id,'specific_room'=>$room->id]) }}" class="btn btn-warning">
+                                        <a href="{{ route('courses.room_for_course', ['course'=>$course->id,'specific_room'=>$room->id]) }}" class="btn btn-warning" style="{{($all_category_rooms['final_remining_student_in_course_not_taken']) ? '':'pointer-events: none;background-color: #ffc10773;border-color: #ffc10773;'}}">
                                                 Joining
                                         </a>
                                     @endif
