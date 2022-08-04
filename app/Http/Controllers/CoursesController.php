@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Ramsey\Uuid\Type\Integer;
 
 class CoursesController extends Controller
 {
@@ -622,7 +623,6 @@ if($specific_room->id == $specific_room->id && in_array($specific_room->id,$comm
             }
                 //calculate disabled_rooms
                 $disabled_rooms=[];
-                $common_rooms=[];
                 $courses_common_rooms=[];
                 $joining_rooms=[];
                 if(count($course->users->toArray())){
@@ -635,7 +635,7 @@ if($specific_room->id == $specific_room->id && in_array($specific_room->id,$comm
                         if($courseN->id == $course->id)
                             continue;
                         foreach ($courseN->rooms as $room) {
-                            if( (($time < $room->pivot->time) && (gmdate('H:i:s',strtotime($time)+strtotime($course->duration))>$room->pivot->time ))
+                            if( (($time < $room->pivot->time) && (gmdate('H:i:s',strtotime($time)+strtotime($course->duration)) > $room->pivot->time ))
                             || (($time >  $room->pivot->time) && (gmdate('H:i:s',strtotime($room->pivot->time)+strtotime($courseN->duration)) > $time)) ){
                                     array_push($disabled_rooms,$room->id);
                                 }elseif(($time == $room->pivot->time) && ! in_array($room->id,$roomsArr)){
@@ -644,11 +644,6 @@ if($specific_room->id == $specific_room->id && in_array($specific_room->id,$comm
                             }
                         }
                     }
-                    //calc common_room
-                    foreach ($course->rooms as $room)
-                        if(in_Array($room->id,$disabled_rooms) && in_Array($room->id,$roomsArr))
-                            array_push($common_rooms,$room->id);
-
                     //calc courses that causes common room
                     foreach (Course::with('users')->whereHas('users', function($query) use($date){$query->where('date',$date);})->get() as $courseN) {
                         if($courseN->id == $course->id) continue;
@@ -661,100 +656,143 @@ if($specific_room->id == $specific_room->id && in_array($specific_room->id,$comm
                     }
                     $courses_common_rooms=array_unique($courses_common_rooms);
 
-                //calc common_room
+                //calc accual_common_rooms
                 $accual_common_rooms=[];
                 $courses_common_with_this_room=Course::with('rooms')->whereHas('rooms', function($query) use($course){$query->where('date',$course->rooms[0]->pivot->date)->where('time',$course->rooms[0]->pivot->time)->where('course_id','!=',$course->id);})->get();
                     foreach ($courses_common_with_this_room as $course_common){
                         foreach ($course_common->rooms as $roomY) {
                             if(!in_array($roomY->id,$disabled_rooms))
-                            array_push($accual_common_rooms,$roomY->id);
+                                array_push($accual_common_rooms,$roomY->id);
                         }
                     }
                 //calc rooms_single_in_course
-                $all_category_rooms=[];
                 $rooms_single_in_course=[];
                 $courses_common_with_this_room=Course::with('rooms')->whereHas('rooms', function($query) use($course){$query->where('date',$course->rooms[0]->pivot->date)->where('time',$course->rooms[0]->pivot->time)->where('course_id',$course->id);})->get();
                 foreach ($courses_common_with_this_room as $single_course_common){
                     foreach ($single_course_common->rooms as $roomY) {
                         if(!in_array($roomY->id,$disabled_rooms) && !in_array($roomY->id,$accual_common_rooms))
-                        array_push($rooms_single_in_course,$roomY->id);
+                            array_push($rooms_single_in_course,$roomY->id);
                     }
                 }
-                //$remining_now=0;
-                $minimise_num_student = $course->students_number;
+                                //calc num students taken
+                                $sum_student=0;
+
+                $all_category_rooms = [];
                 $all_category_rooms['single_rooms_in_this_course'] = $rooms_single_in_course;
+                $remining_now=0;
+                $minimise_num_student = $course->students_number;
+                //Single_rooms_info
                 foreach ($all_category_rooms['single_rooms_in_this_course'] as $single) {
-                    //  $remining_now=0;
-                    //  $room_status='';
-                    //  $room_take=0;
                     $sub_category_rooms = [];
                     $room = Room::where('id',$single)->first();
-                    //dd($room);
-                    if($minimise_num_student > $room->capacity){
-                        $room_take = $room->capacity;
-                        $remining_now = $minimise_num_student - $room->capacity;
+                    if($minimise_num_student >= $room->capacity){
+                        $room_take = $room->capacity/2;
+                        $remining_now = ($minimise_num_student - ($room->capacity/2));
                         $room_status = 'full';
                     }else{
-                        $room_take=$minimise_num_student;
-                        $remining_now= 0;
-                        $room_status='un-full';
+                        if($room->capacity/2 >= $minimise_num_student){
+                            $room_take = ($minimise_num_student);
+                            $remining_now = 0;
+                        }else{
+                            $room_take = ($room->capacity/2);
+                            $remining_now = $minimise_num_student-$room->capacity/2;
                         }
-                    $sub_category_rooms['info']['number_room']=$single;
-                    $sub_category_rooms['info']['room_take']=$room_take;
-                    $sub_category_rooms['info']['room_status']=$room_status;
-                    $sub_category_rooms['info']['num_student_in_course']=$course->students_number;
-                    $sub_category_rooms['info']['capacity']=$room->capacity;
-                    $all_category_rooms['info'][$single]=$sub_category_rooms;
+                        $room_status = 'un-full';
+                    }
+                    $sum_student+=$room_take;
+                    $sub_category_rooms['info']['number_room'] = $single;
+                    $sub_category_rooms['info']['room_take'] = $room_take;
+                    $sub_category_rooms['info']['room_status'] = $room_status;
+                    $sub_category_rooms['info']['num_student_in_course'] = $course->students_number;
+                    $sub_category_rooms['info']['capacity'] = $room->capacity;
+                    $all_category_rooms['info'][$single] = $sub_category_rooms;
+
                     $minimise_num_student-=$room_take;
-                //$minimise_num_student=$remining_now-$room_take;
                 }
-                $all_category_rooms['final_remining_student_in_course_not_taken']=$remining_now;
-                //$all_category_rooms['num_students']=$student_number;
-                $all_category_rooms['common_rooms_with_others']=$accual_common_rooms;
-            }
-            //disabled roomsafter end student Number
+                $all_category_rooms['final_remining_student_in_course_not_taken'] = $remining_now;
+                foreach (array_unique($accual_common_rooms) as $accual) {
+                    foreach ($course->rooms as $room) {
+                        if($room->id == $accual){
+                            $sum_student+=$room->capacity/2;
+                        }
+                    }
+                }
+                $all_category_rooms['sum_student']= ceil($sum_student);
+                //Joining_rooms_info
+                $all_category_rooms['Joining_rooms_in_this_course'] = $joining_rooms;
+                $courses_have_source_Joining=Course::with('rooms')->whereHas('rooms', function($query) use($course,$joining_rooms){$query->where('date',$course->rooms[0]->pivot->date)->where('time',$course->rooms[0]->pivot->time)->whereIn('room_id',$joining_rooms);})->get();
+                foreach ($courses_have_source_Joining as $course_source){
+                        $remining_now1=0;
+                        $minimise_num_student = $course_source->students_number;
+                        $rooms_single_in_current_course=[];
+                        foreach ($course_source->rooms as $joining_room) {
+                            if(in_array($joining_room->id,$joining_rooms)){
+                                $sub_category_rooms = [];
+                                $room = Room::where('id',$joining_room->id)->first();
+                                if($minimise_num_student >= $room->capacity){
+                                    $room_take = $room->capacity/2;
+                                    $remining_now = ($minimise_num_student - ($room->capacity/2));
+                                    $room_status = 'full';
+                                }else{
+                                    if($room->capacity/2 >= $minimise_num_student){
+                                        $room_take = ($minimise_num_student);
+                                        $remining_now = 0;
+                                    }else{
+                                        $room_take = ($room->capacity/2);
+                                        $remining_now = $minimise_num_student-$room->capacity/2;
+                                    }
+                                    $room_status = 'un-full';
+                                }
+                                $sub_category_rooms['info-joining']['number_room']=$joining_room->id;
+                                $sub_category_rooms['info-joining']['room_take']=$room_take;
+                                $sub_category_rooms['info-joining']['room_status']=$room_status;
+                                $sub_category_rooms['info-joining']['num_student_in_course']=$course_source->students_number;
+                                $sub_category_rooms['info-joining']['capacity']=$room->capacity;
+                                $all_category_rooms['info-joining'][$joining_room->id][$course_source->course_name]=$sub_category_rooms;
+                                $minimise_num_student-=$room_take;
+                            }
+                        }
+                }
+                //dd($all_category_rooms);
+
+                //$sum_student+=$all_category_rooms['final_remining_student_in_course_not_taken'];
+                //dd($sum_student);
+            //disabled rooms after end student Number
             $rooms_disabled_after_room_end_available=[];
             if($all_category_rooms['final_remining_student_in_course_not_taken'])
-                //$all_category_rooms['final_remining_student_in_course_not_taken'] = 0;
                 foreach (Room::all() as $roomN)
                     if(! in_array($roomN->id,$roomsArr))
                         array_push($rooms_disabled_after_room_end_available,$roomN->id);
 
-
-
-            //dd($all_category_rooms,$rooms_disabled_after_room_end_available);
-            //dd($all_category_rooms,$rooms_single_in_course,$disabled_rooms,$accual_common_rooms,$joining_rooms,$common_rooms);
-        return view('courses.edit', compact('course','roomsArr','disabled_rooms','common_rooms','courses_common_rooms','joining_rooms','accual_common_rooms','all_category_rooms','rooms_disabled_after_room_end_available'));
+            //check if there is common rom between roomsArr and disabled_rooms
+            $is_there=0;
+            foreach ($disabled_rooms as $disabled_common) {
+                if(in_array($disabled_common,$roomsArr)){
+                        $is_there=1;
+                        break;
+                    }
+            }
+            //clear each common room common with $disabled_rooms
+            $disabled_common_rooms_send=[];
+             if($is_there){
+                $disabled_rooms_accual=[];
+                $mssg_unchecked_spesific_room='';
+                 foreach ($disabled_rooms as $co_dis_room) {
+                     if(!in_array($co_dis_room,$roomsArr))
+                         array_push($disabled_rooms_accual,$co_dis_room);
+                    else
+                    array_push($disabled_common_rooms_send,$co_dis_room);
+                 }
+                 $disabled_rooms=$disabled_rooms_accual;
+             }
+             }
+           //dd($all_category_rooms,$roomsArr,$disabled_rooms,$joining_rooms,$accual_common_rooms,$rooms_single_in_course);
+        return view('courses.edit', compact('course','roomsArr','disabled_rooms','courses_common_rooms','joining_rooms',
+                                            'accual_common_rooms','all_category_rooms','rooms_disabled_after_room_end_available','disabled_common_rooms_send'));
     }
 
     public function update(Request $request, Course $course)
-    {//update the following attributes : course_name, studing_year, semester, rooms[], date, time
-            //   $course->users[0]->courses()->detach($course); //for selest form
-            //   $course->users[1]->courses()->detach($course);
-            //   $course->users[2]->courses()->detach($course);
-            //   $course->users[0]->courses()->attach($course,['room_id'=>$request->room_id,'user_id'=>$request->observer_id ,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Observer']);
-            //   $course->users[1]->courses()->attach($course,['room_id'=>$request->room_id,'user_id'=>$request->secertary_id ,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Secertary']);
-            //   $course->users[2]->courses()->attach($course,['room_id'=>$request->room_id,'user_id'=>$request->roomHead_id ,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Room-Head']);
-            //   $course->update($request->all());
-            //dd(array_keys($request->get('observers')));
-
-
-            // foreach ($course->users as $user) {
-            //     $course->users()->updateExistingPivot($user,['date'=>$request->date,'time'=>$request->time]);
-            // }
-
-            //when disabled a checkbox for specific room
-            // $users_in_room=[];
-            // if(!$request->rooms)
-            //     foreach ($course->rooms as $room) {
-            //         if(!in_array($room->id,$request->rooms)){
-            //             foreach ($room->users as $user) {
-            //                 if($user->pivot->course_id==$course->id)
-            //                 array_push($users_in_room,$user->id);
-            //                 }
-            //             $room->users()->detach($users_in_room,['date'=>$request->date,'time'=>$request->time]);
-            //         }
-            //     }
+    {
             $course->update($request->only('course_name','studing_year','semester','duration','students_number'));
             //when enabled a checkbox for specific room
             $roomHeadArr=[];
@@ -837,7 +875,7 @@ if($specific_room->id == $specific_room->id && in_array($specific_room->id,$comm
                     }
                     $courses_common_rooms=array_unique($courses_common_rooms);
                 }
-//dd($courses_common_rooms,$common_rooms);
+        //dd($courses_common_rooms,$common_rooms);
 
 
              if($request->rooms){

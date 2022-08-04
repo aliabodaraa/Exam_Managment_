@@ -34,7 +34,7 @@
                         </thead>
                         @foreach(App\Models\User::all() as $user)
                         @if(in_array($specific_room->id,$disabled_rooms))
-
+<h1>d1</h1>
                         <tr>
                             <td>
                                 <input type="checkbox"
@@ -99,6 +99,7 @@
                             <td>{{ $user->username }}</td>
                         </tr>
                          @elseif(!in_array($specific_room->id, $common_rooms) && !in_array($specific_room->id,$disabled_rooms))
+                         <h1>d2</h1>
                             <tr>
                                 <td>
                                     <input type="checkbox"
@@ -162,7 +163,7 @@
                                 <td>{{ $user->username }}</td>
                             </tr>
                        @elseif(!in_array($specific_room->id, $common_rooms))
-
+                       <h1>d3</h1>
                        <?php
                        //code 1 falsy
                     //    $users_common=[];

@@ -12,7 +12,7 @@
                     <strong>{{ $message }}</strong>
                 </div>
             @endif
-            <form method="POST" action="{{route('courses.store')}}">
+            <form method="POST" action="{{route('courses.store')}}" id="coursesForm">
                 @csrf
                 <div class="mb-3">
                     <label for="course_name" class="form-label">course_name</label>
@@ -103,4 +103,43 @@
         </div>
 
     </div>
+
+@endsection
+@section('scripts')
+<script type="text/javascript">
+    let request = new XMLHttpRequest();
+    console.log(request.readyState);
+    request.onreadystatechange=()=>{
+        if(request.readyState==4)
+            if(request.status==200)
+                console.log(request.responseText);
+            else if(request.status==404)
+                console.log("Not Found");
+    }
+    $('#saveBtn').click(function (e) {
+        e.preventDefault();
+        $(this).html('Save');
+
+        $.ajax({
+          data: $('#coursesForm').serialize(),
+          url: "{{ route('courses.store') }}",
+          type: "POST",
+          dataType: 'json',
+          success: function (data) {
+
+              $('#bookForm').trigger("reset");
+              $('#ajaxModel').modal('hide');
+              table.draw();
+
+          },
+          error: function (data) {
+              console.log('Error:', data);
+              $('#saveBtn').html('Save Changes');
+          }
+      });
+    });
+request.open("GET","/resources/views/courses/edit.blade.php",true);
+request.send();
+console.log("Ali");
+ </script>
 @endsection

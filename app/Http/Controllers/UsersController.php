@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
-
+use Illuminate\Support\Facades\Response;
 class UsersController extends Controller
 {
     /**
@@ -42,6 +42,7 @@ class UsersController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
+        //dd(1123);
         $user = User::create(
             [// you also can be to write this User::create($request->validated()); but go to StoreUserRequest and make all fields required
                 'username'=> $request->username,
@@ -50,6 +51,7 @@ class UsersController extends Controller
                 'role' => $request['role']
             ]
         );
+        return Response::json($user);
         return redirect()->route('users.index')
             ->withSuccess(__('User created successfully.'));
     }
