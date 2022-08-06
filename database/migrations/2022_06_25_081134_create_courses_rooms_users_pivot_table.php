@@ -17,6 +17,7 @@ class CreateCoursesRoomsUsersPivotTable extends Migration
             $table->date('date');
             $table->time('time');
             $table->string('roleIn');
+            $table->unsignedBigInteger('num_student_in_room')->default(100);
             $table->unsignedBigInteger('course_id');
             $table->foreign('course_id')->references('id')->on('courses')->onDelete('cascade')->onUpdate('cascade');
             $table->unsignedBigInteger('room_id');

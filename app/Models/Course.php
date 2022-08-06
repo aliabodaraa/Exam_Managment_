@@ -18,10 +18,10 @@ class Course extends Model
     ];
 
     public function users(){//many to many between course & user
-        return $this->belongsToMany(User::class,'course_room_user')->withPivot('course_id','room_id','date','time','roleIn');
+        return $this->belongsToMany(User::class,'course_room_user')->withPivot('course_id','room_id','date','time','roleIn','num_student_in_room');
     }
     public function rooms(){//many to many between course & user
-        return $this->belongsToMany(Room::class,'course_room_user')->withPivot('user_id','course_id','date','time','roleIn');
+        return $this->belongsToMany(Room::class,'course_room_user')->withPivot('user_id','course_id','date','time','roleIn','num_student_in_room');
     }
 
 }

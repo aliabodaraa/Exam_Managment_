@@ -16,9 +16,9 @@ class Room extends Model
          'capacity',
     ];
     public function courses(){//many to many between course & user
-        return $this->belongsToMany('App\Models\Course','course_room_user')->withPivot('user_id','room_id','date','time','roleIn');
+        return $this->belongsToMany('App\Models\Course','course_room_user')->withPivot('user_id','room_id','date','time','roleIn','num_student_in_room');
     }
     public function users(){//many to many between course & user
-        return $this->belongsToMany('App\Models\User','course_room_user')->withPivot('course_id','room_id','date','time','roleIn');
+        return $this->belongsToMany('App\Models\User','course_room_user')->withPivot('course_id','room_id','date','time','roleIn','num_student_in_room');
     }
 }

@@ -62,10 +62,10 @@ class User extends Authenticatable
         $this->attributes['password'] = bcrypt($value);
     }
     public function courses(){//many to many between course & user
-        return $this->belongsToMany(Course::class,'course_room_user')->withPivot('user_id','room_id','date','time','roleIn');
+        return $this->belongsToMany(Course::class,'course_room_user')->withPivot('user_id','room_id','date','time','roleIn','num_student_in_room');
     }
     public function rooms(){//many to many between course & user
-        return $this->belongsToMany(Room::class,'course_room_user')->withPivot('user_id','course_id','date','time','roleIn');
+        return $this->belongsToMany(Room::class,'course_room_user')->withPivot('user_id','course_id','date','time','roleIn','num_student_in_room');
     }
     // public function posts(){//one to many between user & post
     //     return $this->hasMany(Post::class);

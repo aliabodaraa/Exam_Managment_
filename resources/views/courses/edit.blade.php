@@ -1,13 +1,10 @@
 @extends('layouts.app-master')
 
 @section('content')
+
     <div class="bg-light p-4 rounded">
-        <div class="numbers-info" style="display:inline-flex;float: right;justify-items:end;">
-            <h5 style="float: right;"><span class="badge bg-success">students number:{{$course->students_number}}</span></h5>
-            <h5 style="float: right;"><span class="{{($all_category_rooms['sum_student']) ? 'badge bg-info':'badge bg-danger'}}">free students:{{$course->students_number-ceil($all_category_rooms['sum_student'])}}</span></h5>
-            <h5 style="float: right;"><span class="badge bg-primary">full number:{{ceil($all_category_rooms['sum_student'])}}</span></h5>
-        </div>
-        <h1>Update Course <span class="badge bg-danger">{{(!$all_category_rooms['sum_student'])?'Full':''}}</span></h1>
+
+        <h1>Update Course <span class="badge bg-danger"></span></h1>
         <div class="lead">
 
         </div>
@@ -18,28 +15,28 @@
                 <strong>{{ $message_update_course_room }}</strong>
             </div>
             @endif
-            {{-- @if ($ss = Session::get('disabled_rooms'))
-            <div class="alert alert-success alert-block">
-                <strong> @dd($ss) </strong>
-            </div>
-            @endif --}}
-            @if(!$all_category_rooms['sum_student'])
+            @if ($ss = Session::get('disabled_rooms'))
+                <!-- when you submit -->
+                @foreach (array_unique($disabled_common_rooms_send) as $itemArr)
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>{{$ss}}Stop trying to submit The<mark>@php $room_name=App\Models\Room::where('id',$itemArr)->first();echo $room_name->room_name; @endphp</mark>reserves now in anothor course it will free after now for this reason either Un-checked the room Or make both courses in the same time</strong>
+                        <button type="button" class="btn-close mt-1" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endforeach
+            @elseif($disabled_common_rooms_send)
+                <!-- when you go to edit page -->
+                @foreach (array_unique($disabled_common_rooms_send) as $itemArr)
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <strong>The<mark>@php $room_name=App\Models\Room::where('id',$itemArr)->first();echo $room_name->room_name; @endphp</mark>reserves now in anothor course it will free after now for this reason either Un-checked the room Or make both courses in the same time</strong>
+                        <button type="button" class="btn-close mt-1" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endforeach
+            @endif
+            @if(true)
                 <div class="alert alert-info alert-dismissible fade show" role="alert">
                     <strong><mark>{{$course->course_name}}</mark> is Full You can release some rooms to become able to edit</strong>
                     <button type="button" class="btn-close mt-1" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-            @endif
-            @if($disabled_common_rooms_send)
-            @foreach ($disabled_common_rooms_send as $itemArr)
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    <strong>The<mark>@php $room_name=App\Models\Room::where('id',$itemArr)->first();echo $room_name->room_name; @endphp</mark>reserves now in anothor course it will free after now for this reason either Un-checked the room Or make both courses in the same time</strong>
-                    <button type="button" class="btn-close mt-1" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {{-- <div class="alert alert-info alert-dismissible fade show" role="alert">
-                    <strong><mark>{{Str::plural('post',count($disabled_common_rooms_send))}}</mark> were added in the <mark></mark> department</strong>
-                    <button type="button" class="btn-close mt-1" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div> --}}
-            @endforeach
             @endif
             @if ($message_detemine_rooms = Session::get('detemine-rooms'))
             <div class="alert alert-success alert-block">
@@ -96,6 +93,87 @@
                             <th scope="col" width="30%">Action</th>
                         </thead>
                         @foreach(App\Models\Room::orderBy('capacity','ASC')->get() as $room)
+                            {{-- info rooms --}}
+
+                                    @php
+                                    $courses_info=[];
+                                    $common=[];
+                                    $is_common=0;
+                                    $current_room_num_taken_in_all_course=0;
+                                            $count_taken_student_in_all_rooms_in_this_course=0;
+                                            $count_taken_student_in_this_room_in_this_course=0;
+                                            $count_taken_student_not_in_this_room_in_this_course=0;
+                                            $count_taken_student_in_this_room_in_all_common_courses=0;
+                                            $count_taken_student_in_this_room_for_each_common_course=0;
+                                            $courses_belongs=[];
+                                @endphp
+
+                                    @foreach (App\Models\Course::all() as $courseN)
+                                        @php
+                                            $is_common++;
+                                            $arr1=[];
+                                            $arr2=[];
+                                            $course_info=[];
+                                        @endphp
+                                        @if($courseN->id == $course->id)
+                                            @foreach ($courseN->rooms as $roomS)
+                                                @if(! in_array($roomS->id, $arr1))
+                                                    @php
+                                                        array_push($arr1,$roomS->id);
+                                                        $count_taken_student_in_all_rooms_in_this_course+=$roomS->pivot->num_student_in_room;
+                                                    @endphp
+                                                    @if ($roomS->id == $room->id)
+                                                        @php $count_taken_student_in_this_room_in_this_course+=$roomS->pivot->num_student_in_room;
+                                                        array_push($courses_belongs,$courseN->course_name);@endphp
+                                                    @else
+                                                        @php $count_taken_student_not_in_this_room_in_this_course+=$roomS->pivot->num_student_in_room; @endphp
+                                                    @endif
+                                                @endif
+                                            @endforeach
+                                        @else
+                                            @foreach ($courseN->rooms as $roomS)
+                                                @if(! in_array($roomS->id, $arr2))
+                                                    @if ($roomS->id == $room->id && $roomS->pivot->date==$course->users[0]->pivot->date && $roomS->pivot->time==$course->users[0]->pivot->time)
+                                                        @php
+                                                            array_push($arr2,$roomS->id);
+                                                            $count_taken_student_in_this_room_in_all_common_courses+=$roomS->pivot->num_student_in_room;
+                                                            $common[$courseN->course_name]['take']=$count_taken_student_in_this_room_in_all_common_courses;
+                                                            array_push($courses_belongs,$courseN->course_name);
+                                                        @endphp
+                                                    @endif
+                                                @endif
+                                            @endforeach
+                                        @endif
+                                        @php
+                                            $course_info['courses_belongs']=$courses_belongs;
+                                            $course_info['room_number']=$room->id;
+                                            $course_info['capacity']=$room->capacity;
+                                            $course_info['count_taken_student_in_all_rooms_in_this_course']=$count_taken_student_in_all_rooms_in_this_course;
+                                            $course_info['count_taken_student_in_this_room_in_this_course']=$count_taken_student_in_this_room_in_this_course;
+                                            $course_info['count_taken_student_not_in_this_room_in_this_course']=$count_taken_student_not_in_this_room_in_this_course;
+                                            $course_info['common-info']['num']=$count_taken_student_in_this_room_in_all_common_courses;
+                                            $course_info['common-info']=$common;
+                                            // $course_info['rooms']=$arr1;
+                                            $courses_info[$course->course_name]=$course_info;
+                                            $is_common= (count($course_info['courses_belongs']) > 1 ? true : false)
+                                        @endphp
+                                    @endforeach
+
+                                    {{-- fly code to top --}}
+
+                                        @once
+                                        <div class="numbers-info" style="    position: absolute;
+                                        top: 155px;
+                                        right: 74px;
+                                        display: inline-flex;">
+                                            <h5 style="float: right;"><span class="badge bg-success">students number:{{$course->students_number}}</span></h5>
+                                            <h5 style="float: right;"><span class="{{(true) ? 'badge bg-info':'badge bg-danger'}}">free students:{{$course->students_number-$courses_info[$course->course_name]['count_taken_student_in_all_rooms_in_this_course']}}</span></h5>
+                                            <h5 style="float: right;"><span class="badge bg-primary">full number:{{$courses_info[$course->course_name]['count_taken_student_in_all_rooms_in_this_course']}}</span></h5>
+                                        </div>
+                                        @endonce
+
+                                     {{-- fly code to top --}}
+                            {{-- info rooms --}}
                             <tr style="position: relative;top:-1px;">
                                 <td>
                                     <input type="checkbox"
@@ -105,7 +183,8 @@
                                     {{ in_array($room->id, array_unique($roomsArr))
                                            ? 'checked'
                                            : '' }}
-                                    {{ (in_array($room->id, array_unique($disabled_rooms)) && !in_array($room->id, array_unique($accual_common_rooms))) || ( !in_array($room->id, array_unique($accual_common_rooms))&&! in_array($room->id,$all_category_rooms['single_rooms_in_this_course']) && ! $all_category_rooms['sum_student'])
+                                    {{ (in_array($room->id, array_unique($disabled_rooms)) &&
+                                      ! in_array($room->id, array_unique($accual_common_rooms)))
                                            ? 'disabled'
                                            : '' }}>
                                 </td>
@@ -113,97 +192,29 @@
                                 @if($accual_common_rooms)
                                     <td>
                                         <div class="common-courses">
-                                            @php $courses_common_with_this_room=App\Models\Course::with('rooms')->whereHas('rooms', function($query) use($course,$room){$query->where('date',$course->rooms[0]->pivot->date)->where('time',$course->rooms[0]->pivot->time)->where('room_id',$room->id)->where('course_id','!=',$course->id);})->get(); @endphp
-                                            @if(( in_array($room->id, array_unique($accual_common_rooms))))
-                                                @foreach ($courses_common_with_this_room as $course_common)
-                                                    <span>
-                                                        <span class="badge bg-secondary">{{$course_common->course_name}}</span>
-                                                    </span>
+                                                @foreach ($courses_info[$course->course_name]['courses_belongs'] as $course_belongs)
+                                                    @if($course->course_name==$course_belongs) @php continue; @endphp @endif
+                                                        <span class="badge bg-secondary">{{$course_belongs}}</span>
                                                 @endforeach
-                                            @else
-                                                @foreach ($courses_common_with_this_room as $course_will)
-                                                <span class="badge bg-secondary">{{$course_will->course_name}}</span>
-                                                @endforeach
-                                            @endif
                                         </div>
                                     </td>
                                 @endif
                                 <td>
                                     {{-- Capacity / Occupied --}}
-                                    @if(in_array($room->id,$all_category_rooms['single_rooms_in_this_course']))
-                                        @foreach ($all_category_rooms['info'] as $info)
-                                            @foreach ($info as $sub_info)
-                                                @if($sub_info['number_room']==$room->id)
-                                                    {{$room->capacity}}/{{floor($sub_info['room_take'])}}
-                                                @endif
-                                            @endforeach
-                                        @endforeach
-                                    {{-- @elseif(in_array($room->id,$all_category_rooms['Joining_rooms_in_this_course']) && in_array($room->id, array_unique($accual_common_rooms)))
-                                        @foreach ($all_category_rooms['info-joining'][$room->id] as $key_course_name => $join_courses)
-                                            @foreach ($join_courses as $join_info_course)
-                                                @if($join_info_course['number_room']==$room->id)
-                                                    <span class="badge bg-secondary"><span class="badge bg-primary">{{$room->capacity}}/{{floor($join_info_course['room_take'])}}</span>{{$key_course_name}}</span>
-                                                @endif
-                                            @endforeach
-                                        @endforeach
-                                        <span class="badge bg-secondary"><span class="badge bg-primary">{{$room->capacity}}/{{floor($join_info_course['room_take'])}}</span>{{$course->course_name}}</span>
-                                     --}}
-                                        @elseif(in_array($room->id,$all_category_rooms['Joining_rooms_in_this_course']))
-                                        @foreach ($all_category_rooms['info-joining'][$room->id] as $key_course_name => $join_courses)
-                                            @foreach ($join_courses as $join_info_course)
-                                                    @if($join_info_course['number_room']==$room->id)
-                                                    <span class="badge bg-secondary"><span class="badge bg-primary">{{$room->capacity}}/{{floor($join_info_course['room_take'])}}</span>{{$key_course_name}}</span>
-                                                    @endif
-                                                @endforeach
-                                        @endforeach
+                                    @if(in_array($room->id, array_unique($joining_rooms)) || in_array($room->id, array_unique($joining_rooms)))
+                                    <span class="badge bg-info">{{$courses_info[$course->course_name]['count_taken_student_in_this_room_in_this_course']}}/{{$room->capacity}}</span>
                                     @endif
                                 </td>
                                 <td>
                                     {{-- status --}}
-                                @php
-                                    $num_courses_others_taken =0;
-                                    $disabled_join_button = false;
-                                @endphp
-                                @if(in_array($room->id,$all_category_rooms['single_rooms_in_this_course']))
-                                    @foreach ($all_category_rooms['info'] as $info)
-                                        @foreach ($info as $sub_info)
-                                            @if($sub_info['number_room']==$room->id)
-                                                @if($sub_info['capacity']-$sub_info['room_take'] == 0)
-                                                    <span class="badge bg-success">Full</span>
-                                                @else
-                                                    <span class="badge bg-warning">{{ceil($sub_info['capacity']-$sub_info['room_take'])}} Free</span>
-                                                @endif
-                                            @endif
-                                        @endforeach
-                                    @endforeach
-                                @elseif(in_array($room->id,$all_category_rooms['Joining_rooms_in_this_course']))
-                                    @foreach ($all_category_rooms['info-joining'][$room->id] as $key_course_name => $join_courses)
-                                        @foreach ($join_courses as $join_info_course)
-                                                @if($join_info_course['number_room']==$room->id)
-                                                    @php
-                                                        $num_courses_others_taken += floor($join_info_course['room_take'])
-                                                    @endphp
-                                                @endif
-                                            @endforeach
-                                    @endforeach
-                                    @if($room->capacity - $num_courses_others_taken > 0)
-                                        <span class="badge {{(ceil($all_category_rooms['sum_student']) > ceil($room->capacity - $num_courses_others_taken)?'bg-warning':'bg-danger')}}">{{ceil($room->capacity - $num_courses_others_taken )}} Free
-                                            @if(ceil($all_category_rooms['sum_student']) > ceil($room->capacity - $num_courses_others_taken))
-                                                 ,You can Join with {{ceil($room->capacity - $num_courses_others_taken )}}</span>
-                                            @else
-                                            ,But you can't join
-                                            @endif
-                                    @else
-                                        @php $disabled_join_button = true; @endphp
-                                        {{-- <span class="badge bg-warning">{{ceil($sub_info['capacity']-$sub_info['room_take'])}} Full</span> --}}
+                                    @if(in_array($room->id, array_unique($joining_rooms)) || in_array($room->id, array_unique($joining_rooms)))
+                                    <span class="badge bg-primary">{{$room->capacity-$courses_info[$course->course_name]['count_taken_student_in_this_room_in_this_course']}} free</span>
                                     @endif
-                                 @elseif(in_array($room->id, array_unique($accual_common_rooms))) {{-- Manage Already Joined --}}
-                                    <span class="badge bg-success">You Already Join with {{ceil(($room->capacity - $num_courses_others_taken) /2)}}</span>
-                                @endif
                                 </td>
                                 <td>
-                                    @if(in_array($room->id, array_unique($joining_rooms)))
-                                            <a href="{{ route('courses.room_for_course', ['course'=>$course->id,'specific_room'=>$room->id]) }}" class="btn btn-warning" style="{{ ceil($all_category_rooms['sum_student']) >= ceil($room->capacity-$num_courses_others_taken  || ($all_category_rooms['sum_student']) && ! $disabled_join_button ) ? '':'pointer-events: none;background-color: #ffc10773;border-color: #ffc10773;'}}">
+                                     @if(in_array($room->id, array_unique($joining_rooms)))
+                                     {{-- count_taken_student_in_all_rooms_in_this_course--}}
+                                            <a href="{{ route('courses.room_for_course', ['course'=>$course->id,'specific_room'=>$room->id]) }}" class="btn btn-warning" style="{{!($courses_info[$course->course_name]['count_taken_student_in_this_room_in_this_course']>=$room->capacity) ? '':'pointer-events: none;background-color: #ffc10773;border-color: #ffc10773;'}}">
                                                     Joining
                                             </a>
                                     @endif

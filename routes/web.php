@@ -59,7 +59,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
                 Route::patch('/{course}/update', 'CoursesController@update')->name('courses.update');
                 Route::get('/{course}/show', 'CoursesController@show')->name('courses.show');
                 Route::delete('/{course}/delete', 'CoursesController@destroy')->name('courses.destroy');
-                Route::get('/{course}/room/{specific_room}', 'CoursesController@get_room_for_course')->name('courses.room_for_course');
+                Route::get('/{course}/room/{specific_room}', 'CoursesController@get_room_for_course')->name('courses.get_room_for_course');
                 Route::patch('/{course}/room/{specific_room}', 'CoursesController@customize_room_for_course')->name('courses.room_for_course');
             });
 
