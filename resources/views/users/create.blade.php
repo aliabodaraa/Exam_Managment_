@@ -52,6 +52,24 @@
                         <span class="text-danger text-left">{{ $errors->first('role') }}</span>
                     @endif
                 </div>
+                <div class="mb-3">
+                    <label for="number_of_observation" class="form-label">number_of_observation</label>
+                    <select class="form-control" name="number_of_observation" class="form-control" required>
+                        <option value='1'>1</option>
+                        <option value='2'>2</option>
+                        <option value='3'>3</option>
+                        <option value='4'>4</option>
+                        <option value='5'>5</option>
+                        <option value='6'>6</option>
+                        <option value='7'>7</option>
+                        <option value='8'>8</option>
+                        <option value='9'>9</option>
+                        <option value='10'>10</option>
+                    </select>
+                    @if ($errors->has('number_of_observation'))
+                        <span class="text-danger text-left">{{ $errors->first('number_of_observation') }}</span>
+                    @endif
+                </div>
                 <button type="submit" class="btn btn-primary">Save user</button>
                 <a href="{{ route('users.index') }}" class="btn btn-default">Back</a>
             </form>

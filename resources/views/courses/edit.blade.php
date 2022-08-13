@@ -4,7 +4,7 @@
 
     <div class="bg-light p-4 rounded">
 
-        <h1>Update Course <span class="badge bg-danger"></span></h1>
+        <h1>Update Course</h1>
         <div class="lead">
 
         </div>
@@ -31,12 +31,6 @@
                         <button type="button" class="btn-close mt-1" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endforeach
-            @endif
-            @if(true)
-                <div class="alert alert-info alert-dismissible fade show" role="alert">
-                    <strong><mark>{{$course->course_name}}</mark> is Full You can release some rooms to become able to edit</strong>
-                    <button type="button" class="btn-close mt-1" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
             @endif
             @if ($message_detemine_rooms = Session::get('detemine-rooms'))
             <div class="alert alert-success alert-block">
@@ -80,6 +74,55 @@
                         <span class="text-danger text-left">{{ $errors->first('semester') }}</span>
                     @endif
                 </div>
+                <div class="mb-3">
+                    <label for="date" class="form-label">date</label>
+                    <input value="{{$course->rooms[0]->pivot->date}}"
+                        type="date"
+                        class="form-control"
+                        name="date"
+                        placeholder="date" required>
+                    @if ($errors->has('date'))
+                        <span class="text-danger text-left">{{ $errors->first('date') }}</span>
+                    @endif
+                </div>
+                <div class="mb-3">
+                    <label for="time" class="form-label">time</label>
+                    <input value="{{$course->rooms[0]->pivot->time}}"
+                        type="time"
+                        class="form-control"
+                        name="time"
+                        placeholder="time" required>
+                    @if ($errors->has('time'))
+                        <span class="text-danger text-left">{{ $errors->first('time') }}</span>
+                    @endif
+                </div>
+                <div class="mb-3">
+                    <label for="students_number" class="form-label">students_number</label>
+                    <input value="{{ $course->students_number }}"
+                        type="number"
+                        class="form-control"
+                        name="students_number"
+                        placeholder="students_number" required>
+                    @if ($errors->has('students_number'))
+                        <span class="text-danger text-left">{{ $errors->first('students_number') }}</span>
+                    @endif
+                </div>
+                <div class="mb-3">
+                    <label for="duration" class="form-label">duration</label>
+                    <select class="form-control" name="duration" class="form-control" required>
+                        <option value="01:00" {{ ($course->duration == "01:00") ? "selected": "" }}>01:00 hours</option>
+                        <option value="01:30" {{ ($course->duration == "01:30") ? "selected": "" }}>01:30 hours</option>
+                        <option value="02:00" {{ ($course->duration == "02:00") ? "selected": "" }}>2 hours</option>
+                        <option value="02:30" {{ ($course->duration == "02:30") ? "selected": ""}}>02:30 hours</option>
+                        <option value="03:00" {{ ($course->duration == "03:00") ? "selected": "" }}>03:00 hours</option>
+                        <option value="03:30" {{ ($course->duration == "03:30") ? "selected": "" }}>03:30 hours</option>
+                        <option value="04:00" {{ ($course->duration == "04:00") ? "selected": "" }}>04:00 hours</option>
+                    </select>
+                    @if ($errors->has('duration'))
+                        <span class="text-danger text-left">{{ $errors->first('duration') }}</span>
+                    @endif
+                </div>
+
                 <label for="rooms" class="form-label">rooms :</label>
                 <div class="mb-3" style="height: 450px;
                 overflow: scroll;">
@@ -91,6 +134,9 @@
                             <th scope="col" width="10%">Capacity/Occupied</th>
                             <th scope="col" width="10%">status</th>
                             <th scope="col" width="30%">Action</th>
+                            @if($disabled_common_rooms_send)
+                            <th scope="col" width="20%">Warrning Message</th>
+                            @endif
                         </thead>
                         @foreach(App\Models\Room::orderBy('capacity','ASC')->get() as $room)
                             {{-- info rooms --}}
@@ -160,15 +206,13 @@
                                     @endforeach
 
                                     {{-- fly code to top --}}
-
                                         @once
-                                        <div class="numbers-info" style="    position: absolute;
-                                        top: 155px;
-                                        right: 74px;
+                                        <h2 class="badge bg-danger" style="position: absolute;top: 163px;left: 343px;{{($course->students_number==$count_taken_student_in_all_rooms_in_this_course)?'':'display:none'}}">Full</h2>
+                                        <div class="numbers-info" style="position: absolute;top: 155px;right: 74px;
                                         display: inline-flex;">
                                             <h5 style="float: right;"><span class="badge bg-success">students number:{{$course->students_number}}</span></h5>
-                                            <h5 style="float: right;"><span class="{{(true) ? 'badge bg-info':'badge bg-danger'}}">free students:{{$course->students_number-$courses_info[$course->course_name]['count_taken_student_in_all_rooms_in_this_course']}}</span></h5>
-                                            <h5 style="float: right;"><span class="badge bg-primary">full number:{{$courses_info[$course->course_name]['count_taken_student_in_all_rooms_in_this_course']}}</span></h5>
+                                            <h5 style="float: right;"><span class="{{(true) ? 'badge bg-info':'badge bg-danger'}}">free students:{{$course->students_number-$count_taken_student_in_all_rooms_in_this_course}}</span></h5>
+                                            <h5 style="float: right;"><span class="badge bg-primary">full number:{{$count_taken_student_in_all_rooms_in_this_course}}</span></h5>
                                         </div>
                                         @endonce
 
@@ -186,7 +230,12 @@
                                     {{ (in_array($room->id, array_unique($disabled_rooms)) &&
                                       ! in_array($room->id, array_unique($accual_common_rooms)))
                                            ? 'disabled'
-                                           : '' }}>
+                                           : '' }}
+                                           {{( $course->students_number==$count_taken_student_in_all_rooms_in_this_course 
+                                             && !in_array($room->id,$disabled_rooms)
+                                             && !in_array($room->id,$accual_common_rooms)
+                                             && !in_array($room->id,$roomsArr) )?'disabled':''}}
+                                             >
                                 </td>
                                 <td>{{ $room->room_name }}</td>
                                 @if($accual_common_rooms)
@@ -201,14 +250,14 @@
                                 @endif
                                 <td>
                                     {{-- Capacity / Occupied --}}
-                                    @if(in_array($room->id, array_unique($joining_rooms)) || in_array($room->id, array_unique($joining_rooms)))
-                                    <span class="badge bg-info">{{$courses_info[$course->course_name]['count_taken_student_in_this_room_in_this_course']}}/{{$room->capacity}}</span>
+                                    @if(in_array($room->id, array_unique($joining_rooms)) || in_array($room->id, array_unique($accual_common_rooms)))
+                                        <span class="badge bg-info">{{$room->capacity}}/{{$courses_info[$course->course_name]['count_taken_student_in_this_room_in_this_course']+$count_taken_student_in_this_room_in_all_common_courses}}</span>
                                     @endif
                                 </td>
                                 <td>
                                     {{-- status --}}
-                                    @if(in_array($room->id, array_unique($joining_rooms)) || in_array($room->id, array_unique($joining_rooms)))
-                                    <span class="badge bg-primary">{{$room->capacity-$courses_info[$course->course_name]['count_taken_student_in_this_room_in_this_course']}} free</span>
+                                    @if(in_array($room->id, array_unique($joining_rooms)) || in_array($room->id, array_unique($accual_common_rooms)))
+                                        <span class="badge bg-primary">{{($room->capacity - ($courses_info[$course->course_name]['count_taken_student_in_this_room_in_this_course']+$count_taken_student_in_this_room_in_all_common_courses) ==0 ) ? 'Full' : $room->capacity - ($courses_info[$course->course_name]['count_taken_student_in_this_room_in_this_course']+$count_taken_student_in_this_room_in_all_common_courses).' Free'}} <span>
                                     @endif
                                 </td>
                                 <td>
@@ -219,60 +268,17 @@
                                             </a>
                                     @endif
                                     <a href="{{ route('courses.room_for_course', ['course'=>$course->id,'specific_room'=>$room->id]) }}" class="btn @php echo (in_array($room->id,array_unique($accual_common_rooms)))? 'btn-success':'btn-danger'; @endphp"
-                                    style="{{ (!in_array($room->id, array_unique($accual_common_rooms)) && in_array($room->id, $disabled_rooms)) ? 'pointer-events: none;background-color:#999' : '' }} ;display:none;">{{(in_array($room->id,array_unique($accual_common_rooms))) ?'Manage':'specify members'}}
+                                    style="{{ (!in_array($room->id, array_unique($accual_common_rooms))&& in_array($room->id,$disabled_common_rooms_send)) ? 'pointer-events: none;background-color:#999' : '' }} ;display:none;">{{(in_array($room->id,array_unique($accual_common_rooms))) ?'Manage':'specify members'}}
                                     </a>
                                 </td>
+                                @if(in_array($room->id,$disabled_common_rooms_send))
+                                    <td>
+                                        <span class="badge bg-warning">You Must Un Checked <span class="badge bg-danger">{{$room->room_name}}</span> , Another course use it Now .</span>
+                                    </td>
+                                @endif   
                             </tr>
                         @endforeach
                     </table>
-                </div>
-                <div class="mb-3">
-                    <label for="date" class="form-label">date</label>
-                    <input value="{{$course->rooms[0]->pivot->date}}"
-                        type="date"
-                        class="form-control"
-                        name="date"
-                        placeholder="date" required>
-                    @if ($errors->has('date'))
-                        <span class="text-danger text-left">{{ $errors->first('date') }}</span>
-                    @endif
-                </div>
-                <div class="mb-3">
-                    <label for="time" class="form-label">time</label>
-                    <input value="{{$course->rooms[0]->pivot->time}}"
-                        type="time"
-                        class="form-control"
-                        name="time"
-                        placeholder="time" required>
-                    @if ($errors->has('time'))
-                        <span class="text-danger text-left">{{ $errors->first('time') }}</span>
-                    @endif
-                </div>
-                <div class="mb-3">
-                    <label for="students_number" class="form-label">students_number</label>
-                    <input value="{{ $course->students_number }}"
-                        type="number"
-                        class="form-control"
-                        name="students_number"
-                        placeholder="students_number" required>
-                    @if ($errors->has('students_number'))
-                        <span class="text-danger text-left">{{ $errors->first('students_number') }}</span>
-                    @endif
-                </div>
-                <div class="mb-3">
-                    <label for="duration" class="form-label">duration</label>
-                    <select class="form-control" name="duration" class="form-control" required>
-                        <option value="01:00" {{ ($course->duration == "01:00") ? "selected": "" }}>01:00 hours</option>
-                        <option value="01:30" {{ ($course->duration == "01:30") ? "selected": "" }}>01:30 hours</option>
-                        <option value="02:00" {{ ($course->duration == "02:00") ? "selected": "" }}>2 hours</option>
-                        <option value="02:30" {{ ($course->duration == "02:30") ? "selected": ""}}>02:30 hours</option>
-                        <option value="03:00" {{ ($course->duration == "03:00") ? "selected": "" }}>03:00 hours</option>
-                        <option value="03:30" {{ ($course->duration == "03:30") ? "selected": "" }}>03:30 hours</option>
-                        <option value="04:00" {{ ($course->duration == "04:00") ? "selected": "" }}>04:00 hours</option>
-                    </select>
-                    @if ($errors->has('duration'))
-                        <span class="text-danger text-left">{{ $errors->first('duration') }}</span>
-                    @endif
                 </div>
                 <button type="submit" class="btn btn-primary">Update Course</button>
                 <a href="{{ route('courses.index') }}" class="btn btn-default">Cancel</button>

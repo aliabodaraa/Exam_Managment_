@@ -13,7 +13,7 @@ class roomsController extends Controller
      */
     public function index()
     {
-        $rooms = room::all();
+        $rooms = room::orderBy('room_name')->get();
         return view('rooms.index', compact('rooms'));
     }
     /**
@@ -35,7 +35,7 @@ class roomsController extends Controller
     public function store(Request $request)
     {
         $this->validate($request,[
-            'room_name' => 'required|min:1|max:10|unique:rooms,room_name',
+            'room_name' => 'required|min:1|max:20|unique:rooms,room_name',
             'capacity' => 'required|min:1|max:1000',
         ],[
             'room_name.unique'=>'the name of room already exist'
@@ -76,7 +76,7 @@ class roomsController extends Controller
     public function update(Request $request, Room $room)
     {
         $this->validate($request,[
-            'room_name' => 'required|min:1|max:10|exists:rooms,room_name',
+            'room_name' => 'required|min:1|max:20',
             'capacity' => 'required|min:1|max:1000',
         ],[
             'room_name.exists'=>'the name of room does not exist'

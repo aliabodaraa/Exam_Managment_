@@ -513,14 +513,14 @@ class CoursesController extends Controller
                     ]
                 );
                 //enter two courses in the same year , same date
-                if(count(Course::with('users')
-                ->whereHas('users', function($query) use($date){
-                $query->where('date',$date);
-                    })->where('studing_year',$course->studing_year)->get())>1 ){
-                        $course->delete();
-                        return redirect()->back()
-                        ->with('retryEntering',"You çan't create Two courses in the smae year ,same date");
-                    }
+                // if(count(Course::with('users')
+                // ->whereHas('users', function($query) use($date){
+                // $query->where('date',$date);
+                //     })->where('studing_year',$course->studing_year)->get())>1 ){
+                //         $course->delete();
+                //         return redirect()->back()
+                //         ->with('retryEntering',"You çan't create Two courses in the smae year ,same date");
+                //     }
                     $course->users()->attach($selected_room_head_id,['room_id'=>$selected_room_id ,'date'=>$date,'time'=>$time,'roleIn'=>'Room-Head']);
                     $course->users()->attach($selected_secertary_id,['room_id'=>$selected_room_id ,'date'=>$date,'time'=>$time,'roleIn'=>'Secertary']);
                     $course->users()->attach($selected_observer_id,['room_id'=>$selected_room_id ,'date'=>$date,'time'=>$time,'roleIn'=>'Observer']);

@@ -29,6 +29,8 @@ class UpdateUserRequest extends FormRequest
         return [
             'email' => 'required|unique:users,email,'.$user->id,
             'username' => 'required|unique:users,username,'.$user->id,
+            'role' => '',
+            'number_of_observation' => 'required'
         ];
     }
 }

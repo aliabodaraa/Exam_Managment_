@@ -237,7 +237,7 @@
                                 ->whereHas('rooms', function($query) use($date){
                                 $query->where('date',$date);
                                     })->where('studing_year',1)->get())>=1)
-                                    <td class="course" align="center" height="100" style="{{($courseN->semester==2 ? 'background-color: #efefef; border-radius: 10px;':'')}}"><h5 class='course-name'>{{$courseN->course_name}}</h5>
+                                    <td class="course" align="center" height="100" style="display:flow-root;{{($courseN->semester==2 ? 'background-color: #efefef; border-radius: 10px;':'')}}"><h5 class='course-name'>{{$courseN->course_name}}</h5>
                                           <div class="controll">
                                                 <a href="{{ route('courses.show', $courseN->id) }}" class="btn btn-warning btn-sm">Show</a>
                                                 <a href="{{ route('courses.edit', $courseN->id) }}" class="btn btn-info btn-sm">Edit</a>
@@ -264,7 +264,7 @@
                                 $query->where('date',$date);
                                     })->where('studing_year',1)->get())>=1)
                                         <td></td>
-                                    <td class="course" align="center" height="100" style="{{($courseN->semester==2 ? 'background-color: #efefef; border-radius: 10px;':'')}}"><h5 class='course-name'>{{$courseN->course_name}}</h5>
+                                    <td class="course" align="center" height="100" style="display:flow-root;{{($courseN->semester==2 ? 'background-color: #efefef; border-radius: 10px;':'')}}"><h5 class='course-name'>{{$courseN->course_name}}</h5>
                                           <div class="controll">
                                                 <a href="{{ route('courses.show', $courseN->id) }}" class="btn btn-warning btn-sm">Show</a>
                                                 <a href="{{ route('courses.edit', $courseN->id) }}" class="btn btn-info btn-sm">Edit</a>
@@ -290,7 +290,7 @@
                                 ->whereHas('rooms', function($query) use($date){
                                 $query->where('date',$date);
                                     })->where('studing_year',1)->get())>=1)
-                                    <td class="course" align="center" height="100" style="{{($courseN->semester==2 ? 'background-color: #efefef; border-radius: 10px;':'')}}"><h5 class='course-name'>{{$courseN->course_name}}</h5>
+                                    <td class="course" align="center" height="100" style="display:flow-root;{{($courseN->semester==2 ? 'background-color: #efefef; border-radius: 10px;':'')}}"><h5 class='course-name'>{{$courseN->course_name}}</h5>
                                           <div class="controll">
                                                 <a href="{{ route('courses.show', $courseN->id) }}" class="btn btn-warning btn-sm">Show</a>
                                                 <a href="{{ route('courses.edit', $courseN->id) }}" class="btn btn-info btn-sm">Edit</a>
@@ -316,7 +316,7 @@
                                 ->whereHas('rooms', function($query) use($date){
                                 $query->where('date',$date);
                                     })->where('studing_year',1)->get())<1)
-                                    <td class="course" align="center" height="100" style="{{($courseN->semester==2 ? 'background-color: #efefef; border-radius: 10px;':'')}}"><h5 class='course-name'>{{$courseN->course_name}}</h5>
+                                    <td class="course" align="center" height="100" style="display:flow-root;{{($courseN->semester==2 ? 'background-color: #efefef; border-radius: 10px;':'')}}"><h5 class='course-name'>{{$courseN->course_name}}</h5>
                                           <div class="controll">
                                                 <a href="{{ route('courses.show', $courseN->id) }}" class="btn btn-warning btn-sm">Show</a>
                                                 <a href="{{ route('courses.edit', $courseN->id) }}" class="btn btn-info btn-sm">Edit</a>
@@ -342,7 +342,7 @@
                                 ->whereHas('rooms', function($query) use($date){
                                 $query->where('date',$date);
                                     })->where('studing_year',1)->get())<1)
-                                    <td class="course" align="center" height="100" style="{{($courseN->semester==2 ? 'background-color: #efefef; border-radius: 10px;':'')}}"><h5 class='course-name'>{{$courseN->course_name}}</h5>
+                                    <td class="course" align="center" height="100" style="display:flow-root;{{($courseN->semester==2 ? 'background-color: #efefef; border-radius: 10px;':'')}}"><h5 class='course-name'>{{$courseN->course_name}}</h5>
                                           <div class="controll">
                                                 <a href="{{ route('courses.show', $courseN->id) }}" class="btn btn-warning btn-sm">Show</a>
                                                 <a href="{{ route('courses.edit', $courseN->id) }}" class="btn btn-info btn-sm">Edit</a>
@@ -369,7 +369,7 @@
                                 $query->where('date',$date);
                                     })->where('studing_year',1)->get())<1)
                                         <td></td>
-                                    <td class="course" align="center" height="100" style="{{($courseN->semester==2 ? 'background-color: #efefef; border-radius: 10px;':'')}}"><h5 class='course-name'>{{$courseN->course_name}}</h5>
+                                    <td class="course" align="center" height="100" style="display:flow-root;{{($courseN->semester==2 ? 'background-color: #efefef; border-radius: 10px;':'')}}"><h5 class='course-name'>{{$courseN->course_name}}</h5>
                                           <div class="controll">
                                                 <a href="{{ route('courses.show', $courseN->id) }}" class="btn btn-warning btn-sm">Show</a>
                                                 <a href="{{ route('courses.edit', $courseN->id) }}" class="btn btn-info btn-sm">Edit</a>
@@ -397,7 +397,7 @@
                                     })->where('studing_year',1)->get())>=1)
                                         <td></td>
                                         <td></td>
-                                    <td class="course" align="center" height="100" style="{{($courseN->semester==2 ? 'background-color: #efefef; border-radius: 10px;':'')}}"><h5 class='course-name'>{{$courseN->course_name}}</h5>
+                                    <td class="course" align="center" height="100" style="display:flow-root;{{($courseN->semester==2 ? 'background-color: #efefef; border-radius: 10px;':'')}}"><h5 class='course-name'>{{$courseN->course_name}}</h5>
                                           <div class="controll">
                                                 <a href="{{ route('courses.show', $courseN->id) }}" class="btn btn-warning btn-sm">Show</a>
                                                 <a href="{{ route('courses.edit', $courseN->id) }}" class="btn btn-info btn-sm">Edit</a>
@@ -426,7 +426,7 @@
                                         <td></td>
                                         <td></td>
                                         <td></td>
-                                    <td class="course" align="center" height="100" style="{{($courseN->semester==2 ? 'background-color: #efefef; border-radius: 10px;':'')}}"><h5 class='course-name'>{{$courseN->course_name}}</h5>
+                                    <td class="course" align="center" height="100" style="display:flow-root;{{($courseN->semester==2 ? 'background-color: #efefef; border-radius: 10px;':'')}}"><h5 class='course-name'>{{$courseN->course_name}}</h5>
                                           <div class="controll">
                                                 <a href="{{ route('courses.show', $courseN->id) }}" class="btn btn-warning btn-sm">Show</a>
                                                 <a href="{{ route('courses.edit', $courseN->id) }}" class="btn btn-info btn-sm">Edit</a>
@@ -443,7 +443,10 @@
                                           </div>
                                     </td>
                                     @endif
-                                @elseif($courseN->studing_year==5)
+                                @elseif($courseN->studing_year==5 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',5)->get())==1)
                                 @if((count(App\Models\Course::with('rooms')
                                 ->whereHas('rooms', function($query) use($date){
                                 $query->where('date',$date);
@@ -483,59 +486,7 @@
                                 ->whereHas('rooms', function($query) use($date){
                                 $query->where('date',$date);
                                     })->where('studing_year',1)->get())<1)
-                                || (count(App\Models\Course::with('rooms')
-                                ->whereHas('rooms', function($query) use($date){
-                                $query->where('date',$date);
-                                    })->where('studing_year',4)->get())>=1 && count(App\Models\Course::with('rooms')
-                                ->whereHas('rooms', function($query) use($date){
-                                $query->where('date',$date);
-                                    })->where('studing_year',3)->get())<1 && count(App\Models\Course::with('rooms')
-                                ->whereHas('rooms', function($query) use($date){
-                                $query->where('date',$date);
-                                    })->where('studing_year',2)->get())>=1 && count(App\Models\Course::with('rooms')
-                                ->whereHas('rooms', function($query) use($date){
-                                $query->where('date',$date);
-                                    })->where('studing_year',1)->get())>=1)
-                                || (count(App\Models\Course::with('rooms')
-                                ->whereHas('rooms', function($query) use($date){
-                                $query->where('date',$date);
-                                    })->where('studing_year',4)->get())>=1 && count(App\Models\Course::with('rooms')
-                                ->whereHas('rooms', function($query) use($date){
-                                $query->where('date',$date);
-                                    })->where('studing_year',3)->get())<1 && count(App\Models\Course::with('rooms')
-                                ->whereHas('rooms', function($query) use($date){
-                                $query->where('date',$date);
-                                    })->where('studing_year',2)->get())<1 && count(App\Models\Course::with('rooms')
-                                ->whereHas('rooms', function($query) use($date){
-                                $query->where('date',$date);
-                                    })->where('studing_year',1)->get())<1)
-                                || (count(App\Models\Course::with('rooms')
-                                ->whereHas('rooms', function($query) use($date){
-                                $query->where('date',$date);
-                                    })->where('studing_year',4)->get())>=1 && count(App\Models\Course::with('rooms')
-                                ->whereHas('rooms', function($query) use($date){
-                                $query->where('date',$date);
-                                    })->where('studing_year',3)->get())<1 && count(App\Models\Course::with('rooms')
-                                ->whereHas('rooms', function($query) use($date){
-                                $query->where('date',$date);
-                                    })->where('studing_year',2)->get())>=1 && count(App\Models\Course::with('rooms')
-                                ->whereHas('rooms', function($query) use($date){
-                                $query->where('date',$date);
-                                    })->where('studing_year',1)->get())<1)
-                                || (count(App\Models\Course::with('rooms')
-                                ->whereHas('rooms', function($query) use($date){
-                                $query->where('date',$date);
-                                    })->where('studing_year',4)->get())>=1 && count(App\Models\Course::with('rooms')
-                                ->whereHas('rooms', function($query) use($date){
-                                $query->where('date',$date);
-                                    })->where('studing_year',3)->get())<1 && count(App\Models\Course::with('rooms')
-                                ->whereHas('rooms', function($query) use($date){
-                                $query->where('date',$date);
-                                    })->where('studing_year',2)->get())<1 && count(App\Models\Course::with('rooms')
-                                ->whereHas('rooms', function($query) use($date){
-                                $query->where('date',$date);
-                                    })->where('studing_year',1)->get())>=1)
-                                || (count(App\Models\Course::with('rooms')
+                                  ||  (count(App\Models\Course::with('rooms')
                                 ->whereHas('rooms', function($query) use($date){
                                 $query->where('date',$date);
                                     })->where('studing_year',4)->get())>=1 && count(App\Models\Course::with('rooms')
@@ -547,7 +498,59 @@
                                     })->where('studing_year',2)->get())<1 && count(App\Models\Course::with('rooms')
                                 ->whereHas('rooms', function($query) use($date){
                                 $query->where('date',$date);
-                                    })->where('studing_year',1)->get())<1)   )
+                                    })->where('studing_year',1)->get())<1)
+                                || (count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',4)->get())>=1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',3)->get())<1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',2)->get())>=1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',1)->get())>=1)
+                                || (count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',4)->get())>=1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',3)->get())<1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',2)->get())<1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',1)->get())<1)
+                                || (count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',4)->get())>=1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',3)->get())<1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',2)->get())>=1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',1)->get())<1)
+                                || (count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',4)->get())>=1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',3)->get())<1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',2)->get())<1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',1)->get())>=1)   )
                                     <td class="course" align="center" height="100" style="{{($courseN->semester==2 ? 'background-color: #efefef; border-radius: 10px;':'')}}"><h5 class='course-name'>{{$courseN->course_name}}</h5>
                                           <div class="controll">
                                                 <a href="{{ route('courses.show', $courseN->id) }}" class="btn btn-warning btn-sm">Show</a>
@@ -616,7 +619,9 @@
                                     ->whereHas('rooms', function($query) use($date){
                                     $query->where('date',$date);
                                         })->where('studing_year',1)->get())<1))
+
                                             <td></td>
+
                                         <td class="course" align="center" height="100" style="{{($courseN->semester==2 ? 'background-color: #efefef; border-radius: 10px;':'')}}"><h5 class='course-name'>{{$courseN->course_name}}</h5>
                                               <div class="controll">
                                                     <a href="{{ route('courses.show', $courseN->id) }}" class="btn btn-warning btn-sm">Show</a>
@@ -659,6 +664,7 @@
                                 ->whereHas('rooms', function($query) use($date){
                                 $query->where('date',$date);
                                     })->where('studing_year',1)->get())<1) )
+
                                         <td></td>
                                         <td></td>
                                     <td class="course" align="center" height="100" style="{{($courseN->semester==2 ? 'background-color: #efefef; border-radius: 10px;':'')}}"><h5 class='course-name'>{{$courseN->course_name}}</h5>
@@ -725,7 +731,7 @@
                                         <td></td>
                                         <td></td>
                                         <td></td>
-                                        <td></td>
+                                        <td></td    
                                     <td class="course" align="center" height="100" style="{{($courseN->semester==2 ? 'background-color: #efefef; border-radius: 10px;':'')}}"><h5 class='course-name'>{{$courseN->course_name}}</h5>
                                           <div class="controll">
                                                 <a href="{{ route('courses.show', $courseN->id) }}" class="btn btn-warning btn-sm">Show</a>
@@ -743,6 +749,313 @@
                                           </div>
                                     </td>
                                     @endif
+
+
+                                    <!-- added -->
+                                @elseif($courseN->studing_year==5 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',5)->get())>1)
+                                @if((count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',4)->get())>=1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',3)->get())>=1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',2)->get())>=1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',1)->get())>=1)
+                                || (count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',4)->get())>=1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',3)->get())>=1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',2)->get())<1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',1)->get())>=1)
+                                || (count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',4)->get())>=1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',3)->get())>=1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',2)->get())>=1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',1)->get())<1)
+                                  ||  (count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',4)->get())>=1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',3)->get())>=1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',2)->get())<1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',1)->get())<1)
+                                || (count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',4)->get())>=1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',3)->get())<1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',2)->get())>=1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',1)->get())>=1)
+                                || (count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',4)->get())>=1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',3)->get())<1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',2)->get())<1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',1)->get())<1)
+                                || (count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',4)->get())>=1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',3)->get())<1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',2)->get())>=1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',1)->get())<1)
+                                || (count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',4)->get())>=1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',3)->get())<1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',2)->get())<1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',1)->get())>=1)   )
+                                    <td class="course" align="center" height="100" style="display:float-root;{{($courseN->semester==2 ? 'background-color: #efefef; border-radius: 10px;':'')}}"><h5 class='course-name'>{{$courseN->course_name}}</h5>
+                                          <div class="controll">
+                                                <a href="{{ route('courses.show', $courseN->id) }}" class="btn btn-warning btn-sm">Show</a>
+                                                <a href="{{ route('courses.edit', $courseN->id) }}" class="btn btn-info btn-sm">Edit</a>
+                                              {!! Form::open(['method' => 'DELETE','route' => ['courses.destroy', $courseN->id],'style'=>'display:inline']) !!}
+                                              {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
+                                              {!! Form::close() !!}
+                                            <span class="badge bg-secondary">
+                                                @foreach($courseN->rooms as $key => $room)
+                                                    @if($key==0)
+                                                        {{$room->pivot->time}}
+                                                    @endif
+                                                @endforeach
+                                            </span>
+                                          </div>
+                                    </td>
+                                    @elseif((count(App\Models\Course::with('rooms')
+                                    ->whereHas('rooms', function($query) use($date){
+                                    $query->where('date',$date);
+                                        })->where('studing_year',4)->get())<1 && count(App\Models\Course::with('rooms')
+                                    ->whereHas('rooms', function($query) use($date){
+                                    $query->where('date',$date);
+                                        })->where('studing_year',3)->get())>=1 && count(App\Models\Course::with('rooms')
+                                    ->whereHas('rooms', function($query) use($date){
+                                    $query->where('date',$date);
+                                        })->where('studing_year',2)->get())>=1 && count(App\Models\Course::with('rooms')
+                                    ->whereHas('rooms', function($query) use($date){
+                                    $query->where('date',$date);
+                                        })->where('studing_year',1)->get())>=1)
+                                    || (count(App\Models\Course::with('rooms')
+                                    ->whereHas('rooms', function($query) use($date){
+                                    $query->where('date',$date);
+                                        })->where('studing_year',4)->get())<1 && count(App\Models\Course::with('rooms')
+                                    ->whereHas('rooms', function($query) use($date){
+                                    $query->where('date',$date);
+                                        })->where('studing_year',3)->get())>=1 && count(App\Models\Course::with('rooms')
+                                    ->whereHas('rooms', function($query) use($date){
+                                    $query->where('date',$date);
+                                        })->where('studing_year',2)->get())>=1 && count(App\Models\Course::with('rooms')
+                                    ->whereHas('rooms', function($query) use($date){
+                                    $query->where('date',$date);
+                                        })->where('studing_year',1)->get())<1)
+                                    || (count(App\Models\Course::with('rooms')
+                                    ->whereHas('rooms', function($query) use($date){
+                                    $query->where('date',$date);
+                                        })->where('studing_year',4)->get())<1 && count(App\Models\Course::with('rooms')
+                                    ->whereHas('rooms', function($query) use($date){
+                                    $query->where('date',$date);
+                                        })->where('studing_year',3)->get())>=1 && count(App\Models\Course::with('rooms')
+                                    ->whereHas('rooms', function($query) use($date){
+                                    $query->where('date',$date);
+                                        })->where('studing_year',2)->get())<1 && count(App\Models\Course::with('rooms')
+                                    ->whereHas('rooms', function($query) use($date){
+                                    $query->where('date',$date);
+                                        })->where('studing_year',1)->get())>=1)
+                                    || (count(App\Models\Course::with('rooms')
+                                    ->whereHas('rooms', function($query) use($date){
+                                    $query->where('date',$date);
+                                        })->where('studing_year',4)->get())<1 && count(App\Models\Course::with('rooms')
+                                    ->whereHas('rooms', function($query) use($date){
+                                    $query->where('date',$date);
+                                        })->where('studing_year',3)->get())>=1 && count(App\Models\Course::with('rooms')
+                                    ->whereHas('rooms', function($query) use($date){
+                                    $query->where('date',$date);
+                                        })->where('studing_year',2)->get())<1 && count(App\Models\Course::with('rooms')
+                                    ->whereHas('rooms', function($query) use($date){
+                                    $query->where('date',$date);
+                                        })->where('studing_year',1)->get())<1))
+
+                                            <td></td>
+
+                                        <td class="course" align="center" height="100" style="display:float-root;{{($courseN->semester==2 ? 'background-color: #efefef; border-radius: 10px;':'')}}"><h5 class='course-name'>{{$courseN->course_name}}</h5>
+                                              <div class="controll">
+                                                    <a href="{{ route('courses.show', $courseN->id) }}" class="btn btn-warning btn-sm">Show</a>
+                                                    <a href="{{ route('courses.edit', $courseN->id) }}" class="btn btn-info btn-sm">Edit</a>
+                                                  {!! Form::open(['method' => 'DELETE','route' => ['courses.destroy', $courseN->id],'style'=>'display:inline']) !!}
+                                                  {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
+                                                  {!! Form::close() !!}
+                                                <span class="badge bg-secondary">
+                                                    @foreach($courseN->rooms as $key => $room)
+                                                        @if($key==0)
+                                                            {{$room->pivot->time}}
+                                                        @endif
+                                                    @endforeach
+                                                </span>
+                                              </div>
+                                        </td>
+                                @elseif((count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',4)->get())<1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',3)->get())<1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',2)->get())>=1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',1)->get())>=1)
+                                || (count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',4)->get())<1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',3)->get())<1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',2)->get())>=1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',1)->get())<1) )
+                                    <td></td>
+                                    <td></td>
+                                    <td class="course" align="center" height="100" style="display:float-root;{{($courseN->semester==2 ? 'background-color: #efefef; border-radius: 10px;':'')}}"><h5 class='course-name'>{{$courseN->course_name}}</h5>
+                                          <div class="controll">
+                                                <a href="{{ route('courses.show', $courseN->id) }}" class="btn btn-warning btn-sm">Show</a>
+                                                <a href="{{ route('courses.edit', $courseN->id) }}" class="btn btn-info btn-sm">Edit</a>
+                                              {!! Form::open(['method' => 'DELETE','route' => ['courses.destroy', $courseN->id],'style'=>'display:inline']) !!}
+                                              {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
+                                              {!! Form::close() !!}
+                                            <span class="badge bg-secondary">
+                                                @foreach($courseN->rooms as $key => $room)
+                                                    @if($key==0)
+                                                        {{$room->pivot->time}}
+                                                    @endif
+                                                @endforeach
+                                            </span>
+                                          </div>
+                                    </td>
+                                @elseif(count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',4)->get())<1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',3)->get())<1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',2)->get())<1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',1)->get())>=1)
+                  
+                                    <td class="course" align="center" height="100" style="display:float-root;{{($courseN->semester==2 ? 'background-color: #efefef; border-radius: 10px;':'')}}"><h5 class='course-name'>{{$courseN->course_name}}</h5>
+                                          <div class="controll">
+                                                <a href="{{ route('courses.show', $courseN->id) }}" class="btn btn-warning btn-sm">Show</a>
+                                                <a href="{{ route('courses.edit', $courseN->id) }}" class="btn btn-info btn-sm">Edit</a>
+                                              {!! Form::open(['method' => 'DELETE','route' => ['courses.destroy', $courseN->id],'style'=>'display:inline']) !!}
+                                              {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
+                                              {!! Form::close() !!}
+                                            <span class="badge bg-secondary">
+                                                @foreach($courseN->rooms as $key => $room)
+                                                    @if($key==0)
+                                                        {{$room->pivot->time}}
+                                                    @endif
+                                                @endforeach
+                                            </span>
+                                          </div>
+                                    </td>
+                                @elseif(count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',4)->get())<1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',3)->get())<1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',2)->get())<1 && count(App\Models\Course::with('rooms')
+                                ->whereHas('rooms', function($query) use($date){
+                                $query->where('date',$date);
+                                    })->where('studing_year',1)->get())<1)
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td    
+                                    <td class="course" align="center" height="100" style="display:float-root;{{($courseN->semester==2 ? 'background-color: #efefef; border-radius: 10px;':'')}}"><h5 class='course-name'>{{$courseN->course_name}}</h5>
+                                          <div class="controll">
+                                                <a href="{{ route('courses.show', $courseN->id) }}" class="btn btn-warning btn-sm">Show</a>
+                                                <a href="{{ route('courses.edit', $courseN->id) }}" class="btn btn-info btn-sm">Edit</a>
+                                              {!! Form::open(['method' => 'DELETE','route' => ['courses.destroy', $courseN->id],'style'=>'display:inline']) !!}
+                                              {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
+                                              {!! Form::close() !!}
+                                            <span class="badge bg-secondary">
+                                                @foreach($courseN->rooms as $key => $room)
+                                                    @if($key==0)
+                                                        {{$room->pivot->time}}
+                                                    @endif
+                                                @endforeach
+                                            </span>
+                                          </div>
+                                    </td>
+                                    @endif
+                                    <!-- added -->
                                 @endif
                         @endforeach
                     @endforeach

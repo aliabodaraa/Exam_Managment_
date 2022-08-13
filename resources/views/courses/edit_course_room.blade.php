@@ -110,6 +110,22 @@
                 </div>
             @endif
             @php $current_num_of_student = App\Models\User::with('rooms')->whereHas('rooms', function($query) use($specific_room,$course){$query->where('date',$course->users[0]->pivot->date)->where('time',$course->users[0]->pivot->time)->where('room_id',$specific_room->id)->where('course_id',$course->id);})->get(); @endphp
+            @php
+            $sholder=10;
+            $message='';
+            if($count_taken_student_not_in_this_room_in_this_course + $specific_room->capacity/2 > $course->students_number){
+                for ($i = 1; $i <= $specific_room->capacity/2; $i++)
+                    if( $count_taken_student_not_in_this_room_in_this_course + $i == $course->students_number ){
+                        $sholder=$i;
+                        $message="You can select number of student between 1 and ".$sholder;
+                        break;
+                    }
+                }else{ 
+                    $sholder=$specific_room->capacity/2;}
+            @endphp
+            @if($message)
+                <span class="badge bg-secondary" style="float:right">{{$message}}</span>
+            @endif
             <form method="post" action="{{ route('courses.room_for_course', [$course->id,$specific_room->id]) }}">
                 @method('patch')
                 @csrf
@@ -118,7 +134,7 @@
                         <label for="num_student_in_room" class="form-label">Number Students In Room <mark>{{$specific_room->room_name}}</mark>  :</label>
                         <select class="form-control" name="num_student_in_room" class="form-control" required>
                             <!-- $courses_info[$course->course_name]['count_taken_student_in_this_room_in_this_course']) -->
-                                    @for ($i = 1; $i <= $specific_room->capacity/2; $i++)
+                                    @for ($i = 1; $i <= $sholder; $i++)
                                         <option value="{{$i}}" {{ ($courses_info[$course->course_name]['count_taken_student_in_this_room_in_this_course'] == $i) ? 'selected': '' }}>{{$i}}</option>
                                     @endfor
                             <!-- endif -->
@@ -347,6 +363,12 @@
         //prevent two checkboxes or more clicked in the same row
         $(".roomheads").on( 'click', function () {
             if($(this).is(':checked')){
+                //prevent take more than one Room-Head in the same column
+                $.each($('.roomheads'), function() {
+                    if (!this.disabled)
+                        $(this).prop('checked',false);
+                });
+                //end prevent
                 $(this).parent().next().next().siblings().children(":first-child").css({'backgroundColor': 'red'}).prop('checked',false);
                 $(this).parent().next().siblings().children(":first-child").prop('checked',false);
                 $(this).prop('checked',true)

@@ -35,8 +35,11 @@
                 </div>
                 <div class="mb-3">
                     <label for="role" class="form-label">Role</label>
+                    @if($user->id==1)
+                        <span class="badge bg-secondary" style="float:right">{{$user->id==1 ?"Admin can't have Role":''}} </span>
+                    @endif
                     <select class="form-control"
-                        name="role" required>
+                        name="role" {{$user->id==1 ?'disabled':''}}>
                         <option value="">Select role</option>
                         <option value="Doctor" {{ ($user->role == 'Doctor') ? 'selected': '' }}>Doctor</option>
                         <option value="Master's student" {{ ($user->role == "Master's student") ? 'selected': '' }}>Master's student</option>
@@ -46,19 +49,27 @@
                         <span class="text-danger text-left">{{ $errors->first('role') }}</span>
                     @endif
                 </div>
-                {{-- <div class="mb-3">
-                    <label for="department" class="form-label">Studing Year :</label>
-                    <select class="form-control" name="studing_year" class="form-control" required>
-                            <option value="1" {{ ($user->studing_year == 1) ? 'selected': '' }}>First Year</option>
-                            <option value="2" {{ ($user->studing_year == 2) ? 'selected': '' }}>Secound Year</option>
-                            <option value="3" {{ ($user->studing_year == 3) ? 'selected': '' }}>Third Year</option>
-                            <option value="4" {{ ($user->studing_year == 4) ? 'selected': '' }}>Fourth Year</option>
-                            <option value="5" {{ ($user->studing_year == 5) ? 'selected': '' }}>Fifth Year</option>
-                    </select>
-                    @if ($errors->has('studing_year'))
-                        <span class="text-danger text-left">{{ $errors->first('studing_year') }}</span>
+                <div class="mb-3">
+                    <label for="number_of_observation" class="form-label">number_of_observation</label>
+                    @if($user->id==1)
+                        <span class="badge bg-secondary" style="float:right">{{$user->id==1 ?"Admin can't have observations":''}} </span>
                     @endif
-                </div> --}}
+                    <select class="form-control" name="number_of_observation" class="form-control" required  {{$user->id==1 ?'disabled':''}}>
+                        <option value='1' {{ ($user->number_of_observation == 1) ? 'selected': '' }}>1</option>
+                        <option value='2' {{ ($user->number_of_observation == 2) ? 'selected': '' }}>2</option>
+                        <option value='3' {{ ($user->number_of_observation == 3) ? 'selected': '' }}>3</option>
+                        <option value='4' {{ ($user->number_of_observation == 4) ? 'selected': '' }}>4</option>
+                        <option value='5' {{ ($user->number_of_observation == 5) ? 'selected': '' }}>5</option>
+                        <option value='6' {{ ($user->number_of_observation == 6) ? 'selected': '' }}>6</option>
+                        <option value='7' {{ ($user->number_of_observation == 7) ? 'selected': '' }}>7</option>
+                        <option value='8' {{ ($user->number_of_observation == 8) ? 'selected': '' }}>8</option>
+                        <option value='9' {{ ($user->number_of_observation == 9) ? 'selected': '' }}>9</option>
+                        <option value='10' {{ ($user->number_of_observation == 10) ? 'selected': '' }}>10</option>
+                    </select>
+                    @if ($errors->has('number_of_observation'))
+                        <span class="text-danger text-left">{{ $errors->first('number_of_observation') }}</span>
+                    @endif
+                </div>
                 <button type="submit" class="btn btn-primary">Update user</button>
                 <a href="{{ route('users.index') }}" class="btn btn-default">Cancel</button>
             </form>

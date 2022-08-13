@@ -17,7 +17,7 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $users = User::first()->paginate(5);
+        $users = User::first()->paginate(10);
 
         return view('users.index', compact('users'));
     }
@@ -48,10 +48,11 @@ class UsersController extends Controller
                 'username'=> $request->username,
                 'email'=> $request->email,
                 'password' => $request['password'],
-                'role' => $request['role']
+                'role' => $request['role'],
+                'number_of_observation' => $request['number_of_observation']
             ]
         );
-        return Response::json($user);
+        //return Response::json($user);
         return redirect()->route('users.index')
             ->withSuccess(__('User created successfully.'));
     }
@@ -98,7 +99,7 @@ class UsersController extends Controller
     {
         $user->update($request->validated());
 
-        $user->syncRoles($request->get('role'));
+        //$user->syncRoles($request->get('role'));
 
         return redirect()->route('users.index')
             ->withSuccess(__('User updated successfully.'));

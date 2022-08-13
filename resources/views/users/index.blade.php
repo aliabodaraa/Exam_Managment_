@@ -2,11 +2,6 @@
 
 @section('content')
 
-    <h1 class="mb-3">
-        Control's @role('Admin')Admin <div class="lead">You Can Manage Any User Has A Role Student Or Teacher So You @can('user-edit') Can Edit ,@endcan @can('user-edit')Delete @endcan Any One You Need @can('user-create') , Also You Can Add A New User @endcan .</div>@endrole
-                  @role('Teacher')Teacher<div class="lead">You Can Show Any Profile's Admin Or Any one Of Your Teacher Colleagues here Also you @can('user-edit') Can Edit ,@endcan @can('user-edit')Delete @endcan Any Student In Your Department Only @can('user-create') , Also You Can Add A New User @endcan . @endrole
-                  @role('Student')Student<div class="lead">You Can Show Any Profile's Admin Or Profile's Teacher Or Any one Of Your Student Colleagues here @can('user-edit')Also You Can Edit Any Student In Your Department Only ,@endcan @can('user-edit')Also You Can Delete Any Student In Your Department Only @endcan  @can('user-create') , Also You Can Add A New User @endcan . @endrole
-    </h1>
     <div class="bg-light p-4 rounded">
         <h1>Users
             <div style="float: right;">
@@ -25,9 +20,11 @@
             <thead>
             <tr>
                 <th scope="col" width="3%">#</th>
-                <th scope="col" width="15%">Email</th>
-                <th scope="col" width="15%">Username</th>
+                <th scope="col" width="10%">Email</th>
+                <th scope="col" width="10%">Username</th>
                 <th scope="col" width="10%">Role</th>
+                <th scope="col" width="1%">number_of_observation</th>
+                <th scope="col" width="20%">current number_of_observation</th>
                 <th scope="col" width="1%" colspan="3">Actions</th>
             </tr>
             </thead>
@@ -39,6 +36,38 @@
                             <td>{{ $user->username }}</td>
                             <td>
                                 <span class="badge bg-danger">{{$user->role}}</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">{{$user->number_of_observation}}</span>
+                            </td>
+                            <td>
+                                
+                                @php
+                                    $current_observations_for_all_users=App\Models\User::with('courses')->whereHas('courses',function($query) use($user) {
+                                        $query->where('user_id',$user->id);
+                                    })->get();
+                                    $dates_distinct=[];
+                                    $times_distinct=[];
+                                @endphp
+
+                                @foreach($current_observations_for_all_users as $current_user)
+                                    @foreach($current_user->courses as $course)
+                                         @if( (!in_array($course->pivot->date,$dates_distinct) && !in_array($course->pivot->time,$times_distinct) ) ||
+                                              ( in_array($course->pivot->date,$dates_distinct) && !in_array($course->pivot->time,$times_distinct) ) ||
+                                              (!in_array($course->pivot->date,$dates_distinct) &&  in_array($course->pivot->time,$times_distinct) ) )
+                                                @php 
+                                                    array_push($dates_distinct,$course->pivot->date);
+                                                    array_push($times_distinct,$course->pivot->time); 
+                                                @endphp
+                                                <h6 class="badge bg-secondary">{{$course->pivot->date}}-{{$course->pivot->time}}-{{$course->course_name}}-{{$course->pivot->roleIn}} 
+                                                    @php $room=App\Models\Room::where('id',$course->pivot->room_id)->first(); @endphp
+                                                    -{{$room->room_name}}
+                                                </h6>
+                                        @endif
+                                    @endforeach
+                                @endforeach
+
+                                <span class="badge bg-secondary">{{count($dates_distinct)}}</span>
                             </td>
                             <td><a href="{{ route('users.show', $user->id) }}" class="btn btn-warning btn-sm">Show</a></td>
                             <td><a href="{{ route('users.edit', $user->id) }}" class="btn btn-info btn-sm">Edit</a></td>
@@ -53,7 +82,7 @@
         </table>
 {{-- added --}}
         {{-- <div class="modal show" id="formModal" aria-hidden="true"> --}}
-            <div class="modal-dialog">
+            <div class="modal-dialog" style="display:none">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h4 class="modal-title" id="formModalLabel">Create Todo</h4>
