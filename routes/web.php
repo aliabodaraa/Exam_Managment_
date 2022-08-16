@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
 Route::group(['namespace' => 'App\Http\Controllers'], function()
 {
     /**
@@ -43,6 +42,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
                 Route::get('/create', 'UsersController@create')->name('users.create');
                 Route::post('/create', 'UsersController@store')->name('users.store');
                 Route::get('/{user}/show', 'UsersController@show')->name('users.show');
+                Route::get('/{user}/observations', 'UsersController@observations')->name('users.observations');
                 Route::get('/{user}/edit', 'UsersController@edit')->name('users.edit');
                 Route::patch('/{user}/update', 'UsersController@update')->name('users.update');
                 Route::delete('/{user}/delete', 'UsersController@destroy')->name('users.destroy');
@@ -53,6 +53,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
              */
             Route::group(['prefix' => 'courses'], function() {
                 Route::get('/index', 'CoursesController@index')->name('courses.index');
+                Route::get('/misboard', 'CoursesController@misboard')->name('courses.misboard');
                 Route::get('/create', 'CoursesController@create')->name('courses.create');
                 Route::post('/create', 'CoursesController@store')->name('courses.store');
                 Route::get('/{course}/edit', 'CoursesController@edit')->name('courses.edit');
@@ -77,3 +78,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
             });
         });
     });
+
+
+
+//Livewires
+     Route::get('/search', \App\Http\Livewire\Search::class)->name('search');

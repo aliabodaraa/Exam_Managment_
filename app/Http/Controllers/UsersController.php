@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Room;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use App\Http\Requests\StoreUserRequest;
@@ -41,7 +42,8 @@ class UsersController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(StoreUserRequest $request)
-    {
+    {//dd($request->secure());
+        dd($request->getRequestUri());
         //dd(1123);
         $user = User::create(
             [// you also can be to write this User::create($request->validated()); but go to StoreUserRequest and make all fields required
@@ -70,7 +72,38 @@ class UsersController extends Controller
             'user' => $user
         ]);
     }
+    public function observations(User $user)
+    {
+        $user_name=User::where('id',$user->id)->first()->username;
+        $current_observations_for_all_users=User::with('courses')->whereHas('courses',function($query) use($user) {
+            $query->where('user_id',$user->id);
+        })->get();
+        $dates_distinct=[];
+        $times_distinct=[];
+        $table=[];
+        $i=0;
+    foreach($current_observations_for_all_users as $current_user)
+        foreach($current_user->courses as $course){
+             if( (!in_array($course->pivot->date,$dates_distinct) && !in_array($course->pivot->time,$times_distinct) ) ||
+                  ( in_array($course->pivot->date,$dates_distinct) && !in_array($course->pivot->time,$times_distinct) ) ||
+                  (!in_array($course->pivot->date,$dates_distinct) &&  in_array($course->pivot->time,$times_distinct) ) ){
+                        array_push($dates_distinct,$course->pivot->date);
+                        array_push($times_distinct,$course->pivot->time); 
+                        $table[$i]['date']=$course->pivot->date;
+                        $table[$i]['time']=$course->pivot->time;
+                        $table[$i]['roleIn']=$course->pivot->roleIn;
+                        $table[$i]['course_name']=$course->course_name;
+                        $table[$i]['room_name']=Room::where('id',$course->pivot->room_id)->first()->room_name;
+            }
+            $i++;
+        }
 
+    //dd($table);
+
+        return view('users.observations', [
+            'user_name' => $user_name,'table' => $table
+        ]);
+    }                             
     /**
      * Edit user data
      *

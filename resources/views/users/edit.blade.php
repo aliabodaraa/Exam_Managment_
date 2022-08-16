@@ -43,6 +43,7 @@
                         <option value="">Select role</option>
                         <option value="Doctor" {{ ($user->role == 'Doctor') ? 'selected': '' }}>Doctor</option>
                         <option value="Master's student" {{ ($user->role == "Master's student") ? 'selected': '' }}>Master's student</option>
+                        <option value="teacher" {{ ($user->role == "teacher") ? 'selected': '' }}>teacher</option>
                         <option value="administrative employee" {{ ($user->role == 'administrative employee') ? 'selected': '' }}>administrative employee</option>
                     </select>
                     @if ($errors->has('role'))
@@ -55,16 +56,9 @@
                         <span class="badge bg-secondary" style="float:right">{{$user->id==1 ?"Admin can't have observations":''}} </span>
                     @endif
                     <select class="form-control" name="number_of_observation" class="form-control" required  {{$user->id==1 ?'disabled':''}}>
-                        <option value='1' {{ ($user->number_of_observation == 1) ? 'selected': '' }}>1</option>
-                        <option value='2' {{ ($user->number_of_observation == 2) ? 'selected': '' }}>2</option>
-                        <option value='3' {{ ($user->number_of_observation == 3) ? 'selected': '' }}>3</option>
-                        <option value='4' {{ ($user->number_of_observation == 4) ? 'selected': '' }}>4</option>
-                        <option value='5' {{ ($user->number_of_observation == 5) ? 'selected': '' }}>5</option>
-                        <option value='6' {{ ($user->number_of_observation == 6) ? 'selected': '' }}>6</option>
-                        <option value='7' {{ ($user->number_of_observation == 7) ? 'selected': '' }}>7</option>
-                        <option value='8' {{ ($user->number_of_observation == 8) ? 'selected': '' }}>8</option>
-                        <option value='9' {{ ($user->number_of_observation == 9) ? 'selected': '' }}>9</option>
-                        <option value='10' {{ ($user->number_of_observation == 10) ? 'selected': '' }}>10</option>
+                        @for ($i = 1; $i <31; $i++)
+                            <option value='{{ $i }}' {{ ($user->number_of_observation == $i) ? 'selected': '' }}>{{ $i }}</option>
+                        @endfor
                     </select>
                     @if ($errors->has('number_of_observation'))
                         <span class="text-danger text-left">{{ $errors->first('number_of_observation') }}</span>

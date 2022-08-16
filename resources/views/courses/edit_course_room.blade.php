@@ -1,9 +1,11 @@
 @extends('layouts.app-master')
 
 @section('content')
+
 {{-- calc all students not in this room in this course --}}
 {{-- calc count_taken_student_in_all_rooms_in_this_course in this course --}}
 @php
+$course_id=$course->id;
     $courses_info=[];
     $common=[];
     $is_common=0;
@@ -45,7 +47,7 @@
                         @php
                             array_push($arr2,$room->id);
                             $count_taken_student_in_this_room_in_all_common_courses+=$room->pivot->num_student_in_room;
-                            $common[$courseN->course_name]['take']=$count_taken_student_in_this_room_in_all_common_courses;
+                            $common[$courseN->course_name]['take']=$room->pivot->num_student_in_room;
                             array_push($courses_belongs,$courseN->course_name);
                         @endphp
                     @endif
@@ -66,38 +68,64 @@
             $is_common= (count($course_info['courses_belongs']) > 1 ? true : false)
         @endphp
     @endforeach
+@php
+$count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in_this_room_in_this_course
+@endphp
 
-    <div class="info" style="display: inline-flex;">
-        <h6><span class="badge bg-info">Room Name : {{$specific_room->room_name}}</span></h6>
-        <h6><span class="badge bg-secondary">Capacity : {{$specific_room->capacity}}</span></h6>
+    <div class="info-room" style="display: inline-flex;">
+        <h6><span class="badge bg-primary">Room Name : {{$specific_room->room_name}}</span></h6>
+        <h6><span class="badge bg-{{(!$count_taken_student_in_this_room_in_this_course && $specific_room->capacity == $count_taken_student_in_this_room_in_all_common_courses) || ($count_taken_student_in_this_room_in_this_course && $specific_room->capacity == $count_taken_student_in_this_room_in_all_common_courses) ? 'danger':'secondary'}}">Capacity : {{$specific_room->capacity}}@if($is_common || count($courses_info[$course->course_name]['courses_belongs']) == 1)/{{$count_taken_student_in_this_room_in_all_common_courses}}@endif</span></h6>
     </div>
-    @if($is_common)
+    <div class="info-date-time-for-course" style="display: inline-flex;">
+        @php $current_course=App\Models\Course::where('id',$course_id)->first();@endphp
+        <h6><span class="badge bg-success">Date : {{date('l d-m-Y', strtotime($current_course->rooms[0]->pivot->date))}}</span></h6>
+        <h6><span class="badge bg-warning">Time : {{gmdate('H:i A',strtotime($current_course->rooms[0]->pivot->time))}}</span></h6>
+    </div>
+
+    {{-- @if($is_common ) considered by joining and manage rooms --}}
     <div class="info" style="display: inline-flex;float:right">
-            <h6><span class="badge bg-info">Common with :</span></h6>
+        @if($is_common)<h6><span class="badge bg-dark">Common with :</span></h6>@endif
             @foreach ($courses_info[$course->course_name]['courses_belongs'] as $course_belongs)
             @if($course->course_name==$course_belongs) @php continue; @endphp @endif
-            <h6><span class="badge bg-primary">{{$course_belongs}}<span class="badge bg-danger" style="
+            @php $current_course_belong=App\Models\Course::where('course_name',$course_belongs)->first(); @endphp
+            <h6><a href="/courses/{{ $current_course_belong->id }}/room/{{ $specific_room->id }}" class="badge bg-primary" style="text-decoration: none;">{{$course_belongs}}<span class="badge bg-danger" style="
                 padding: 3px;
                 border-radius: 62px;
                 position: absolute;
                 font-size: 8px;
                 top: 113px;
-            "> take  {{$course_info['common-info'][$course_belongs]['take']}}</span></span></h6>
+            "> take  {{$course_info['common-info'][$course_belongs]['take']}}</span></a></h6>
             @endforeach
     </div>
-    @endif
+    {{-- @endif --}}
     <div class="bg-light p-4 rounded">
-        <h2>Update the room <mark>{{$specific_room->room_name}}</mark> in Course <mark>{{$course->course_name}}</mark> </h2>
-        <div class="lead">
-            @if($is_common)
-                this Common room take <mark>{{$count_taken_student_in_this_room_in_this_course}}</mark> and other rooms take <mark>{{$count_taken_student_not_in_this_room_in_this_course}}</mark> in this course
-            @else
-                this Common room take <mark>{{$count_taken_student_in_this_room_in_this_course}}</mark> and other rooms take <mark>{{$count_taken_student_not_in_this_room_in_this_course}}</mark> in this course
+        <h2>Update the room <mark>{{$specific_room->room_name}}</mark> in Course <mark>{{$course->course_name}}</mark> 
+            @if((!$count_taken_student_in_this_room_in_this_course && $specific_room->capacity == $count_taken_student_in_this_room_in_all_common_courses))
+                <span class="badge bg-danger">The Room Is Full , You Can't Join</span>
+                @elseif(($count_taken_student_in_this_room_in_this_course && $specific_room->capacity == $count_taken_student_in_this_room_in_all_common_courses))
+                <span class="badge bg-danger">The Room Is Full</span>
             @endif
-            the course now take :<mark>{{$count_taken_student_in_all_rooms_in_this_course}}/{{$course->students_number}}</mark> person
+            <div class="" style="float: right;">
+                <a href="{{ URL::previous() }}" class="btn btn-dark">Back</a>
+            </div>
+        </h2>
+        <div class="lead">
+            @if($is_common && $count_taken_student_in_this_room_in_this_course)
+                this Common room take <mark>{{$count_taken_student_in_this_room_in_this_course}}</mark>Place, and other rooms take <mark>{{$count_taken_student_not_in_this_room_in_this_course}}</mark> in this course
+            @elseif(count($courses_info[$course->course_name]['courses_belongs']) >= 1 && !$count_taken_student_in_this_room_in_this_course)
+            {{-- //Joining room --}}
+            this Join room now take <mark>{{$count_taken_student_in_this_room_in_this_course}}</mark>, You can Join Maximum <mark>{{$specific_room->capacity - $count_taken_student_in_this_room_in_all_common_courses}}</mark> Empty Place
+            @elseif(count($courses_info[$course->course_name]['courses_belongs']) == 0)
+            {{-- single_room does not exist --}}
+            single_room does not exist this Common room take <mark>{{$count_taken_student_in_this_room_in_this_course}}
+            @elseif(count($courses_info[$course->course_name]['courses_belongs']) == 1)
+            {{-- single_room exist --}}
+            single_room exist this room take <mark>{{$count_taken_student_in_this_room_in_this_course}}
+            @endif
+            <br>and all rooms in this course now take :<mark>{{$count_taken_student_in_all_rooms_in_this_course}}/{{$course->students_number}}</mark> person
         </div>
 
-        <div class="container mt-4">
+        <div class="">
             @if(in_array($specific_room->id, $common_rooms)) <h5>notes These rooms are common with
                 @foreach ($all_common_courses as $course_common)
                     {{$course_common}} ,
@@ -109,22 +137,30 @@
                     <strong>{{ $message_detemine_rooms }}</strong>
                 </div>
             @endif
-            @php $current_num_of_student = App\Models\User::with('rooms')->whereHas('rooms', function($query) use($specific_room,$course){$query->where('date',$course->users[0]->pivot->date)->where('time',$course->users[0]->pivot->time)->where('room_id',$specific_room->id)->where('course_id',$course->id);})->get(); @endphp
-            @php
+            @php $current_num_of_student = App\Models\User::with('rooms')->whereHas('rooms', function($query) use($specific_room,$course){$query->where('date',$course->users[0]->pivot->date)->where('time',$course->users[0]->pivot->time)->where('room_id',$specific_room->id)->where('course_id',$course->id);})->get();
             $sholder=10;
-            $message='';
-            if($count_taken_student_not_in_this_room_in_this_course + $specific_room->capacity/2 > $course->students_number){
-                for ($i = 1; $i <= $specific_room->capacity/2; $i++)
-                    if( $count_taken_student_not_in_this_room_in_this_course + $i == $course->students_number ){
-                        $sholder=$i;
-                        $message="You can select number of student between 1 and ".$sholder;
-                        break;
-                    }
-                }else{ 
-                    $sholder=$specific_room->capacity/2;}
+            $message='';//dd(count($courses_info[$course->course_name]['courses_belongs']));
+            //dd($count_taken_student_in_this_room_in_this_course);
+            if(count($courses_info[$course->course_name]['courses_belongs']) > 1 && $count_taken_student_in_this_room_in_this_course){
+                //for ($i = 1; $i <= $specific_room->capacity/count($courses_info[$course->course_name]['courses_belongs']); $i++)
+                    // if( $count_taken_student_not_in_this_room_in_this_course + $i == $course->students_number ){
+                    //     $sholder=$i;
+                    //     $message="You can select number of student between 1 and ".$sholder;
+                    //     break;
+                    // }else{ 
+                        $sholder=$specific_room->capacity/count($courses_info[$course->course_name]['courses_belongs']);
+                    //}
+            }else{ 
+                if(count($courses_info[$course->course_name]['courses_belongs']) == 0)//single_room does not exist
+                    $sholder=$specific_room->capacity/2;
+                elseif(count($courses_info[$course->course_name]['courses_belongs']) >= 1 && !$count_taken_student_in_this_room_in_this_course)//Joining room
+                    $sholder=$specific_room->capacity-$count_taken_student_in_this_room_in_all_common_courses;
+                elseif(count($courses_info[$course->course_name]['courses_belongs']) == 1)//single_room exist
+                    $sholder=$specific_room->capacity/2;
+            }
             @endphp
             @if($message)
-                <span class="badge bg-secondary" style="float:right">{{$message}}</span>
+                <span class="badge bg-secondary">{{$message}}</span>
             @endif
             <form method="post" action="{{ route('courses.room_for_course', [$course->id,$specific_room->id]) }}">
                 @method('patch')
@@ -132,7 +168,7 @@
                 @if(count($course->users->toArray()))
                     <div class="mb-3">
                         <label for="num_student_in_room" class="form-label">Number Students In Room <mark>{{$specific_room->room_name}}</mark>  :</label>
-                        <select class="form-control" name="num_student_in_room" class="form-control" required>
+                        <select class="form-control" name="num_student_in_room" class="form-control" required {{ (!$count_taken_student_in_this_room_in_this_course && $specific_room->capacity == $count_taken_student_in_this_room_in_all_common_courses) ? 'disabled' : '' }}>
                             <!-- $courses_info[$course->course_name]['count_taken_student_in_this_room_in_this_course']) -->
                                     @for ($i = 1; $i <= $sholder; $i++)
                                         <option value="{{$i}}" {{ ($courses_info[$course->course_name]['count_taken_student_in_this_room_in_this_course'] == $i) ? 'selected': '' }}>{{$i}}</option>
@@ -145,86 +181,92 @@
                     </div>
                 @endif
                 <div class="mb-3">
-                    <label for="members" class="form-label">members :</label>
-                    <table class="table">
-                        <thead>
-                            <th scope="col" width="1%"><input type="checkbox" name="all_roomheads"></th>
-                            <th scope="col" width="30%">Room-Heads</th>
-                            <th scope="col" width="1%"><input type="checkbox" name="all_secertaries"></th>
-                            <th scope="col" width="30%">Secertaries</th>
-                            <th scope="col" width="1%"><input type="checkbox" name="all_observers"></th>
-                            <th scope="col" width="30%">Observers</th>
-                        </thead>
-                        @foreach(App\Models\User::all() as $user)
-                        @if(in_array($specific_room->id,$disabled_rooms))
-          @once <span>d1</span>@endonce
-                        <tr>
-                            <td>
-                                <input type="checkbox"
-                                name="roomheads[{{ $user->id }}]"
-                                value="{{ $user->id }}"
-                                class='roomheads'
+                <label for="members" class="form-label">members :</label>
+                <div class="d">
+                @foreach(App\Models\User::all() as $user)
+                        <?php if($user->id==1) continue; ?>
 
-                                {{ in_array($user->id, $users_will_in_common_ids["Room_Head"])
-                                    ? 'checked'
-                                    : '' }}
-                                {{ (!in_array($user->id, $users_will_in_common_ids["Room_Head"])&&!in_array($user->id, $users_will_in_common_ids["Secertary"])&&!in_array($user->id, $users_will_in_common_ids["Observer"]))&&(in_array($user->id, $users_will_in_common_ids["Secertary"])||in_array($user->id, $users_will_in_common_ids["Observer"])||in_array($user->id, $disabled_secertaryArr) || in_array($user->id, $disabled_roomHeadArr) || in_array($user->id, $disabled_observerArr))
-                                    ? 'disabled'
-                                    : '' }}
-                                    @foreach ( $room_Distinct as  $room_D )
-                                        {{($room_D != $specific_room->id &&
-                                        (in_array($user->id, $users_in_rooms[$room_D]['roomHeads'])
-                                        || in_array($user->id, $users_in_rooms[$room_D]['secertaries'])
-                                        || in_array($user->id, $users_in_rooms[$room_D]['observers']))) ? 'disabled' : ''}}
-                                    @endforeach>
-                            </td>
-                            <td>{{ $user->username }}</td>
-                            <td>
-                                <input type="checkbox"
-                                name="secertaries[{{ $user->id }}]"
-                                value="{{ $user->id }}"
-                                class='secertaries'
+                        @php
+                            $current_observations_for_all_users=App\Models\User::with('courses')->whereHas('courses',function($query) use($user) {
+                                $query->where('user_id',$user->id);
+                            })->get();
+                            $dates_distinct=[];
+                            $times_distinct=[];
+                            foreach($current_observations_for_all_users as $current_user)
+                                foreach($current_user->courses as $course)
+                                    if( (!in_array($course->pivot->date,$dates_distinct) && !in_array($course->pivot->time,$times_distinct) ) ||
+                                        ( in_array($course->pivot->date,$dates_distinct) && !in_array($course->pivot->time,$times_distinct) ) ||
+                                        (!in_array($course->pivot->date,$dates_distinct) &&  in_array($course->pivot->time,$times_distinct) ) ){
+                                                array_push($dates_distinct,$course->pivot->date);
+                                                array_push($times_distinct,$course->pivot->time); 
+                                    }
+                        @endphp
+                        @if(true)
+                        {{-- @once <span>d1</span>@endonce --}}
+                            <div class="d1" style="display: block;
+                            background-color: rgba(224, 224, 224, 0.499);
+                            border-radius: 7px;
+                            padding: 20px 20px 20px 0px;margin:5px;height: 71px;">
+                                <h4 style="float:right;">Room-Head</h4>
+                                    <input type="checkbox" style="float:right;"
+                                    name="roomheads[{{ $user->id }}]"
+                                    value="{{ $user->id }}"
+                                    class='roomheads toggler-wrapper style-4'
 
-                                {{ in_array($user->id, $users_will_in_common_ids["Secertary"])
-                                    ? 'checked'
-                                    : '' }}
-                                    {{ (!in_array($user->id, $users_will_in_common_ids["Room_Head"])&&!in_array($user->id, $users_will_in_common_ids["Secertary"])&&!in_array($user->id, $users_will_in_common_ids["Observer"]))&&!in_array($user->id, $users_will_in_common_ids["Secertary"])&&(in_array($user->id, $users_will_in_common_ids["Secertary"])||in_array($user->id, $users_will_in_common_ids["Observer"])||in_array($user->id, $disabled_secertaryArr) || in_array($user->id, $disabled_roomHeadArr) || in_array($user->id, $disabled_observerArr))
-                                    ? 'disabled'
-                                    : '' }}
-                                    @foreach ( $room_Distinct as  $room_D )
-                                        {{($room_D != $specific_room->id &&
-                                        (in_array($user->id, $users_in_rooms[$room_D]['roomHeads'])
-                                        || in_array($user->id, $users_in_rooms[$room_D]['secertaries'])
-                                        || in_array($user->id, $users_in_rooms[$room_D]['observers']))) ? 'disabled' : ''}}
-                                    @endforeach>
-                            </td>
-                            {{-- 'course','secertaryArr','disabled_secertaryArr','roomHeadArr','disabled_roomHeadArr','observerArr','disabled_observerArr' --}}
-                            <td>{{ $user->username }}</td>
-                            <td>
-                                <input type="checkbox"
-                                name="observers[{{ $user->id }}]"
-                                value="{{ $user->id }}"
-                                class='observers'
-
-                                {{ in_array($user->id, $users_will_in_common_ids["Observer"])
-                                    ? 'checked'
-                                    : '' }}
+                                    {{ in_array($user->id, $users_will_in_common_ids["Room_Head"])
+                                        ? 'checked'
+                                        : '' }}
                                     {{ (!in_array($user->id, $users_will_in_common_ids["Room_Head"])&&!in_array($user->id, $users_will_in_common_ids["Secertary"])&&!in_array($user->id, $users_will_in_common_ids["Observer"]))&&(in_array($user->id, $users_will_in_common_ids["Secertary"])||in_array($user->id, $users_will_in_common_ids["Observer"])||in_array($user->id, $disabled_secertaryArr) || in_array($user->id, $disabled_roomHeadArr) || in_array($user->id, $disabled_observerArr))
-                                    ? 'disabled'
-                                    : '' }}
-                                    @foreach ( $room_Distinct as  $room_D )
-                                        {{($room_D != $specific_room->id &&
-                                        (in_array($user->id, $users_in_rooms[$room_D]['roomHeads'])
-                                        || in_array($user->id, $users_in_rooms[$room_D]['secertaries'])
-                                        || in_array($user->id, $users_in_rooms[$room_D]['observers']))) ? 'disabled' : ''}}
-                                    @endforeach>
-                            </td>
-                            <td>{{ $user->username }}</td>
-                        </tr>
-                         @elseif(!in_array($specific_room->id, $common_rooms) && !in_array($specific_room->id,$disabled_rooms))
-                         @once <span>d2</span>@endonce
-                            <tr>
-                                <td>
+                                        ? 'disabled'
+                                        : '' }}
+                                        @foreach ( $room_Distinct as  $room_D )
+                                            {{($room_D != $specific_room->id &&
+                                            (in_array($user->id, $users_in_rooms[$room_D]['roomHeads'])
+                                            || in_array($user->id, $users_in_rooms[$room_D]['secertaries'])
+                                            || in_array($user->id, $users_in_rooms[$room_D]['observers']))) || (count($dates_distinct)>=$user->number_of_observation && !in_array($user->id, $users_will_in_common_ids["Room_Head"]) && !in_array($user->id, $users_will_in_common_ids["Secertary"]) && !in_array($user->id, $users_will_in_common_ids["Observer"]))  ? 'disabled' : ''}}
+                                        @endforeach>
+                                        <h4 style="float:right;">Secertary</h4>
+                                        <input type="checkbox" style="float:right;"
+                                        name="secertaries[{{ $user->id }}]"
+                                        value="{{ $user->id }}"
+                                        class='secertaries toggler-wrapper style-4'
+    
+                                        {{ in_array($user->id, $users_will_in_common_ids["Secertary"])
+                                            ? 'checked'
+                                            : '' }}
+                                            {{ (!in_array($user->id, $users_will_in_common_ids["Room_Head"])&&!in_array($user->id, $users_will_in_common_ids["Secertary"])&&!in_array($user->id, $users_will_in_common_ids["Observer"]))&&!in_array($user->id, $users_will_in_common_ids["Secertary"])&&(in_array($user->id, $users_will_in_common_ids["Secertary"])||in_array($user->id, $users_will_in_common_ids["Observer"])||in_array($user->id, $disabled_secertaryArr) || in_array($user->id, $disabled_roomHeadArr) || in_array($user->id, $disabled_observerArr))
+                                            ? 'disabled'
+                                            : '' }}
+                                            @foreach ( $room_Distinct as  $room_D )
+                                                {{($room_D != $specific_room->id &&
+                                                (in_array($user->id, $users_in_rooms[$room_D]['roomHeads'])
+                                                || in_array($user->id, $users_in_rooms[$room_D]['secertaries'])
+                                                || in_array($user->id, $users_in_rooms[$room_D]['observers']))) || (count($dates_distinct)>=$user->number_of_observation && !in_array($user->id, $users_will_in_common_ids["Room_Head"]) && !in_array($user->id, $users_will_in_common_ids["Secertary"]) && !in_array($user->id, $users_will_in_common_ids["Observer"])) ? 'disabled' : ''}}
+                                            @endforeach>
+                                            <h4 style="float:right;">Observer</h4>
+                                            <input type="checkbox" style="float:right;"
+                                            name="observers[{{ $user->id }}]"
+                                            value="{{ $user->id }}"
+                                            class='observers toggler-wrapper style-4'
+            
+                                            {{ in_array($user->id, $users_will_in_common_ids["Observer"])
+                                                ? 'checked'
+                                                : '' }}
+                                                {{ (!in_array($user->id, $users_will_in_common_ids["Room_Head"])&&!in_array($user->id, $users_will_in_common_ids["Secertary"])&&!in_array($user->id, $users_will_in_common_ids["Observer"]))&&(in_array($user->id, $users_will_in_common_ids["Secertary"])||in_array($user->id, $users_will_in_common_ids["Observer"])||in_array($user->id, $disabled_secertaryArr) || in_array($user->id, $disabled_roomHeadArr) || in_array($user->id, $disabled_observerArr))
+                                                ? 'disabled'
+                                                : '' }}
+                                                @foreach ( $room_Distinct as  $room_D )
+                                                    {{($room_D != $specific_room->id &&
+                                                    (in_array($user->id, $users_in_rooms[$room_D]['roomHeads'])
+                                                    || in_array($user->id, $users_in_rooms[$room_D]['secertaries'])
+                                                    || in_array($user->id, $users_in_rooms[$room_D]['observers']))) || (count($dates_distinct)>=$user->number_of_observation && !in_array($user->id, $users_will_in_common_ids["Room_Head"]) && !in_array($user->id, $users_will_in_common_ids["Secertary"]) && !in_array($user->id, $users_will_in_common_ids["Observer"])) ? 'disabled' : ''}}
+                                                @endforeach>
+                                                <h5 style="margin-left: 150px;"><b>{{ $user->username }}</b></h5>
+                                                <h4 style="position: relative;top: -60px;display:inline-flex"><a href="{{ route('users.observations', $user->id) }}" class="badge bg-{{(count($dates_distinct)==$user->number_of_observation)?'danger':'secondary'}}">{{count($dates_distinct)}}/{{$user->number_of_observation}}</a></h4>
+                            </div>
+                         @else
+                            {{-- @once <span>d2</span>@endonce --}}
+                            <div class="d2">
                                     <input type="checkbox"
                                     name="roomheads[{{ $user->id }}]"
                                     value="{{ $user->id }}"
@@ -239,60 +281,53 @@
                                             {{($room_D != $specific_room->id &&
                                             (in_array($user->id, $users_in_rooms[$room_D]['roomHeads'])
                                             || in_array($user->id, $users_in_rooms[$room_D]['secertaries'])
-                                            || in_array($user->id, $users_in_rooms[$room_D]['observers']))) ? 'disabled' : ''}}
+                                            || in_array($user->id, $users_in_rooms[$room_D]['observers']))) || (count($dates_distinct)>=$user->number_of_observation && !in_array($user->id, $users_in_rooms[$specific_room->id]['roomHeads'])&& !in_array($user->id, $users_in_rooms[$specific_room->id]['secertaries'])&& !in_array($user->id, $users_in_rooms[$specific_room->id]['observers'])) ? 'disabled' : ''}}
                                         @endforeach>
-                                </td>
-                                <td>{{ $user->username }}</td>
-                                <td>
-                                    <input type="checkbox"
-                                    name="secertaries[{{ $user->id }}]"
-                                    value="{{ $user->id }}"
-                                    class='secertaries'
-
-                                    {{ (in_array($user->id, $users_in_rooms[$specific_room->id]['secertaries']))
-                                           ? 'checked'
-                                           : '' }}
-                                           {{ (in_array($user->id, $users_will_in_common_ids["Room_Head"])||in_array($user->id, $users_will_in_common_ids["Secertary"])||in_array($user->id, $users_will_in_common_ids["Observer"])|| in_array($user->id, $disabled_secertaryArr) || in_array($user->id, $disabled_roomHeadArr) || in_array($user->id, $disabled_observerArr) )&& (!in_array($user->id, $users_in_rooms[$specific_room->id]['secertaries'])&&!in_array($user->id, $users_in_rooms[$specific_room->id]['roomHeads'])&&!in_array($user->id, $users_in_rooms[$specific_room->id]['observers']))
-                                    ? 'disabled'
-                                    : '' }}
-                                        @foreach ( $room_Distinct as  $room_D )
-                                            {{($room_D != $specific_room->id &&
-                                            (in_array($user->id, $users_in_rooms[$room_D]['roomHeads'])
-                                            || in_array($user->id, $users_in_rooms[$room_D]['secertaries'])
-                                            || in_array($user->id, $users_in_rooms[$room_D]['observers']))) ? 'disabled' : ''}}
-                                        @endforeach>
-                                </td>
-                                {{-- 'course','secertaryArr','disabled_secertaryArr','roomHeadArr','disabled_roomHeadArr','observerArr','disabled_observerArr' --}}
-                                <td>{{ $user->username }}</td>
-                                <td>
-                                    <input type="checkbox"
-                                    name="observers[{{ $user->id }}]"
-                                    value="{{ $user->id }}"
-                                    class='observers'
-
-                                    {{ in_array($user->id, $users_in_rooms[$specific_room->id]['observers'])
-                                           ? 'checked'
-                                           : '' }}
-                                           {{ (in_array($user->id, $users_will_in_common_ids["Room_Head"])||in_array($user->id, $users_will_in_common_ids["Secertary"])||in_array($user->id, $users_will_in_common_ids["Observer"])|| in_array($user->id, $disabled_secertaryArr) || in_array($user->id, $disabled_roomHeadArr) || in_array($user->id, $disabled_observerArr) )&& (!in_array($user->id, $users_in_rooms[$specific_room->id]['secertaries'])&&!in_array($user->id, $users_in_rooms[$specific_room->id]['roomHeads'])&&!in_array($user->id, $users_in_rooms[$specific_room->id]['observers']))
+                                        <input type="checkbox"
+                                        name="secertaries[{{ $user->id }}]"
+                                        value="{{ $user->id }}"
+                                        class='secertaries'
+    
+                                        {{ (in_array($user->id, $users_in_rooms[$specific_room->id]['secertaries']))
+                                               ? 'checked'
+                                               : '' }}
+                                               {{ (in_array($user->id, $users_will_in_common_ids["Room_Head"])||in_array($user->id, $users_will_in_common_ids["Secertary"])||in_array($user->id, $users_will_in_common_ids["Observer"])|| in_array($user->id, $disabled_secertaryArr) || in_array($user->id, $disabled_roomHeadArr) || in_array($user->id, $disabled_observerArr) )&& (!in_array($user->id, $users_in_rooms[$specific_room->id]['secertaries'])&&!in_array($user->id, $users_in_rooms[$specific_room->id]['roomHeads'])&&!in_array($user->id, $users_in_rooms[$specific_room->id]['observers']))
                                         ? 'disabled'
                                         : '' }}
-                                        @foreach ( $room_Distinct as  $room_D )
-                                            {{($room_D != $specific_room->id &&
-                                            (in_array($user->id, $users_in_rooms[$room_D]['roomHeads'])
-                                            || in_array($user->id, $users_in_rooms[$room_D]['secertaries'])
-                                            || in_array($user->id, $users_in_rooms[$room_D]['observers']))) ? 'disabled' : ''}}
-                                        @endforeach>
-                                </td>
-                                <td>{{ $user->username }}</td>
-                            </tr>
-
-
-                       @endif
+                                            @foreach ( $room_Distinct as  $room_D )
+                                                {{($room_D != $specific_room->id &&
+                                                (in_array($user->id, $users_in_rooms[$room_D]['roomHeads'])
+                                                || in_array($user->id, $users_in_rooms[$room_D]['secertaries'])
+                                                || in_array($user->id, $users_in_rooms[$room_D]['observers']))) || (count($dates_distinct)>=$user->number_of_observation && !in_array($user->id, $users_in_rooms[$specific_room->id]['roomHeads'])&& !in_array($user->id, $users_in_rooms[$specific_room->id]['secertaries'])&& !in_array($user->id, $users_in_rooms[$specific_room->id]['observers'])) ? 'disabled' : ''}}
+                                            @endforeach>
+                                            <input type="checkbox"
+                                            name="observers[{{ $user->id }}]"
+                                            value="{{ $user->id }}"
+                                            class='observers'
+        
+                                            {{ in_array($user->id, $users_in_rooms[$specific_room->id]['observers'])
+                                                   ? 'checked'
+                                                   : '' }}
+                                                   {{ (in_array($user->id, $users_will_in_common_ids["Room_Head"])||in_array($user->id, $users_will_in_common_ids["Secertary"])||in_array($user->id, $users_will_in_common_ids["Observer"])|| in_array($user->id, $disabled_secertaryArr) || in_array($user->id, $disabled_roomHeadArr) || in_array($user->id, $disabled_observerArr) )&& (!in_array($user->id, $users_in_rooms[$specific_room->id]['secertaries'])&&!in_array($user->id, $users_in_rooms[$specific_room->id]['roomHeads'])&&!in_array($user->id, $users_in_rooms[$specific_room->id]['observers']))
+                                                ? 'disabled'
+                                                : '' }}
+                                                @foreach ( $room_Distinct as  $room_D )
+                                                    {{($room_D != $specific_room->id &&
+                                                    (in_array($user->id, $users_in_rooms[$room_D]['roomHeads'])
+                                                    || in_array($user->id, $users_in_rooms[$room_D]['secertaries'])
+                                                    || in_array($user->id, $users_in_rooms[$room_D]['observers']))) || (count($dates_distinct)>=$user->number_of_observation && !in_array($user->id, $users_in_rooms[$specific_room->id]['roomHeads'])&& !in_array($user->id, $users_in_rooms[$specific_room->id]['secertaries'])&& !in_array($user->id, $users_in_rooms[$specific_room->id]['observers'])) ? 'disabled' : ''}}
+                                                @endforeach>
+                                                {{ $user->username }}
+                                                <td><h4><a href="{{ route('users.observations', $user->id) }}" class="badge bg-{{(count($dates_distinct)==$user->number_of_observation)?'danger':'secondary'}}">{{count($dates_distinct)}}/{{$user->number_of_observation}}</a></h4></td>
+                                </div>
+                            @endif
                        @endforeach
-                    </table>
+                    </div>
                 </div>
+                 @php $current_course=App\Models\Course::where('id',$course_id)->first();@endphp
+                {{-- @dd($current_course,$current_course->rooms[0]->pivot->date)  --}}
                 <div class="mb-3">
-                    <input value="{{$course->rooms[0]->pivot->date}}"
+                    <input value="{{$current_course->rooms[0]->pivot->date}}"
                         type="date"
                         class="form-control"
                         name="date"
@@ -302,7 +337,7 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <input value="{{$course->rooms[0]->pivot->time}}"
+                    <input value="{{$current_course->rooms[0]->pivot->time}}"
                         type="time"
                         class="form-control"
                         name="time"
@@ -311,8 +346,8 @@
                         <span class="text-danger text-left">{{ $errors->first('time') }}</span>
                     @endif
                 </div>
-                <button type="submit" class="btn btn-primary">Update Course</button>
-                <a href="{{ route('courses.index') }}" class="btn btn-default">Cancel</button>
+                <button type="submit" class="btn btn-primary" {{ (!$count_taken_student_in_this_room_in_this_course && $specific_room->capacity == $count_taken_student_in_this_room_in_all_common_courses) ? 'disabled' : '' }}>Update Course</button>
+                <a href="{{ route('courses.index') }}" class="btn btn-default">Cancel</a>
             </form>
         </div>
 
@@ -369,22 +404,72 @@
                         $(this).prop('checked',false);
                 });
                 //end prevent
-                $(this).parent().next().next().siblings().children(":first-child").css({'backgroundColor': 'red'}).prop('checked',false);
-                $(this).parent().next().siblings().children(":first-child").prop('checked',false);
+                $(this).next().next().next().next().prop('checked',false);
+                $(this).next().next().prop('checked',false);
                 $(this).prop('checked',true)
             }
         });
+
+
+        //calc number of secertaries that checked
+        let number_of_secertaries_secertaries_that_checked=0;
+        let number_of_secertaries_secertaries_that_not_checked=0;
+        $(".secertaries").each(function(){
+            if($(this).is(':checked'))
+                number_of_secertaries_secertaries_that_checked++;
+            else
+                number_of_secertaries_secertaries_that_not_checked++;
+        });
+        console.log(number_of_secertaries_secertaries_that_checked,number_of_secertaries_secertaries_that_not_checked);
+
+        //let x=0;
         $(".secertaries").on( 'click', function () {
-            if($(this).is(':checked')){
-                $(this).parent().prev().siblings().children(":first-child").css({'backgroundColor': 'red'}).prop('checked',false);
-                $(this).parent().next().siblings().children(":first-child").prop('checked',false);
-                $(this).prop('checked',true)
+            // $(this).each(function(){
+            //     if($(this).is(':checked'))
+            //         x++;
+            //     else if(!$(this).is(':checked'))
+            //         x+=10;
+            // });
+            // if(number_of_secertaries_secertaries_that_checked<2){
+            //     console.log('err');}
+            if($(this).is(':checked') && number_of_secertaries_secertaries_that_checked < 2){
+                $(this).prev().prev().prop('checked',false);
+                $(this).next().next().prop('checked',false);
+                $(this).prop('checked',true);
+                number_of_secertaries_secertaries_that_checked++;
+                number_of_secertaries_secertaries_that_not_checked--;
+                console.log('err1');
+            }else if($(this).is(':checked') && number_of_secertaries_secertaries_that_checked >= 2){
+                $(this).prev().prev().prop('checked',false);
+                $(this).next().next().prop('checked',false);
+                $(this).prop('checked',true);
+                number_of_secertaries_secertaries_that_checked++;
+                number_of_secertaries_secertaries_that_not_checked--;console.log('err2');
+            }else if(!$(this).is(':checked') && number_of_secertaries_secertaries_that_checked < 2){
+                number_of_secertaries_secertaries_that_checked--;
+                number_of_secertaries_secertaries_that_not_checked++;console.log('err3');
+            }else{
+                //$(this).prop('checked',false);
+                number_of_secertaries_secertaries_that_not_checked++;
+                number_of_secertaries_secertaries_that_checked--;console.log('err4');
+            }
+            console.log(number_of_secertaries_secertaries_that_checked,number_of_secertaries_secertaries_that_not_checked);
+            if(number_of_secertaries_secertaries_that_checked>=2){
+                $(".secertaries").each(function(){
+                    if(!$(this).is(':checked'))
+                        $(this).prop('disabled',true);
+                });
+            }else{
+                $(".secertaries").each(function(){
+                    if(!$(this).is(':checked')&& !$(this).prev().prev().prop('disabled') && !$(this).next().next().prop('disabled'))
+                        $(this).prop('disabled',false);
+                });
             }
         });
         $(".observers").on( 'click', function () {
             if($(this).is(':checked')){
-                $(this).parent().next().siblings().children(":first-child").prop('checked',false);
-                $(this).parent().next().next().siblings().children(":first-child").css({'backgroundColor': 'red'}).prop('checked',false);
+                $(this).prev().prev().prop('checked',false);
+                $(this).prev().prev().prev().prev().prop('checked',false);
                 $(this).prop('checked',true)
             }
         });

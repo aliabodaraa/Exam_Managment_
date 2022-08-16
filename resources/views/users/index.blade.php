@@ -15,17 +15,17 @@
         <div class="mt-2">
             @include('layouts.partials.messages')
         </div>
-
+        {{-- @livewire('search') --}}
         <table class="table table-striped">
             <thead>
             <tr>
-                <th scope="col" width="3%">#</th>
-                <th scope="col" width="10%">Email</th>
-                <th scope="col" width="10%">Username</th>
-                <th scope="col" width="10%">Role</th>
-                <th scope="col" width="1%">number_of_observation</th>
+                <th scope="col" width="5%">#</th>
+                <th scope="col" width="15%">Email</th>
+                <th scope="col" width="15%">Username</th>
+                <th scope="col" width="15%">Role</th>
+                <th scope="col" width="20%">number observation</th>
                 <th scope="col" width="20%">current number_of_observation</th>
-                <th scope="col" width="1%" colspan="3">Actions</th>
+                <th scope="col" width="10%" colspan="3">Actions</th>
             </tr>
             </thead>
             <tbody id="user-list" name="users-list">
@@ -59,16 +59,13 @@
                                                     array_push($dates_distinct,$course->pivot->date);
                                                     array_push($times_distinct,$course->pivot->time); 
                                                 @endphp
-                                                <h6 class="badge bg-secondary">{{$course->pivot->date}}-{{$course->pivot->time}}-{{$course->course_name}}-{{$course->pivot->roleIn}} 
-                                                    @php $room=App\Models\Room::where('id',$course->pivot->room_id)->first(); @endphp
-                                                    -{{$room->room_name}}
-                                                </h6>
                                         @endif
                                     @endforeach
                                 @endforeach
 
                                 <span class="badge bg-secondary">{{count($dates_distinct)}}</span>
                             </td>
+                            <td><a href="{{ route('users.observations', $user->id) }}" class="btn btn-success btn-sm">observations</a></td>
                             <td><a href="{{ route('users.show', $user->id) }}" class="btn btn-warning btn-sm">Show</a></td>
                             <td><a href="{{ route('users.edit', $user->id) }}" class="btn btn-info btn-sm">Edit</a></td>
                             <td>

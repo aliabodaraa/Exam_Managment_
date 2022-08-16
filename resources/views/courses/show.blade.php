@@ -27,6 +27,6 @@
         @endif
     </div>
     <div class="mt-4">
-        <a href="{{ route('courses.index') }}" class="btn btn-dark">Back</a>
+        <a href="{{ URL::previous() }}" class="btn btn-dark">Back</a>
     </div>
 @endsection
