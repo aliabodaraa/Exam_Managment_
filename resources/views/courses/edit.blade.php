@@ -190,7 +190,7 @@ function ret_room_info($room,$course){
                         <label for="rooms" class="form-label">rooms :</label>
                         <div class="mb-3" style="height: 580px;
                         overflow: scroll;">
-                            <table class="table table-warning table-striped">
+                            <table class="table table-light">
                                 <thead>
                                     <th scope="col" width="1%"><input type="checkbox" name="all_rooms" class="toggler-wrapper style-4"></th>
                                     <th scope="col" width="9%">Rooms</th>
@@ -203,7 +203,7 @@ function ret_room_info($room,$course){
                                     @endif
                                 </thead>
                                 @php $num_all_courses_occupied_in_all_rooms=0; @endphp
-                                @foreach(App\Models\Room::orderBy('capacity','DESC')->get() as $room)
+                                @foreach(App\Models\Room::all() as $room)
                                     {{-- info rooms --}}
 
                                     {{-- info rooms --}}
@@ -257,7 +257,7 @@ function ret_room_info($room,$course){
                                                                     $number_taken_in_this_room_course=$onecoom->pivot->num_student_in_room;
                                                                 $num_all_courses_occupied_this_room+=$number_taken_in_this_room_course;
                                                             @endphp
-                                                            <a style="text-decoration: none;" href="/courses/{{ $course_belongs->id }}/room/{{ $room->id }}" class="badge bg-{{($course->id == $course_belongs->id ) ? 'danger': 'secondary'}}">{{$course_belongs->course_name}}</a>
+                                                            <a style="text-decoration: none;" href="/courses/{{ $course_belongs->id }}/edit" class="badge bg-{{($course->id == $course_belongs->id ) ? 'danger': 'secondary'}}">{{$course_belongs->course_name}}</a>
                                                             <span class="badge bg-danger" style="
                                                             right:14px;
                                                             border-radius: 62px;
@@ -301,23 +301,23 @@ function ret_room_info($room,$course){
                                 @endforeach
                                 {{-- fly code to top --}}
                                 <h2 class="badge bg-danger" style="position: absolute;top: 163px;left: 343px;{{($course->students_number==$num_all_courses_occupied_in_all_rooms)?'':'display:none'}}">Full</h2>
-                                <div class="numbers-info" style="position: absolute;    top: 143px;
-                                right: 755px;display: inline-flex;">
-                                    <h3 style="float: right;"><span class="badge bg-secondary">students number:{{$course->students_number}}</span></h3>
-                                    <span class="badge bg-danger" style="
-                                                                right: 268px;
-                                                                border-radius: 62px;
-                                                                position: relative;
-                                                                font-size: 15px;
-                                                                height: 28px;
-                                                                top: -16px;">{{$course->students_number-$num_all_courses_occupied_in_all_rooms}} free</span>
-                                    <span class="badge bg-danger" style="
-                                                                right: 109px;
-                                                                border-radius: 62px;
-                                                                position: relative;
-                                                                font-size: 15px;
-                                                                height: 28px;
-                                                                top: -16px;">{{$num_all_courses_occupied_in_all_rooms}} full</span>
+                                <div class="numbers-info" style="position: absolute;
+                                top: 170px;
+                                right: -45px;
+                                display: inline-flex;">
+                                    <h4 style="float: right;"><span class="badge bg-secondary">students number:{{$course->students_number}}</span></h4>
+                                    <span class="badge bg-danger" style="right: 226px;
+                                                                        border-radius: 5px;
+                                                                        position: relative;
+                                                                        font-size: 15px;
+                                                                        height: 28px;
+                                                                        top: -21px;">{{$course->students_number-$num_all_courses_occupied_in_all_rooms}} free</span>
+                                    <span class="badge bg-danger" style="right: 111px;
+                                                                        border-radius: 5px;
+                                                                        position: relative;
+                                                                        font-size: 15px;
+                                                                        height: 28px;
+                                                                        top: -21px;">{{$num_all_courses_occupied_in_all_rooms}} full</span>
                                 </div>
                                 {{-- fly code to top --}}
                             </table>
@@ -325,7 +325,6 @@ function ret_room_info($room,$course){
                 </div>
             </div>
                 <button type="submit" class="btn btn-dark">Update Course</button>
-                <a href="{{ route('courses.edit',[$course->id]) }}" class="btn btn-default">Cancel</button>
             </form>
         </div>
 

@@ -16,9 +16,9 @@
         text-decoration: none;
       }
         /* @media (min-width: 1400px){
-.container, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
-    max-width: 1581px;
-}} */
+        .container, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
+            max-width: 1581px;
+        }} */
       .bd-placeholder-img {
         font-size: 1.125rem;
         text-anchor: middle;
@@ -29,7 +29,7 @@
     .Active{
         border-radius: 5px;
         color: black;
-        background-color: red;
+        background-color:#898c8e;
     }
     body > header > div > div > ul > li:hover{
         border-radius: 5px;
@@ -2219,13 +2219,13 @@ template {
     <!-- Custom styles for this template -->
     <link href="{!! url('assets/css/app.css') !!}" rel="stylesheet">
 </head>
-<body>
+<body style="margin-top: 77px;">
   {{-- <nav class="flex bg-slate-700 text-white">
     <a href="/search" class="py-4 px-6 hover:bg-slate-800 {{ (request()->routeIs('search')) ? 'bg-slate-800' : '' }}">search</a>
   </nav> --}}
     @include('layouts.partials.navbar')
 
-    <main class="container-fluid px-5 mt-5">
+    <main class="container-fluid px-5">
         @yield('content')
     </main>
 

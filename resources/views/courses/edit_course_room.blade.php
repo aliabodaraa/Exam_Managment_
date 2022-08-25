@@ -71,7 +71,6 @@ $course_id=$course->id;
 @php
 $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in_this_room_in_this_course
 @endphp
-
     <div class="info-room" style="display: inline-flex;">
         <h6><span class="badge bg-primary">Room Name : {{$specific_room->room_name}}</span></h6>
         <h6><span class="badge bg-{{(!$count_taken_student_in_this_room_in_this_course && $specific_room->capacity == $count_taken_student_in_this_room_in_all_common_courses) || ($count_taken_student_in_this_room_in_this_course && $specific_room->capacity == $count_taken_student_in_this_room_in_all_common_courses) ? 'danger':'secondary'}}">Capacity : {{$specific_room->capacity}}@if($is_common || count($courses_info[$course->course_name]['courses_belongs']) == 1)/{{$count_taken_student_in_this_room_in_all_common_courses}}@endif</span></h6>
@@ -98,7 +97,7 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
             @endforeach
     </div>
     {{-- @endif --}}
-    <div class="bg-light p-4 rounded">
+    <div class="bg-light p-4 rounded" id="y">
         <h2>Update the room <mark>{{$specific_room->room_name}}</mark> in Course <mark>{{$course->course_name}}</mark> 
             @if((!$count_taken_student_in_this_room_in_this_course && $specific_room->capacity == $count_taken_student_in_this_room_in_all_common_courses))
                 <span class="badge bg-danger">The Room Is Full , You Can't Join</span>
@@ -125,7 +124,6 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
             <br>and all rooms in this course now take :<mark>{{$count_taken_student_in_all_rooms_in_this_course}}/{{$course->students_number}}</mark> person
         </div>
 
-        <div class="">
             @if(in_array($specific_room->id, $common_rooms)) <h5>notes These rooms are common with
                 @foreach ($all_common_courses as $course_common)
                     {{$course_common}} ,
@@ -180,9 +178,19 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
                         @endif
                     </div>
                 @endif
-                <div class="mb-3">
                 <label for="members" class="form-label">members :</label>
-                <div class="d">
+                <div class="mb-3">
+                    <div class="row num_of_members" style="color: black;padding: 6px;background-color: #eceded;border-radius: 15px;width:100%">
+                        <div class="col-sm-4" style="width:33.1%;background-color: #f8f9fa;border-radius: 15px 0 0 15px;height: 60px;text-align: center;margin-right:5px">
+                            <h1 id="num_roomHeads" style="margin-top: 9px;"></h1>
+                        </div>
+                        <div class="col-sm-4" style="width:33.1%;background-color: #f8f9fa;text-align: center;height: 60px;margin-right:5px">
+                            <h1 id="num_secertaries" style="margin-top: 9px;"></h1>
+                        </div>
+                        <div class="col-sm-4" style="width:33.2%;background-color: #f8f9fa;height: 60px;border-radius: 0 15px 15px 0;text-align: center">
+                            <h1 id="num_observers" style="margin-top: 9px;"></h1>
+                        </div>
+                    </div>
                 @foreach(App\Models\User::all() as $user)
                         <?php if($user->id==1) continue; ?>
 
@@ -205,9 +213,9 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
                         {{-- @once <span>d1</span>@endonce --}}
                             <div class="d1" style="display: block;
                             background-color: rgba(224, 224, 224, 0.499);
-                            border-radius: 7px;
-                            padding: 20px 20px 20px 0px;margin:5px;height: 71px;">
-                                <h4 style="float:right;">Room-Head</h4>
+                            border-radius: 7px;width:32.8%;position:relative;float:right;right:6px;
+                            padding: 20px 20px 20px 0px;margin:5px;height: 60px;border:{{(count($dates_distinct)==$user->number_of_observation)?'1px solid #dc35467c':''}}">
+                                <h5 style="float:right;">Room-Head</h5>
                                     <input type="checkbox" style="float:right;"
                                     name="roomheads[{{ $user->id }}]"
                                     value="{{ $user->id }}"
@@ -225,7 +233,7 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
                                             || in_array($user->id, $users_in_rooms[$room_D]['secertaries'])
                                             || in_array($user->id, $users_in_rooms[$room_D]['observers']))) || (count($dates_distinct)>=$user->number_of_observation && !in_array($user->id, $users_will_in_common_ids["Room_Head"]) && !in_array($user->id, $users_will_in_common_ids["Secertary"]) && !in_array($user->id, $users_will_in_common_ids["Observer"]))  ? 'disabled' : ''}}
                                         @endforeach>
-                                        <h4 style="float:right;">Secertary</h4>
+                                        <h5 style="float:right;">Secertary</h5>
                                         <input type="checkbox" style="float:right;"
                                         name="secertaries[{{ $user->id }}]"
                                         value="{{ $user->id }}"
@@ -243,7 +251,7 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
                                                 || in_array($user->id, $users_in_rooms[$room_D]['secertaries'])
                                                 || in_array($user->id, $users_in_rooms[$room_D]['observers']))) || (count($dates_distinct)>=$user->number_of_observation && !in_array($user->id, $users_will_in_common_ids["Room_Head"]) && !in_array($user->id, $users_will_in_common_ids["Secertary"]) && !in_array($user->id, $users_will_in_common_ids["Observer"])) ? 'disabled' : ''}}
                                             @endforeach>
-                                            <h4 style="float:right;">Observer</h4>
+                                            <h5 style="float:right;">Observer</h5>
                                             <input type="checkbox" style="float:right;"
                                             name="observers[{{ $user->id }}]"
                                             value="{{ $user->id }}"
@@ -261,8 +269,8 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
                                                     || in_array($user->id, $users_in_rooms[$room_D]['secertaries'])
                                                     || in_array($user->id, $users_in_rooms[$room_D]['observers']))) || (count($dates_distinct)>=$user->number_of_observation && !in_array($user->id, $users_will_in_common_ids["Room_Head"]) && !in_array($user->id, $users_will_in_common_ids["Secertary"]) && !in_array($user->id, $users_will_in_common_ids["Observer"])) ? 'disabled' : ''}}
                                                 @endforeach>
-                                                <h5 style="margin-left: 150px;"><b>{{ $user->username }}</b></h5>
-                                                <h4 style="position: relative;top: -60px;display:inline-flex"><a href="{{ route('users.observations', $user->id) }}" class="badge bg-{{(count($dates_distinct)==$user->number_of_observation)?'danger':'secondary'}}">{{count($dates_distinct)}}/{{$user->number_of_observation}}</a></h4>
+                                                <h5 style="float:right;align-items:start"><b>{{ $user->username }}</b></h5>
+                                                <h4 style="position: absolute;top:-10px;display:inline-flex"><a href="{{ route('users.observations', $user->id) }}" class="badge bg-{{(count($dates_distinct)==$user->number_of_observation)?'danger':'secondary'}}">{{count($dates_distinct)}}/{{$user->number_of_observation}}</a></h4>
                             </div>
                          @else
                             {{-- @once <span>d2</span>@endonce --}}
@@ -346,12 +354,14 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
                         <span class="text-danger text-left">{{ $errors->first('time') }}</span>
                     @endif
                 </div>
-                <button type="submit" class="btn btn-primary" {{ (!$count_taken_student_in_this_room_in_this_course && $specific_room->capacity == $count_taken_student_in_this_room_in_all_common_courses) ? 'disabled' : '' }}>Update Course</button>
-                <a href="{{ route('courses.index') }}" class="btn btn-default">Cancel</a>
-            </form>
-        </div>
+                <br>
+                <div class="buttons" style="margin-top: 80px;float: left;margin-bottom: 30px;">
+                    <button type="submit" class="btn btn-primary" {{ (!$count_taken_student_in_this_room_in_this_course && $specific_room->capacity == $count_taken_student_in_this_room_in_all_common_courses) ? 'disabled' : '' }}>Update Course</button>
+                    <a href="{{ route('courses.index') }}" class="btn btn-default">Cancel</a>
+                </div>
+        </form>
 
-    </div>
+</div>
 @endsection
 @section('scripts')
 <script type="text/javascript">
@@ -395,66 +405,21 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
                 });
             }
         });
-        //prevent two checkboxes or more clicked in the same row
-        $(".roomheads").on( 'click', function () {
-            if($(this).is(':checked')){
-                //prevent take more than one Room-Head in the same column
-                $.each($('.roomheads'), function() {
-                    if (!this.disabled)
-                        $(this).prop('checked',false);
-                });
-                //end prevent
-                $(this).next().next().next().next().prop('checked',false);
-                $(this).next().next().prop('checked',false);
-                $(this).prop('checked',true)
-            }
-        });
-
 
         //calc number of secertaries that checked
-        let number_of_secertaries_secertaries_that_checked=0;
-        let number_of_secertaries_secertaries_that_not_checked=0;
+        let number_of_secertaries_that_checked=0;
+        let number_of_secertaries_that_not_checked=0;
+
+        let number_of_observers_that_checked=0;
+        let number_of_roomheads_that_checked=0;
         $(".secertaries").each(function(){
             if($(this).is(':checked'))
-                number_of_secertaries_secertaries_that_checked++;
+                number_of_secertaries_that_checked++;
             else
-                number_of_secertaries_secertaries_that_not_checked++;
+                number_of_secertaries_that_not_checked++;
         });
-        console.log(number_of_secertaries_secertaries_that_checked,number_of_secertaries_secertaries_that_not_checked);
 
-        //let x=0;
-        $(".secertaries").on( 'click', function () {
-            // $(this).each(function(){
-            //     if($(this).is(':checked'))
-            //         x++;
-            //     else if(!$(this).is(':checked'))
-            //         x+=10;
-            // });
-            // if(number_of_secertaries_secertaries_that_checked<2){
-            //     console.log('err');}
-            if($(this).is(':checked') && number_of_secertaries_secertaries_that_checked < 2){
-                $(this).prev().prev().prop('checked',false);
-                $(this).next().next().prop('checked',false);
-                $(this).prop('checked',true);
-                number_of_secertaries_secertaries_that_checked++;
-                number_of_secertaries_secertaries_that_not_checked--;
-                console.log('err1');
-            }else if($(this).is(':checked') && number_of_secertaries_secertaries_that_checked >= 2){
-                $(this).prev().prev().prop('checked',false);
-                $(this).next().next().prop('checked',false);
-                $(this).prop('checked',true);
-                number_of_secertaries_secertaries_that_checked++;
-                number_of_secertaries_secertaries_that_not_checked--;console.log('err2');
-            }else if(!$(this).is(':checked') && number_of_secertaries_secertaries_that_checked < 2){
-                number_of_secertaries_secertaries_that_checked--;
-                number_of_secertaries_secertaries_that_not_checked++;console.log('err3');
-            }else{
-                //$(this).prop('checked',false);
-                number_of_secertaries_secertaries_that_not_checked++;
-                number_of_secertaries_secertaries_that_checked--;console.log('err4');
-            }
-            console.log(number_of_secertaries_secertaries_that_checked,number_of_secertaries_secertaries_that_not_checked);
-            if(number_of_secertaries_secertaries_that_checked>=2){
+        if(number_of_secertaries_that_checked>=2){
                 $(".secertaries").each(function(){
                     if(!$(this).is(':checked'))
                         $(this).prop('disabled',true);
@@ -465,14 +430,229 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
                         $(this).prop('disabled',false);
                 });
             }
+
+
+        console.log(number_of_secertaries_that_checked,number_of_secertaries_that_not_checked);  
+        $(".observers").each(function(){
+            if($(this).is(':checked'))
+            number_of_observers_that_checked++;
+        });
+        $(".roomheads").each(function(){
+            if($(this).is(':checked'))
+            number_of_roomheads_that_checked++;
+        });
+
+                
+                                $('#num_roomHeads').text(`${number_of_roomheads_that_checked} roomHeads`);
+            $('#num_secertaries').text(`${number_of_secertaries_that_checked} secertaries`);
+            $('#num_observers').text(`${number_of_observers_that_checked} observers`)
+        
+        //prevent two checkboxes or more clicked in the same row
+        $(".roomheads").on( 'click', function () {
+            if($(this).is(':checked')){
+                number_of_roomheads_that_checked=1;
+                //prevent take more than one Room-Head in the same column
+                $.each($('.roomheads'), function() {
+                    if (!this.disabled)
+                        $(this).prop('checked',false);
+                });
+                //end prevent
+                if($(this).next().next().next().next().prop('checked')){
+                    number_of_observers_that_checked--;
+                    $(this).next().next().next().next().prop('checked',false);
+                }
+                //$(this).next().next().prop('checked',false);
+                $(this).prop('checked',true);
+                if($(this).next().next().prop('checked')){
+                    $(this).next().next().prop('checked',false);
+                    number_of_secertaries_that_not_checked++;
+                    number_of_secertaries_that_checked--;
+                    //when you swich betwen secertary to observer in the same person
+                    if(number_of_secertaries_that_checked>=2){
+                        $(".secertaries").each(function(){
+                            if(!$(this).is(':checked'))
+                                $(this).prop('disabled',true);
+                        });
+                    }else{
+                        $(".secertaries").each(function(){
+                            if(!$(this).is(':checked')&& !$(this).prev().prev().prop('disabled') && !$(this).next().next().prop('disabled'))
+                                $(this).prop('disabled',false);
+                        });
+                    }
+                }
+            }else{
+                number_of_roomheads_that_checked--;
+            }
+            //number_of_roomheads_that_checked++;
+            if(number_of_roomheads_that_checked ==1){
+                $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }else if(number_of_roomheads_that_checked ==0){
+                $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_danger" src="{{ asset('images/danger.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }
+            if(number_of_secertaries_that_checked ==2){
+                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }else if(number_of_secertaries_that_checked ==0){
+                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_danger" src="{{ asset('images/danger.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }else{
+                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }
+            if(number_of_observers_that_checked >=2){
+                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }else if(number_of_observers_that_checked ==0){
+                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_danger" src="{{ asset('images/danger.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }else{
+                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }
+        });
+
+
+
+        //let x=0;
+        $(".secertaries").on( 'click', function () {
+            if($(this).is(':checked') && $(this).next().next().prop('checked')){
+                number_of_observers_that_checked--;
+            }
+            if($(this).is(':checked') && $(this).prev().prev().prop('checked')){
+                number_of_roomheads_that_checked--;
+            }
+            if($(this).is(':checked') && number_of_secertaries_that_checked < 2){
+                // if($(this).next().next().prop('checked')){
+                //     number_of_observers_that_checked--;
+                // }else if($(this).prev().prev().prop('checked')){
+                //     number_of_roomheads_that_checked--;
+                // }
+                $(this).prev().prev().prop('checked',false);
+                $(this).next().next().prop('checked',false);
+                $(this).prop('checked',true);
+                number_of_secertaries_that_checked++;
+                number_of_secertaries_that_not_checked--;
+                console.log('err1');
+            }else if($(this).is(':checked') && number_of_secertaries_that_checked >= 2){
+                $(this).prev().prev().prop('checked',false);
+                $(this).next().next().prop('checked',false);
+                $(this).prop('checked',true);
+                number_of_secertaries_that_checked++;
+                number_of_secertaries_that_not_checked--;console.log('err2');
+            }else if(!$(this).is(':checked') && number_of_secertaries_that_checked < 2){
+                number_of_secertaries_that_checked--;
+                number_of_secertaries_that_not_checked++;console.log('err3');
+            }else{
+                //$(this).prop('checked',false);
+                number_of_secertaries_that_not_checked++;
+                number_of_secertaries_that_checked--;console.log('err4');
+            }
+            console.log(number_of_secertaries_that_checked,number_of_secertaries_that_not_checked);
+            if(number_of_secertaries_that_checked>=2){
+                $(".secertaries").each(function(){
+                    if(!$(this).is(':checked'))
+                        $(this).prop('disabled',true);
+                });
+            }else{
+                $(".secertaries").each(function(){
+                    if(!$(this).is(':checked')&& !$(this).prev().prev().prop('disabled') && !$(this).next().next().prop('disabled'))
+                        $(this).prop('disabled',false);
+                });
+            }
+            if(number_of_roomheads_that_checked ==1){
+                $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }else if(number_of_roomheads_that_checked ==0){
+                $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_danger" src="{{ asset('images/danger.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }
+            if(number_of_secertaries_that_checked ==2){
+                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }else if(number_of_secertaries_that_checked ==0){
+                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_danger" src="{{ asset('images/danger.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }else{
+                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }
+            if(number_of_observers_that_checked >=2){
+                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }else if(number_of_observers_that_checked ==0){
+                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_danger" src="{{ asset('images/danger.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }else{
+                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }
         });
         $(".observers").on( 'click', function () {
             if($(this).is(':checked')){
-                $(this).prev().prev().prop('checked',false);
-                $(this).prev().prev().prev().prev().prop('checked',false);
-                $(this).prop('checked',true)
+                number_of_observers_that_checked++;
+                if($(this).prev().prev().prop('checked')){
+                    $(this).prev().prev().prop('checked',false);
+                    number_of_secertaries_that_not_checked++;
+                    number_of_secertaries_that_checked--;
+                    //when you swich betwen secertary to observer in the same person
+                    if(number_of_secertaries_that_checked>=2){
+                    $(".secertaries").each(function(){
+                        if(!$(this).is(':checked'))
+                            $(this).prop('disabled',true);
+                    });
+                    }else{
+                        $(".secertaries").each(function(){
+                            if(!$(this).is(':checked')&& !$(this).prev().prev().prop('disabled') && !$(this).next().next().prop('disabled'))
+                                $(this).prop('disabled',false);
+                        });
+                    }
+                }else if($(this).prev().prev().prev().prev().prop('checked')){
+                    $(this).prev().prev().prev().prev().prop('checked',false);
+                        number_of_roomheads_that_checked--;
+                }
+            }else if(!$(this).is(':checked')){
+                number_of_observers_that_checked--;
+            }
+            if(number_of_roomheads_that_checked ==1){
+                $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }else if(number_of_roomheads_that_checked ==0){
+                $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_danger" src="{{ asset('images/danger.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }
+            if(number_of_secertaries_that_checked ==2){
+                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }else if(number_of_secertaries_that_checked ==0){
+                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_danger" src="{{ asset('images/danger.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }else{
+                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }
+            if(number_of_observers_that_checked >=2){
+                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }else if(number_of_observers_that_checked ==0){
+                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_danger" src="{{ asset('images/danger.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }else{
+                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="success" style="width: 30px;height: 30px;">`);
             }
         });
+         let num_observers=`<h6><span class="badge bg-dark">${number_of_observers_that_checked}</span></h6>`;
+         let num_secertaries=`<h6><span class="badge bg-dark">${number_of_secertaries_that_checked}</span></h6>`;
+        // var $newdiv1 = $( `<div id='yy'>${num-observers}</div>` );
+        // $( "span" ).append($newdiv1);
+        // $('.rounded').prepend(`<span> I have been appended ${num_observers}</span>`);
+        // $('.rounded').prepend(`<span> I have been appended ${num_secertaries}</span>`);
+        // let i=0;
+        // const timer=setInterval(()=>{
+        // ++i;
+        // if(i === 1000){
+        // clearInterval(timer);
+        // }
+        // $('.rounded').prepend(`<span>${num_observers}</span>`);
+        // $('.rounded').prepend(`<span>${num_secertaries}</span>`);
+        // },200);
+        if(number_of_roomheads_that_checked ==1){
+                $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }else if(number_of_roomheads_that_checked ==0){
+                $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_danger" src="{{ asset('images/danger.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }
+            if(number_of_secertaries_that_checked ==2){
+                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }else if(number_of_secertaries_that_checked ==0){
+                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_danger" src="{{ asset('images/danger.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }else{
+                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }
+            if(number_of_observers_that_checked >=2){
+                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }else if(number_of_observers_that_checked ==0){
+                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_danger" src="{{ asset('images/danger.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }else{
+                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+            }
     });
 </script>
 @endsection

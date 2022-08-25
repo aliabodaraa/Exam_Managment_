@@ -18,7 +18,7 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $users = User::first()->paginate(10);
+        $users = User::first()->paginate(20);
 
         return view('users.index', compact('users'));
     }
@@ -43,7 +43,7 @@ class UsersController extends Controller
      */
     public function store(StoreUserRequest $request)
     {//dd($request->secure());
-        dd($request->getRequestUri());
+        //dd($request->getRequestUri());
         //dd(1123);
         $user = User::create(
             [// you also can be to write this User::create($request->validated()); but go to StoreUserRequest and make all fields required
