@@ -1,6 +1,8 @@
 @extends('layouts.app-master')
 
 @section('content')
+{{-- @php $foo = "105";
+dd( number_format((float)$foo, 2, '.', '')); @endphp --}}
 {{-- @php
 function ret_room_info($room,$course){
     $courses_info=[];
@@ -300,10 +302,10 @@ function ret_room_info($room,$course){
                                     @php $num_all_courses_occupied_in_all_rooms+=$num_all_courses_occupied_this_room; @endphp
                                 @endforeach
                                 {{-- fly code to top --}}
-                                <h2 class="badge bg-danger" style="position: absolute;top: 163px;left: 343px;{{($course->students_number==$num_all_courses_occupied_in_all_rooms)?'':'display:none'}}">Full</h2>
-                                <div class="numbers-info" style="position: absolute;
-                                top: 170px;
-                                right: -45px;
+                                {{-- <h2 class="badge bg-danger" style="position: absolute;top: 163px;left: 343px;{{($course->students_number==$num_all_courses_occupied_in_all_rooms)?'':'display:none'}}">Full</h2>
+                                <div class="numbers-info-full-free" style="position: absolute;
+                                top: 200px;
+                                right: 23px;
                                 display: inline-flex;">
                                     <h4 style="float: right;"><span class="badge bg-secondary">students number:{{$course->students_number}}</span></h4>
                                     <span class="badge bg-danger" style="right: 226px;
@@ -318,7 +320,50 @@ function ret_room_info($room,$course){
                                                                         font-size: 15px;
                                                                         height: 28px;
                                                                         top: -21px;">{{$num_all_courses_occupied_in_all_rooms}} full</span>
-                                </div>
+                                </div> --}}
+                                        {{-- progress --}}
+                                                <div class="row bg-red rounded-lg" style="width: fit-content;padding: 8px 0 8px 0px;flex-flow: nowrap;
+                                                position: absolute;
+                                                padding: 2px 25px 2px 2px;
+                                                z-index: 9;
+                                                right: 20%;
+                                                height: 90px;
+                                                top: 100px;">
+                                                    {{-- <h2 class="h6 font-weight-bold text-center mb-4">Overall progress</h2> --}}
+                                            
+                                                    <!-- Progress bar 1 -->
+                                                    <div id="progress_line" class="col-sm-3 progress mx-2 mt-1" data-value='{{number_format((int)(($num_all_courses_occupied_in_all_rooms/$course->students_number)*100), 0, '.', '')}}'>
+                                                        <span class="progress-left">
+                                                            <span class="progress-bar border-<?php if((($num_all_courses_occupied_in_all_rooms/$course->students_number)*100)<30) echo'danger';elseif((($num_all_courses_occupied_in_all_rooms/$course->students_number)*100)<=60) echo 'warning'; elseif((($num_all_courses_occupied_in_all_rooms/$course->students_number)*100)<=80) echo 'primary';else echo 'success';?>"></span>
+                                                        </span>
+                                                        <span class="progress-right">
+                                                            <span class="progress-bar border-<?php if((($num_all_courses_occupied_in_all_rooms/$course->students_number)*100)<30) echo'danger';elseif((($num_all_courses_occupied_in_all_rooms/$course->students_number)*100)<=60) echo 'warning'; elseif((($num_all_courses_occupied_in_all_rooms/$course->students_number)*100)<=80) echo 'primary';else echo 'success';?>"></span>
+                                                        </span>
+                                                        <div class="progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
+                                                            <div id="progress_value" class="h2 font-weight-bold">{{number_format((int)(($num_all_courses_occupied_in_all_rooms/$course->students_number)*100), 0, '.', '')}}</div><sup class=" h5 font-weight-bold">%</sup>
+                                                        </div>
+                                                    </div>
+                                                    <!-- END -->
+                                            
+                                                    <!-- Demo info -->
+                                                    <div class="col-sm-8">
+                                                        <div class="row text-center mt-4">
+                                                           <div class="col-5 border-right" style="display:none;">
+                                                                <div id="progress_remaining_to_full" class="h6 font-weight-bold my-0">{{100-number_format((int)(($num_all_courses_occupied_in_all_rooms/$course->students_number)*100), 0, '.', '')}}</div><span class="small text-gray"> still</span>
+                                                            </div>
+                                                            <div class="col-4">
+                                                                <div class="h4 font-weight-bold my-0">{{$num_all_courses_occupied_in_all_rooms}}</div><span class="small text-gray">full</span>
+                                                            </div>
+                                                            <div class="col-4">
+                                                                <div class="h4 font-weight-bold my-0">{{$course->students_number-$num_all_courses_occupied_in_all_rooms}}</div><span class="small text-gray">free</span>
+                                                            </div>
+                                                            <div class="col-4">
+                                                                <div class="h4 font-weight-bold my-0">{{$course->students_number}}</div><span class="small text-gray">students</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <!-- END -->
+                                        {{-- progress --}}
                                 {{-- fly code to top --}}
                             </table>
                         </div>
@@ -381,5 +426,80 @@ console.log("Ali");
                     }
             });
         });
+    </script>
+
+
+{{-- progress js --}}
+<script type="text/javascript">
+    $(function() {
+    
+    $(".progress").each(function() {
+    
+      var value = $(this).attr('data-value');
+      var left = $(this).find('.progress-left .progress-bar');
+      var right = $(this).find('.progress-right .progress-bar');
+    
+      if (value > 0) {
+        if (value <= 50) {
+          right.css('transform', 'rotate(' + percentageToDegrees(value) + 'deg)')
+        } else {
+          right.css('transform', 'rotate(180deg)')
+          left.css('transform', 'rotate(' + percentageToDegrees(value - 50) + 'deg)')
+        }
+      }
+    
+    })
+    
+    function percentageToDegrees(percentage) {
+    
+      return percentage / 100 * 360
+    
+    }
+         //increase slowly
+         progress_remaining_to_full = parseInt($("#progress_remaining_to_full").text());
+         //console.log(typeof(progress_remaining_to_full))
+         var i=0;
+         const timer1=setInterval(()=>{
+            i+=1;
+            $("#progress_value").text(i);
+            if(i == 100-progress_remaining_to_full){
+            clearInterval(timer1);
+            }
+         },30);
+
+                  //increase slowly
+                  progress_remaining_to_full = parseInt($("#progress_remaining_to_full").text());
+         //console.log(typeof(progress_remaining_to_full))
+         var k=0;
+         const timer3=setInterval(()=>{
+            var value = $("#progress_line").attr('data-value');console.log(value)
+            var left = $("#progress_line").find('.progress-left .progress-bar');
+            var right = $("#progress_line").find('.progress-right .progress-bar');
+            left.css('transform', 'rotate(0deg)')
+            k+=1;
+            if (k > 0) {
+                if (k <= 50) {
+                right.css('transform', 'rotate(' + percentageToDegrees(k) + 'deg)')
+                } else {
+                //right.css('transform', `rotate(180deg)`)
+                left.css('transform', 'rotate(' + percentageToDegrees(k+50) + 'deg)')
+                }
+            }
+            if(k == value){
+                clearInterval(timer3);
+            }
+         },30);
+        //  var j=0;
+        //  const timer2=setInterval(()=>{
+        //     j+=1;
+        //     $("#progress_remaining_to_full").html(j);
+        //     if(j == progress_remaining_to_full){
+        //     clearInterval(timer2);
+        //     }
+        //  },20);
+        //  $(`<sup class=" h5 font-weight-bold">%</sub>`).appendTo("#progress_remaining_to_full");
+    });
+    
+    
     </script>
 @endsection

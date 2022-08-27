@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="bg-light p-4 rounded">
-        <h1>Update user</h1>
+        <h1>Update User Page</h1>
         <div class="lead">
 
         </div>
@@ -68,6 +68,5 @@
                 <a href="{{ route('users.index') }}" class="btn btn-default">Cancel</button>
             </form>
         </div>
-
     </div>
 @endsection

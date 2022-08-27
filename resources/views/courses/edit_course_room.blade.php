@@ -139,7 +139,9 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
             $sholder=10;
             $message='';//dd(count($courses_info[$course->course_name]['courses_belongs']));
             //dd($count_taken_student_in_this_room_in_this_course);
-            if(count($courses_info[$course->course_name]['courses_belongs']) > 1 && $count_taken_student_in_this_room_in_this_course){
+            if($course->students_number-$count_taken_student_in_all_rooms_in_this_course<$specific_room->capacity/2 &&count($courses_info[$course->course_name]['courses_belongs']) == 0){
+                $sholder=$course->students_number-$count_taken_student_in_all_rooms_in_this_course;
+            }elseif(count($courses_info[$course->course_name]['courses_belongs']) > 1 && $count_taken_student_in_this_room_in_this_course){
                 //for ($i = 1; $i <= $specific_room->capacity/count($courses_info[$course->course_name]['courses_belongs']); $i++)
                     // if( $count_taken_student_not_in_this_room_in_this_course + $i == $course->students_number ){
                     //     $sholder=$i;
@@ -157,16 +159,23 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
                     $sholder=$specific_room->capacity/2;
             }
             @endphp
+            
             @if($message)
                 <span class="badge bg-secondary">{{$message}}</span>
             @endif
+            @if(!$sholder)
+            <div class="alert alert-warning alert-block">
+                <strong>You can't take this room because the course is full</strong>
+            </div>
+            @endif
+            @if($sholder)
             <form method="post" action="{{ route('courses.room_for_course', [$course->id,$specific_room->id]) }}">
                 @method('patch')
                 @csrf
                 @if(count($course->users->toArray()))
                     <div class="mb-3">
                         <label for="num_student_in_room" class="form-label">Number Students In Room <mark>{{$specific_room->room_name}}</mark>  :</label>
-                        <select class="form-control" name="num_student_in_room" class="form-control" required {{ (!$count_taken_student_in_this_room_in_this_course && $specific_room->capacity == $count_taken_student_in_this_room_in_all_common_courses) ? 'disabled' : '' }}>
+                        <select class="form-control" name="num_student_in_room" class="form-control" required {{ ($sholder) ? '' : 'disabled' }}>
                             <!-- $courses_info[$course->course_name]['count_taken_student_in_this_room_in_this_course']) -->
                                     @for ($i = 1; $i <= $sholder; $i++)
                                         <option value="{{$i}}" {{ ($courses_info[$course->course_name]['count_taken_student_in_this_room_in_this_course'] == $i) ? 'selected': '' }}>{{$i}}</option>
@@ -179,15 +188,15 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
                     </div>
                 @endif
                 <label for="members" class="form-label">members :</label>
-                <div class="mb-3">
-                    <div class="row num_of_members" style="color: black;padding: 6px;background-color: #eceded;border-radius: 15px;width:100%">
-                        <div class="col-sm-4" style="width:33.1%;background-color: #f8f9fa;border-radius: 15px 0 0 15px;height: 60px;text-align: center;margin-right:5px">
+                <div class="mb-3" style="margin:0 5px;">
+                    <div class="row num_of_members" style="flex-flow: nowrap;color: black;padding: 6px;background-color: #eceded;border-radius: 15px;width:99%;margin:0 5px">
+                        <div class="col-sm-4" style="width:33%;background-color: #f8f9fa;border-radius: 15px 0 0 15px;height: 60px;text-align: center;margin-right:5px">
                             <h1 id="num_roomHeads" style="margin-top: 9px;"></h1>
                         </div>
-                        <div class="col-sm-4" style="width:33.1%;background-color: #f8f9fa;text-align: center;height: 60px;margin-right:5px">
+                        <div class="col-sm-4" style="width:33%;background-color: #f8f9fa;text-align: center;height: 60px;margin-right:5px">
                             <h1 id="num_secertaries" style="margin-top: 9px;"></h1>
                         </div>
-                        <div class="col-sm-4" style="width:33.2%;background-color: #f8f9fa;height: 60px;border-radius: 0 15px 15px 0;text-align: center">
+                        <div class="col-sm-4" style="width:33.4%;background-color: #f8f9fa;height: 60px;border-radius: 0 15px 15px 0;text-align: center">
                             <h1 id="num_observers" style="margin-top: 9px;"></h1>
                         </div>
                     </div>
@@ -211,10 +220,10 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
                         @endphp
                         @if(true)
                         {{-- @once <span>d1</span>@endonce --}}
-                            <div class="d1" style="display: block;
+                            <div class="d1" style="display: block;border: 1px solid #d5d5d5;
                             background-color: rgba(224, 224, 224, 0.499);
-                            border-radius: 7px;width:32.8%;position:relative;float:right;right:6px;
-                            padding: 20px 20px 20px 0px;margin:5px;height: 60px;border:{{(count($dates_distinct)==$user->number_of_observation)?'1px solid #dc35467c':''}}">
+                            border-radius: 7px;width:32.5%;position:relative;float:right;right:6px;
+                            padding: 20px 20px 20px 0px;margin:5px;height: 100px;border:{{(count($dates_distinct)==$user->number_of_observation)?'1px solid #dc35467c':''}}">
                                 <h5 style="float:right;">Room-Head</h5>
                                     <input type="checkbox" style="float:right;"
                                     name="roomheads[{{ $user->id }}]"
@@ -268,7 +277,7 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
                                                     (in_array($user->id, $users_in_rooms[$room_D]['roomHeads'])
                                                     || in_array($user->id, $users_in_rooms[$room_D]['secertaries'])
                                                     || in_array($user->id, $users_in_rooms[$room_D]['observers']))) || (count($dates_distinct)>=$user->number_of_observation && !in_array($user->id, $users_will_in_common_ids["Room_Head"]) && !in_array($user->id, $users_will_in_common_ids["Secertary"]) && !in_array($user->id, $users_will_in_common_ids["Observer"])) ? 'disabled' : ''}}
-                                                @endforeach>
+                                                @endforeach><br>
                                                 <h5 style="float:right;align-items:start"><b>{{ $user->username }}</b></h5>
                                                 <h4 style="position: absolute;top:-10px;display:inline-flex"><a href="{{ route('users.observations', $user->id) }}" class="badge bg-{{(count($dates_distinct)==$user->number_of_observation)?'danger':'secondary'}}">{{count($dates_distinct)}}/{{$user->number_of_observation}}</a></h4>
                             </div>
@@ -359,8 +368,8 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
                     <button type="submit" class="btn btn-primary" {{ (!$count_taken_student_in_this_room_in_this_course && $specific_room->capacity == $count_taken_student_in_this_room_in_all_common_courses) ? 'disabled' : '' }}>Update Course</button>
                     <a href="{{ route('courses.index') }}" class="btn btn-default">Cancel</a>
                 </div>
-        </form>
-
+            </form>
+            @endif
 </div>
 @endsection
 @section('scripts')

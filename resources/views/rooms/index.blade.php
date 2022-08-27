@@ -1,14 +1,8 @@
 @extends('layouts.app-master')
 
 @section('content')
-
-    <h1 class="mb-3">
-        Control's @role('Admin')Admin <div class="lead">You Can Manage Any room Has A Role Student Or Teacher So You @can('room-edit') Can Edit ,@endcan @can('room-edit')Delete @endcan Any One You Need @can('room-create') , Also You Can Add A New room @endcan .</div>@endrole
-                  @role('Teacher')Teacher<div class="lead">You Can Show Any Profile's Admin Or Any one Of Your Teacher Colleagues here Also you @can('room-edit') Can Edit ,@endcan @can('room-edit')Delete @endcan Any Student In Your Department Only @can('room-create') , Also You Can Add A New room @endcan . @endrole
-                  @role('Student')Student<div class="lead">You Can Show Any Profile's Admin Or Profile's Teacher Or Any one Of Your Student Colleagues here @can('room-edit')Also You Can Edit Any Student In Your Department Only ,@endcan @can('room-edit')Also You Can Delete Any Student In Your Department Only @endcan  @can('room-create') , Also You Can Add A New room @endcan . @endrole
-    </h1>
     <div class="bg-light p-4 rounded">
-        <h1>rooms
+        <h1>Rooms Control Page
             <div style="float: right;">
                 <a href="{{url()->previous()}}" class="btn btn-dark">Back</a>
             </div>

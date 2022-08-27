@@ -3,7 +3,7 @@
 @section('content')
 
     <div class="bg-light p-4 rounded">
-        <h1>Users
+        <h1>Users Control Page
             <div style="float: right;">
                 <a href="{{url()->previous()}}" class="btn btn-dark">Back</a>
             </div>
