@@ -98,7 +98,7 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
     </div>
     {{-- @endif --}}
     <div class="bg-light p-4 rounded" id="y">
-        <h2>Update the room <mark>{{$specific_room->room_name}}</mark> in Course <mark>{{$course->course_name}}</mark> 
+        <h2>Update the room <b>{{$specific_room->room_name}}</b> in Course <b>{{$course->course_name}}</b> 
             @if((!$count_taken_student_in_this_room_in_this_course && $specific_room->capacity == $count_taken_student_in_this_room_in_all_common_courses))
                 <span class="badge bg-danger">The Room Is Full , You Can't Join</span>
                 @elseif(($count_taken_student_in_this_room_in_this_course && $specific_room->capacity == $count_taken_student_in_this_room_in_all_common_courses))
@@ -110,18 +110,18 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
         </h2>
         <div class="lead">
             @if($is_common && $count_taken_student_in_this_room_in_this_course)
-                this Common room take <mark>{{$count_taken_student_in_this_room_in_this_course}}</mark>Place, and other rooms take <mark>{{$count_taken_student_not_in_this_room_in_this_course}}</mark> in this course
+                this Common room take <b>{{$count_taken_student_in_this_room_in_this_course}}</b>Place, and other rooms take <b>{{$count_taken_student_not_in_this_room_in_this_course}}</b> in this course
             @elseif(count($courses_info[$course->course_name]['courses_belongs']) >= 1 && !$count_taken_student_in_this_room_in_this_course)
             {{-- //Joining room --}}
-            this Join room now take <mark>{{$count_taken_student_in_this_room_in_this_course}}</mark>, You can Join Maximum <mark>{{$specific_room->capacity - $count_taken_student_in_this_room_in_all_common_courses}}</mark> Empty Place
+            this Join room now take <b>{{$count_taken_student_in_this_room_in_this_course}}</b>, You can Join Maximum <b>{{$specific_room->capacity - $count_taken_student_in_this_room_in_all_common_courses}}</b> Empty Place
             @elseif(count($courses_info[$course->course_name]['courses_belongs']) == 0)
             {{-- single_room does not exist --}}
-            single_room does not exist this Common room take <mark>{{$count_taken_student_in_this_room_in_this_course}}
+            single_room does not exist this Common room take <b>{{$count_taken_student_in_this_room_in_this_course}} students</b>
             @elseif(count($courses_info[$course->course_name]['courses_belongs']) == 1)
             {{-- single_room exist --}}
-            single_room exist this room take <mark>{{$count_taken_student_in_this_room_in_this_course}}
+            single_room exist this room take <b>{{$count_taken_student_in_this_room_in_this_course}} students</b>
             @endif
-            <br>and all rooms in this course now take :<mark>{{$count_taken_student_in_all_rooms_in_this_course}}/{{$course->students_number}}</mark> person
+            <br>and all rooms in this course now take :<b>{{$count_taken_student_in_all_rooms_in_this_course}}/{{$course->students_number}}</b> students
         </div>
 
             @if(in_array($specific_room->id, $common_rooms)) <h5>notes These rooms are common with
@@ -139,7 +139,7 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
             $sholder=10;
             $message='';//dd(count($courses_info[$course->course_name]['courses_belongs']));
             //dd($count_taken_student_in_this_room_in_this_course);
-            if($course->students_number-$count_taken_student_in_all_rooms_in_this_course<$specific_room->capacity/2 &&count($courses_info[$course->course_name]['courses_belongs']) == 0){
+            if($course->students_number-$count_taken_student_in_all_rooms_in_this_course<$specific_room->capacity/2 && count($courses_info[$course->course_name]['courses_belongs']) == 0){
                 $sholder=$course->students_number-$count_taken_student_in_all_rooms_in_this_course;
             }elseif(count($courses_info[$course->course_name]['courses_belongs']) > 1 && $count_taken_student_in_this_room_in_this_course){
                 //for ($i = 1; $i <= $specific_room->capacity/count($courses_info[$course->course_name]['courses_belongs']); $i++)
@@ -220,8 +220,7 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
                         @endphp
                         @if(true)
                         {{-- @once <span>d1</span>@endonce --}}
-                            <div class="d1" style="display: block;border: 1px solid #d5d5d5;
-                            background-color: rgba(224, 224, 224, 0.499);
+                            <div class="d1 bg-white"" style="display: block;border: 1px solid #d5d5d5;cursor: disabled;
                             border-radius: 7px;width:32.5%;position:relative;float:right;right:6px;
                             padding: 20px 20px 20px 0px;margin:5px;height: 100px;border:{{(count($dates_distinct)==$user->number_of_observation)?'1px solid #dc35467c':''}}">
                                 <h5 style="float:right;">Room-Head</h5>
@@ -279,7 +278,7 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
                                                     || in_array($user->id, $users_in_rooms[$room_D]['observers']))) || (count($dates_distinct)>=$user->number_of_observation && !in_array($user->id, $users_will_in_common_ids["Room_Head"]) && !in_array($user->id, $users_will_in_common_ids["Secertary"]) && !in_array($user->id, $users_will_in_common_ids["Observer"])) ? 'disabled' : ''}}
                                                 @endforeach><br>
                                                 <h5 style="float:right;align-items:start"><b>{{ $user->username }}</b></h5>
-                                                <h4 style="position: absolute;top:-10px;display:inline-flex"><a href="{{ route('users.observations', $user->id) }}" class="badge bg-{{(count($dates_distinct)==$user->number_of_observation)?'danger':'secondary'}}">{{count($dates_distinct)}}/{{$user->number_of_observation}}</a></h4>
+                                                <h4 style="position: absolute;top:-10px;display:inline-flex"><a href="{{ route('users.observations', $user->id) }}" class="badge bg-{{(count($dates_distinct)==$user->number_of_observation)?'danger':'success'}}">{{count($dates_distinct)}}/{{$user->number_of_observation}}</a></h4>
                             </div>
                          @else
                             {{-- @once <span>d2</span>@endonce --}}
@@ -452,7 +451,7 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
         });
 
                 
-                                $('#num_roomHeads').text(`${number_of_roomheads_that_checked} roomHeads`);
+            $('#num_roomHeads').text(`${number_of_roomheads_that_checked} roomHeads`);
             $('#num_secertaries').text(`${number_of_secertaries_that_checked} secertaries`);
             $('#num_observers').text(`${number_of_observers_that_checked} observers`)
         
@@ -496,19 +495,19 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
             if(number_of_roomheads_that_checked ==1){
                 $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
             }else if(number_of_roomheads_that_checked ==0){
-                $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_danger" src="{{ asset('images/danger.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+                $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_danger" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 30px;height: 30px;">`);
             }
             if(number_of_secertaries_that_checked ==2){
                 $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
             }else if(number_of_secertaries_that_checked ==0){
-                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_danger" src="{{ asset('images/danger.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_danger" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 30px;height: 30px;">`);
             }else{
                 $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="success" style="width: 30px;height: 30px;">`);
             }
             if(number_of_observers_that_checked >=2){
                 $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
             }else if(number_of_observers_that_checked ==0){
-                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_danger" src="{{ asset('images/danger.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_danger" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 30px;height: 30px;">`);
             }else{
                 $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="success" style="width: 30px;height: 30px;">`);
             }
@@ -565,19 +564,19 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
             if(number_of_roomheads_that_checked ==1){
                 $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
             }else if(number_of_roomheads_that_checked ==0){
-                $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_danger" src="{{ asset('images/danger.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+                $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_danger" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 30px;height: 30px;">`);
             }
             if(number_of_secertaries_that_checked ==2){
                 $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
             }else if(number_of_secertaries_that_checked ==0){
-                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_danger" src="{{ asset('images/danger.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_danger" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 30px;height: 30px;">`);
             }else{
                 $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="success" style="width: 30px;height: 30px;">`);
             }
             if(number_of_observers_that_checked >=2){
                 $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
             }else if(number_of_observers_that_checked ==0){
-                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_danger" src="{{ asset('images/danger.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_danger" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 30px;height: 30px;">`);
             }else{
                 $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="success" style="width: 30px;height: 30px;">`);
             }
@@ -611,19 +610,19 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
             if(number_of_roomheads_that_checked ==1){
                 $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
             }else if(number_of_roomheads_that_checked ==0){
-                $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_danger" src="{{ asset('images/danger.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+                $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_danger" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 30px;height: 30px;">`);
             }
             if(number_of_secertaries_that_checked ==2){
                 $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
             }else if(number_of_secertaries_that_checked ==0){
-                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_danger" src="{{ asset('images/danger.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_danger" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 30px;height: 30px;">`);
             }else{
                 $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="success" style="width: 30px;height: 30px;">`);
             }
             if(number_of_observers_that_checked >=2){
                 $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
             }else if(number_of_observers_that_checked ==0){
-                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_danger" src="{{ asset('images/danger.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_danger" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 30px;height: 30px;">`);
             }else{
                 $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="success" style="width: 30px;height: 30px;">`);
             }
@@ -646,19 +645,19 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
         if(number_of_roomheads_that_checked ==1){
                 $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
             }else if(number_of_roomheads_that_checked ==0){
-                $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_danger" src="{{ asset('images/danger.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+                $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_danger" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 30px;height: 30px;">`);
             }
             if(number_of_secertaries_that_checked ==2){
                 $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
             }else if(number_of_secertaries_that_checked ==0){
-                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_danger" src="{{ asset('images/danger.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_danger" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 30px;height: 30px;">`);
             }else{
                 $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="success" style="width: 30px;height: 30px;">`);
             }
             if(number_of_observers_that_checked >=2){
                 $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
             }else if(number_of_observers_that_checked ==0){
-                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_danger" src="{{ asset('images/danger.png') }}" alt="success" style="width: 30px;height: 30px;">`);
+                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_danger" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 30px;height: 30px;">`);
             }else{
                 $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="success" style="width: 30px;height: 30px;">`);
             }

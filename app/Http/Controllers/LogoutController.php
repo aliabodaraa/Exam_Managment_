@@ -24,7 +24,7 @@ class LogoutController extends Controller
         // $currUser->save();
 
         Auth::logout();
-
-        return redirect('login');
+        //return redirect('login');
+        return redirect('/');
     }
 }

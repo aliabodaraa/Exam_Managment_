@@ -44,6 +44,8 @@ class roomsController extends Controller
             [
                 'room_name'=> $request->room_name,
                 'capacity'=> $request->capacity,
+                'location'=> $request->location,
+                'notes'=> $request->notes,
             ]
         );
         return redirect()->route('rooms.index')

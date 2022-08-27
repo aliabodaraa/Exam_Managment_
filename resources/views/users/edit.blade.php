@@ -2,12 +2,13 @@
 
 @section('content')
     <div class="bg-light p-4 rounded">
-        <h1>Update User Page</h1>
-        <div class="lead">
-
-        </div>
-
         <div class="container mt-4">
+            <h1>
+                Update User Page
+                <div class="float-right">
+                    <a href="{{ URL::previous() }}" class="btn btn-dark">Back</a>
+                </div>
+            </h1>
             <form method="post" action="{{ route('users.update', $user->id) }}">
                 @method('patch')
                 @csrf
@@ -35,14 +36,16 @@
                 </div>
                 <div class="mb-3">
                     <label for="role" class="form-label">Role</label>
-                    @if($user->id==1)
+                    {{-- @if($user->id==1)
                         <span class="badge bg-secondary" style="float:right">{{$user->id==1 ?"Admin can't have Role":''}} </span>
-                    @endif
+                    @endif --}}
                     <select class="form-control"
-                        name="role" {{$user->id==1 ?'disabled':''}}>
+                        name="role">
                         <option value="">Select role</option>
                         <option value="Doctor" {{ ($user->role == 'Doctor') ? 'selected': '' }}>Doctor</option>
-                        <option value="Master's student" {{ ($user->role == "Master's student") ? 'selected': '' }}>Master's student</option>
+                        @if($user->id != 1)
+                            <option value="Master's student" {{ ($user->role == "Master's student") ? 'selected': '' }}>Master's student</option>
+                        @endif
                         <option value="teacher" {{ ($user->role == "teacher") ? 'selected': '' }}>teacher</option>
                         <option value="administrative employee" {{ ($user->role == 'administrative employee') ? 'selected': '' }}>administrative employee</option>
                     </select>

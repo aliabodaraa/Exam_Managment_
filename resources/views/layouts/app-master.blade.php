@@ -6,7 +6,7 @@
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.87.0">
-    <title>Educational Platform</title>
+    <title>Exam Time Management</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- Bootstrap core CSS -->
     <link href="{!! url('assets/bootstrap/css/bootstrap.min.css') !!}" rel="stylesheet">
@@ -29,7 +29,7 @@
     .Active{
         border-radius: 5px;
         color: black;
-        background-color:#898c8e;
+        background-color:#004871;
     }
     body > header > div > div > ul > li:hover{
         border-radius: 5px;
@@ -2302,8 +2302,11 @@ div.h4 {
     <!-- Custom styles for this template -->
     <link href="{!! url('assets/css/app.css') !!}" rel="stylesheet">
 </head>
-<body style="margin-top: 77px;">
-  {{-- <nav class="flex bg-slate-700 text-white">
+<body style="margin-top: 77px;<?php if(URL::full()=='http://127.0.0.1:8000')echo'
+            background-image: url(http://127.0.0.1:8000/images/Exam_Time.png);
+            background-repeat: no-repeat;
+            background-size: cover;'?>">
+  {{-- <nav class="flex bg-slate-700 text-white'}}">
     <a href="/search" class="py-4 px-6 hover:bg-slate-800 {{ (request()->routeIs('search')) ? 'bg-slate-800' : '' }}">search</a>
   </nav> --}}
     @include('layouts.partials.navbar')

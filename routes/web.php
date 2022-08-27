@@ -53,8 +53,10 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
              */
             Route::group(['prefix' => 'courses'], function() {
                 Route::get('/index', 'CoursesController@index')->name('courses.index');
-                Route::get('/misboard', 'CoursesController@misboard')->name('courses.misboard');
                 Route::get('/create', 'CoursesController@create')->name('courses.create');
+                Route::get('/add_course_to_program', 'CoursesController@add_course_to_program')->name('courses.add_course_to_program');
+                Route::post('/store_add_course_to_program', 'CoursesController@store_add_course_to_program')->name('courses.store_add_course_to_program');
+                Route::get('/{course}/delete_course_from_program', 'CoursesController@delete_course_from_program')->name('courses.delete_course_from_program');
                 Route::post('/create', 'CoursesController@store')->name('courses.store');
                 Route::get('/{course}/edit', 'CoursesController@edit')->name('courses.edit');
                 Route::patch('/{course}/update', 'CoursesController@update')->name('courses.update');

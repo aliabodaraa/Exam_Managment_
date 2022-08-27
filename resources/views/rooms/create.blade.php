@@ -2,11 +2,16 @@
 
 @section('content')
     <div class="bg-light p-4 rounded">
-        <h1>Add new course</h1>
-        <div class="lead">
-            Add new course .
-        </div>
         <div class="container mt-4">
+            <h1>
+                Add new course
+                <div class="float-right">
+                    <a href="{{ URL::previous() }}" class="btn btn-dark">Back</a>
+                </div>
+            </h1>
+            <div class="lead">
+                
+            </div>
             @if ($message = Session::get('retryEntering'))
                 <div class="alert alert-danger alert-block">
                     <strong>{{ $message }}</strong>
@@ -34,6 +39,28 @@
                         placeholder="capacity" required>
                     @if ($errors->has('capacity'))
                         <span class="text-danger text-left">{{ $errors->first('capacity') }}</span>
+                    @endif
+                </div>
+                <div class="mb-3">
+                    <label for="location" class="form-label">location</label>
+                    <input value="{{ old('location') }}"
+                        type="text"
+                        class="form-control"
+                        name="location"
+                        placeholder="location" required>
+                    @if ($errors->has('location'))
+                        <span class="text-danger text-left">{{ $errors->first('location') }}</span>
+                    @endif
+                </div>
+                <div class="mb-3">
+                    <label for="notes" class="form-label">notes</label>
+                    <textarea cols="30" rows="10" value="{{ old('notes') }}"
+                        type="text"
+                        class="form-control"
+                        name="notes"
+                        placeholder="write note for this room" required></textarea>
+                    @if ($errors->has('notes'))
+                        <span class="text-danger text-left">{{ $errors->first('notes') }}</span>
                     @endif
                 </div>
                 <button type="submit" class="btn btn-primary">Save Room</button>

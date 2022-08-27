@@ -21,6 +21,9 @@
 
       @auth
         <div class="text-end">
+          @if(auth()->user()->id==1)
+            <a href="{{ route('courses.create') }}" class="btn btn-secondary me-2">Add New Course</a>
+          @endif
           <a href="{{ route('logout.perform') }}" class="btn btn-outline-light me-2">Logout</a>
         </div>
       @endauth

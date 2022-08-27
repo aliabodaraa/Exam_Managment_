@@ -14,6 +14,8 @@ class Room extends Model
     protected $fillable = [
          'room_name',
          'capacity',
+         'location',
+         'notes',
     ];
     public function courses(){//many to many between course & user
         return $this->belongsToMany('App\Models\Course','course_room_user')->withPivot('user_id','room_id','date','time','roleIn','num_student_in_room');

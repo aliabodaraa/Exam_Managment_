@@ -63,8 +63,9 @@ function ret_room_info($room,$course){
 @endphp --}}
     <div class="bg-light p-4 rounded">
 
-        <h1>Update Course
-            <div class="" style="float: right;">
+        <h1>
+            Update Course
+            <div class="float-right">
                 <a href="{{ URL::previous() }}" class="btn btn-dark">Back</a>
             </div>
         </h1>
@@ -82,7 +83,7 @@ function ret_room_info($room,$course){
                 <!-- when you submit -->
                 @foreach (array_unique($disabled_common_rooms_send) as $itemArr)
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <strong>{{$ss}}Stop trying to submit The<mark>@php $room_name=App\Models\Room::where('id',$itemArr)->first();echo $room_name->room_name; @endphp</mark>reserves now in anothor course it will free after now for this reason either Un-checked the room Or make both courses in the same time</strong>
+                        <strong>{{$ss}}Stop trying to submit The<b>@php $room_name=App\Models\Room::where('id',$itemArr)->first();echo $room_name->room_name; @endphp</b>reserves now in anothor course it will free after now for this reason either Un-checked the room Or make both courses in the same time</strong>
                         <button type="button" class="btn-close mt-1" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endforeach
@@ -90,7 +91,7 @@ function ret_room_info($room,$course){
                 <!-- when you go to edit page -->
                 @foreach (array_unique($disabled_common_rooms_send) as $itemArr)
                     <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                        <strong>The<mark>@php $room_name=App\Models\Room::where('id',$itemArr)->first();echo $room_name->room_name; @endphp</mark>reserves now in anothor course it will free after now for this reason either Un-checked the room Or make both courses in the same time</strong>
+                        <strong>The<b>@php $room_name=App\Models\Room::where('id',$itemArr)->first();echo $room_name->room_name; @endphp</b>reserves now in anothor course it will free after now for this reason either Un-checked the room Or make both courses in the same time</strong>
                         <button type="button" class="btn-close mt-1" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endforeach
@@ -104,7 +105,7 @@ function ret_room_info($room,$course){
                 @method('patch')
                 @csrf
                 <div class="row">
-                <div class="left col-sm-2" style="float:left">   
+                <div class="left col-sm-3" style="float:left">   
                     <div class="mb-3">
                         <label for="email" class="form-label">Course Name :</label>
                         <input value="{{ $course->course_name }}"
@@ -188,7 +189,7 @@ function ret_room_info($room,$course){
                         @endif
                     </div>
                 </div>
-                <div class="right col-sm-10" style="float:right">
+                <div class="right col-sm-9" style="float:right">
                         <label for="rooms" class="form-label">rooms :</label>
                         <div class="mb-3" style="height: 580px;
                         overflow: scroll;">
@@ -232,19 +233,18 @@ function ret_room_info($room,$course){
                                                         <div class="toggler-knob"></div>
                                                     </div>
                                             {{-- </label> --}}
-        {{-- <!-- Toggle Button Style 4 -->
-            <label class="toggler-wrapper style-4">
-                <input type="checkbox" >
-                <div class="toggler-slider">
-                    <div class="toggler-knob"></div>
-                </div>
-            </label>
-        <!-- End Toggle Button Style 4 -->                                                     --}}
+                                            {{-- <!-- Toggle Button Style 4 -->
+                                                <label class="toggler-wrapper style-4">
+                                                    <input type="checkbox" >
+                                                    <div class="toggler-slider">
+                                                        <div class="toggler-knob"></div>
+                                                    </div>
+                                                </label>
+                                            <!-- End Toggle Button Style 4 -->                                                     --}}
                                         </td>
                                         <td>{{ $room->room_name }}</td>
                                         @php if($course->users[0]->toArray()) 
-                                        $common_courses=App\Models\Course::with('rooms')->whereHas('rooms',function($query) use($course,$room)
-                                        {$query
+                                        $common_courses=App\Models\Course::with('rooms')->whereHas('rooms',function($query) use($course,$room){$query
                                         ->where('room_id',$room->id)
                                         ->where('date',$course->users[0]->pivot->date)
                                         ->where('time',$course->users[0]->pivot->time); })->get();@endphp
@@ -256,7 +256,7 @@ function ret_room_info($room,$course){
                                                                 $number_taken_in_this_room_course=0;
                                                                 foreach ($course_belongs->rooms as $onecoom)
                                                                     if($onecoom->id==$room->id)
-                                                                    $number_taken_in_this_room_course=$onecoom->pivot->num_student_in_room;
+                                                                        $number_taken_in_this_room_course=$onecoom->pivot->num_student_in_room;
                                                                 $num_all_courses_occupied_this_room+=$number_taken_in_this_room_course;
                                                             @endphp
                                                             <a style="text-decoration: none;" href="/courses/{{ $course_belongs->id }}/edit" class="badge bg-{{($course->id == $course_belongs->id ) ? 'danger': 'secondary'}}">{{$course_belongs->course_name}}</a>
@@ -283,9 +283,9 @@ function ret_room_info($room,$course){
                                             @endif
                                         </td>
                                         <td>
-                                            @if(in_array($room->id, array_unique($joining_rooms)))
+                                            @if(in_array($room->id, array_unique($joining_rooms))) 
                                             {{-- count_taken_student_in_all_rooms_in_this_course--}}
-                                                    <a href="{{ route('courses.room_for_course', ['course'=>$course->id,'specific_room'=>$room->id]) }}" class="btn btn-warning" style="{{true ? '':'pointer-events: none;background-color: #ffc10773;border-color: #ffc10773;'}}">
+                                                    <a href="{{ route('courses.room_for_course', ['course'=>$course->id,'specific_room'=>$room->id]) }}" class="btn btn-warning" style="{{$course->students_number>$number_students_in_this_course ? '':'pointer-events: none;background-color: #ffc10773;border-color: #ffc10773;'}}">
                                                             Joining
                                                     </a>
                                             @endif
@@ -322,43 +322,42 @@ function ret_room_info($room,$course){
                                                                         top: -21px;">{{$num_all_courses_occupied_in_all_rooms}} full</span>
                                 </div> --}}
                                         {{-- progress --}}
-                                                <div class="row bg-red rounded-lg" style="width: fit-content;padding: 8px 0 8px 0px;flex-flow: nowrap;
+                                                <div class="row rounded-lg mx-2" style="width: fit-content;padding: 8px 0 8px 0px;white-space: nowrap;
                                                 position: absolute;
                                                 padding: 2px 25px 2px 2px;
                                                 z-index: 9;
-                                                right: 20%;
+                                                right: 40%;
                                                 height: 90px;
                                                 top: 100px;">
-                                                    {{-- <h2 class="h6 font-weight-bold text-center mb-4">Overall progress</h2> --}}
-                                            
+                                                     {{-- <h2 class="h6 font-weight-bold text-center">{{ $course->course_name }} progress</h2> --}}
                                                     <!-- Progress bar 1 -->
-                                                    <div id="progress_line" class="col-sm-3 progress mx-2 mt-1" data-value='{{number_format((int)(($num_all_courses_occupied_in_all_rooms/$course->students_number)*100), 0, '.', '')}}'>
+                                                    <div id="progress_line" class="col-sm-3 progress mx-1 mt-2" data-value='{{number_format((int)(($number_students_in_this_course/$course->students_number)*100), 0, '.', '')}}'>
                                                         <span class="progress-left">
-                                                            <span class="progress-bar border-<?php if((($num_all_courses_occupied_in_all_rooms/$course->students_number)*100)<30) echo'danger';elseif((($num_all_courses_occupied_in_all_rooms/$course->students_number)*100)<=60) echo 'warning'; elseif((($num_all_courses_occupied_in_all_rooms/$course->students_number)*100)<=80) echo 'primary';else echo 'success';?>"></span>
+                                                            <span class="progress-bar border-<?php if((($number_students_in_this_course/$course->students_number)*100)<40) echo'danger';elseif((($number_students_in_this_course/$course->students_number)*100)<60) echo 'warning'; elseif((($number_students_in_this_course/$course->students_number)*100)<80) echo 'primary';else echo 'success';?>"></span>
                                                         </span>
                                                         <span class="progress-right">
-                                                            <span class="progress-bar border-<?php if((($num_all_courses_occupied_in_all_rooms/$course->students_number)*100)<30) echo'danger';elseif((($num_all_courses_occupied_in_all_rooms/$course->students_number)*100)<=60) echo 'warning'; elseif((($num_all_courses_occupied_in_all_rooms/$course->students_number)*100)<=80) echo 'primary';else echo 'success';?>"></span>
+                                                            <span class="progress-bar border-<?php if((($number_students_in_this_course/$course->students_number)*100)<30) echo'danger';elseif((($number_students_in_this_course/$course->students_number)*100)<=60) echo 'warning'; elseif((($number_students_in_this_course/$course->students_number)*100)<=80) echo 'primary';else echo 'success';?>"></span>
                                                         </span>
                                                         <div class="progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
-                                                            <div id="progress_value" class="h2 font-weight-bold">{{number_format((int)(($num_all_courses_occupied_in_all_rooms/$course->students_number)*100), 0, '.', '')}}</div><sup class=" h5 font-weight-bold">%</sup>
+                                                            <div id="progress_value" class="h3 font-weight-bold text-<?php if((($number_students_in_this_course/$course->students_number)*100)<30) echo'danger';elseif((($number_students_in_this_course/$course->students_number)*100)<=60) echo 'warning'; elseif((($number_students_in_this_course/$course->students_number)*100)<=80) echo 'primary';else echo 'success';?>">{{number_format((int)(($number_students_in_this_course/$course->students_number)*100), 0, '.', '')}}</div><span class="h4 font-weight-bold text-<?php if((($number_students_in_this_course/$course->students_number)*100)<30) echo'danger';elseif((($number_students_in_this_course/$course->students_number)*100)<=60) echo 'warning'; elseif((($number_students_in_this_course/$course->students_number)*100)<=80) echo 'primary';else echo 'success';?>">%</span>
                                                         </div>
                                                     </div>
                                                     <!-- END -->
                                             
                                                     <!-- Demo info -->
                                                     <div class="col-sm-8">
-                                                        <div class="row text-center mt-4">
+                                                        <div class="row text-center mt-3">
                                                            <div class="col-5 border-right" style="display:none;">
-                                                                <div id="progress_remaining_to_full" class="h6 font-weight-bold my-0">{{100-number_format((int)(($num_all_courses_occupied_in_all_rooms/$course->students_number)*100), 0, '.', '')}}</div><span class="small text-gray"> still</span>
+                                                                <div id="progress_remaining_to_full" class="h6 font-weight-bold my-0">{{100-number_format((int)(($number_students_in_this_course/$course->students_number)*100), 0, '.', '')}}</div><span class="small text-gray"> still</span>
                                                             </div>
                                                             <div class="col-4">
-                                                                <div class="h4 font-weight-bold my-0">{{$num_all_courses_occupied_in_all_rooms}}</div><span class="small text-gray">full</span>
+                                                                <div class="h2 font-weight-bold my-0 text-">{{$number_students_in_this_course}}</div><span class="small text-gray">full places</span>
                                                             </div>
                                                             <div class="col-4">
-                                                                <div class="h4 font-weight-bold my-0">{{$course->students_number-$num_all_courses_occupied_in_all_rooms}}</div><span class="small text-gray">free</span>
+                                                                <div class="h2 font-weight-bold my-0">{{$course->students_number-$number_students_in_this_course}}</div><span class="small text-gray">free places</span>
                                                             </div>
                                                             <div class="col-4">
-                                                                <div class="h4 font-weight-bold my-0">{{$course->students_number}}</div><span class="small text-gray">students</span>
+                                                                <div class="h2 font-weight-bold my-0">{{$course->students_number}}</div><span class="small text-gray">students num</span>
                                                             </div>
                                                         </div>
                                                     </div>

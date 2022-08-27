@@ -2,12 +2,16 @@
 
 @section('content')
     <div class="bg-light p-4 rounded">
-        <h1>Add new user</h1>
-        <div class="lead">
-            Add new user and assign role.
-        </div>
-{{-- here --}}
         <div class="container mt-4">
+            <h1>
+                Add new user
+                <div class="float-right">
+                    <a href="{{ URL::previous() }}" class="btn btn-dark">Back</a>
+                </div>
+            </h1>
+            <div class="lead">
+                
+            </div>
             <form method="POST" action="{{route('users.store')}}">
                 @csrf
                 <div class="mb-3">

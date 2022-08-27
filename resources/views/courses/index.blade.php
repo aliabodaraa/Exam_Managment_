@@ -4,8 +4,9 @@
         <h1>Exam Program</h1>
         <div class="lead">
             TIME TABLE .
-            <a href="{{ route('courses.create') }}" class="btn btn-primary btn-sm float-right">Add Course</a>
-            {{-- <a href="{{ route('courses.misboard') }}" class="btn btn-warning btn-sm">misboard courses</a> --}}
+                @if(auth()->user()->id==1)
+                    <a href="{{ route('courses.add_course_to_program') }}" class="btn btn-success float-right me-2 m4-2">Add Course</a>
+                @endif
         </div>
         {{-- class="container mt-2" --}}
         <div class="container-fluid px-2 mt-2">
@@ -24,6 +25,7 @@
                 <strong>{{ $messageDelete }}</strong>
             </div>
             @endif
+            @if(count($courses_info))
             <table class="table" class='exam-program'>
             <thead>
                 <tr>
@@ -112,11 +114,14 @@
                                     @endphp
                                     </h5>
                                         <div class="controll">
-                                                <a href="{{ route('courses.show', $id_course) }}" class="btn btn-warning btn-sm">Show</a>
-                                                <a href="{{ route('courses.edit', $id_course) }}" class="btn btn-info btn-sm">Edit</a>
-                                              {!! Form::open(['method' => 'DELETE','route' => ['courses.destroy', $id_course],'style'=>'display:inline']) !!}
+                                                <a href="{{ route('courses.show', $id_course) }}" class="btn btn-warning btn-sm btn-outline-light rounded">Show</a>
+                                                @if(auth()->user()->id==1)
+                                                    <a href="{{ route('courses.edit', $id_course) }}" class="btn btn-info btn-sm btn-outline-light rounded">Edit</a>
+                                                    <a href="{{ route('courses.delete_course_from_program', $id_course) }}" class="btn btn-danger btn-sm btn-outline-light rounded">Delete</a>
+                                                @endif
+                                              {{-- {!! Form::open(['method' => 'DELETE','route' => ['courses.destroy', $id_course],'style'=>'display:inline']) !!}
                                               {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
-                                              {!! Form::close() !!}
+                                              {!! Form::close() !!} --}}
                                             <span class="badge bg-secondary">{{gmdate('H:i A',strtotime($time))}}</span>
                                           </div>
                                     </td>
@@ -126,6 +131,16 @@
                 @endforeach
             </tbody>
         </table>
+        @else
+        <div class="alert text-black alert-success" role="alert" style="margin-top: 20px;">
+            <h4 class="alert-heading">Sorry<h4>
+            <p>The Program has not any course yet .</p>
+            <hr>
+            <p class="mb-0">Whenever you need to add a new course, click the green button .</p>
+           <h1><a href="{{url()->previous()}}" class="btn btn-secondary"> Back</a></h1>
+           {{-- problem in back --}}
+        </div>
+      @endif
       </div>
       {{-- <div class="d-flex">
         {!! $courses->links() !!}

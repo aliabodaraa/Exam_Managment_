@@ -2,11 +2,16 @@
 
 @section('content')
     <div class="bg-light p-4 rounded">
-        <h1>Add new course</h1>
-        <div class="lead">
-            Add new course .
-        </div>
         <div class="container mt-4">
+            <h1>
+                Add A New Course To The System
+                <div class="float-right">
+                    <a href="{{ URL::previous() }}" class="btn btn-dark">Back</a>
+                </div>
+            </h1>
+            <div class="lead">
+
+            </div>
             @if ($message = Session::get('retryEntering'))
                 <div class="alert alert-danger alert-block">
                     <strong>{{ $message }}</strong>
