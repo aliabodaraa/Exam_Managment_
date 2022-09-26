@@ -21,7 +21,9 @@ class CreateObjectionsTable extends Migration
             $table->time('suggest_time');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('user_id')->on('course_room_user')->onDelete('cascade')->onUpdate('cascade');
-            $table->primary(['user_id','date','time']);
+            $table->unsignedBigInteger('rotation_id');
+            $table->foreign('rotation_id')->references('id')->on('rotations')->onDelete('cascade')->onUpdate('cascade');
+            $table->primary(['user_id','date','time','rotation_id']);
         });
     }
 

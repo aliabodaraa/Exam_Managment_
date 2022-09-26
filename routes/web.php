@@ -78,6 +78,19 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
                 Route::get('/{room}/show', 'RoomsController@show')->name('rooms.show');
                 Route::delete('/{room}/delete', 'RoomsController@destroy')->name('rooms.destroy');
             });
+            
+            /**
+             * Rotation Routes
+             */
+            Route::group(['prefix' => 'rotations'], function() {
+                Route::get('/index', 'RotationsController@index')->name('rotations.index');
+                Route::get('/create', 'RotationsController@create')->name('rotations.create');
+                Route::post('/create', 'RotationsController@store')->name('rotations.store');
+                Route::get('/{rotation}/edit', 'RotationsController@edit')->name('rotations.edit');
+                Route::patch('/{rotation}/update', 'RotationsController@update')->name('rotations.update');
+                Route::get('/{rotation}/show', 'RotationsController@show')->name('rotations.show');
+                Route::delete('/{rotation}/delete', 'RotationsController@destroy')->name('rotations.destroy');
+            });
         });
     });
 

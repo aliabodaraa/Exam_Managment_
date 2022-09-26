@@ -401,6 +401,7 @@ class CoursesController extends Controller
     }
 
     public function store_add_course_to_program(Request $request){
+        //dd($request);
         if($request->course_name=='none')
             return redirect()->back()
             ->with('retryEntering',"Please Detemine which course you need to add .");
@@ -527,15 +528,15 @@ class CoursesController extends Controller
                         $i=1;
                         foreach ($room_info['members'] as $member) {
                             if($i==1) {
-                                $courseN->users()->attach($member,['room_id'=>$room_id,'num_student_in_room'=> $room_info['take'] ,'date'=>$date,'time'=>$time,'roleIn'=>'Room-Head']);
+                                $courseN->users()->attach($member,['room_id'=>$room_id,'num_student_in_room'=> $room_info['take'] ,'date'=>$date,'time'=>$time,'roleIn'=>'Room-Head','rotation_id'=>$request->rotation_id]);
                                 $i++;
                                 continue;
                             }elseif($i==2){
-                                $courseN->users()->attach($member,['room_id'=>$room_id, 'num_student_in_room'=> $room_info['take'] ,'date'=>$date,'time'=>$time,'roleIn'=>'Secertary']);
+                                $courseN->users()->attach($member,['room_id'=>$room_id, 'num_student_in_room'=> $room_info['take'] ,'date'=>$date,'time'=>$time,'roleIn'=>'Secertary','rotation_id'=>$request->rotation_id]);
                                 $i++;
                                 continue;
                             }else{
-                                $courseN->users()->attach($member,['room_id'=>$room_id, 'num_student_in_room'=> $room_info['take'] ,'date'=>$date,'time'=>$time,'roleIn'=>'Observer']);
+                                $courseN->users()->attach($member,['room_id'=>$room_id, 'num_student_in_room'=> $room_info['take'] ,'date'=>$date,'time'=>$time,'roleIn'=>'Observer','rotation_id'=>$request->rotation_id]);
                             }
                         }
                     }

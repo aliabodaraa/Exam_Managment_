@@ -9,7 +9,7 @@ class Objection extends Model
 {
     use HasFactory;
 
-    public function course_room_user(){//One to One between Objection & Course_Room_User
-        return $this->belongsTo("App\Course_room_User");
+    public function rotation(){//one to many between Rotation & Objection
+        return $this->belongsTo('App\Models\Rotation');
     }
 }

@@ -138,6 +138,20 @@
                         <span class="text-danger text-left">{{ $errors->first('students_number') }}</span>
                     @endif
                 </div>
+                <div class="mb-3">
+                    @php 
+                    $latest_rotation=App\Models\Rotation::latest()->first();//latest rotation
+                    @endphp
+                    {{-- @empty(!$latest_rotation) --}}
+                    <label for="rotation_id" class="form-label">Rotation Number :</label>
+                    <select class="form-control" name="rotation_id" class="form-control" required>
+                        <option value="{{ $latest_rotation['id'] }}" >{{ $latest_rotation['name'] }}</option>
+                    </select>
+                    @if ($errors->has('studing_year'))
+                        <span class="text-danger text-left">{{ $errors->first('rotation_id') }}</span>
+                    @endif
+                    {{-- @endempty --}}
+                </div>
                     {{-- <label for="rooms" class="form-label">rooms :</label>
                     <div class="mb-3" style="height: 580px;
                     overflow: scroll;">
