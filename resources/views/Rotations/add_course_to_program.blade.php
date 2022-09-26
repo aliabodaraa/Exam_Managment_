@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="container" style="margin-top: -50px;">
-        <h1>Add course to the Exam Program
+        <h1>Add course to the Exam Program {{ $rotation->name }}
             <div class="" style="float: right;">
                 <a href="{{ URL::previous() }}" class="btn btn-dark">Back</a>
             </div>
@@ -16,7 +16,7 @@
                 </div>
             @endif
             <br>
-            <form method="POST" action="{{route('courses.store_add_course_to_program')}}" id="coursesForm">
+            <form method="POST" action="{{route('rotations.store_add_course_to_program',$rotation->id)}}" id="coursesForm">
                 @csrf
                 <div class="mb-3">
                     <label for="course_name" class="form-label">choose course_name :</label>
@@ -24,14 +24,20 @@
                         @if(count(App\Models\Course::all()))
                             <optgroup label="One Year" class="bg-danger h5 font-weight-bold text-light">
                                 @foreach (App\Models\Course::where('studing_year',1)->where('semester',1)->get() as $course)
-                                    @if(!count($course->rooms->toArray()))
+                                    @php
+                                        $courses_in_current_rotationOneOne=App\Models\Course::with('rooms')->whereHas('rooms', function($query) use($course,$rotation){$query->where('rotation_id',$rotation->id)->where('course_id',$course->id);})->where('studing_year',1)->where('semester',1)->get();
+                                    @endphp
+                                    @if(!count($courses_in_current_rotationOneOne->toArray()))
                                         @once <option class="h5 font-weight-bold text-dark" label="first semester" disabled>&nbsp;&nbsp;</option> @endonce
                                         <option value='{{ $course->id }}'>&nbsp;&nbsp;&nbsp;&nbsp;{{ $course->course_name }}</option>
                                     @endif
                                 @endforeach
                                 
                                 @foreach (App\Models\Course::where('studing_year',1)->where('semester',2)->get() as $course)
-                                    @if(!count($course->rooms->toArray()))
+                                    @php
+                                        $courses_in_current_rotationOneTwo=App\Models\Course::with('rooms')->whereHas('rooms', function($query) use($course,$rotation){$query->where('rotation_id',$rotation->id)->where('course_id',$course->id);})->where('studing_year',1)->where('semester',2)->get();
+                                    @endphp
+                                    @if(!count($courses_in_current_rotationOneTwo->toArray()))
                                         @once <option class="h5 font-weight-bold text-dark" label="second semester" disabled>&nbsp;&nbsp;</option> @endonce
                                         <option value='{{ $course->id }}'>&nbsp;&nbsp;&nbsp;&nbsp;{{ $course->course_name }}</option>
                                     @endif
@@ -39,14 +45,20 @@
                             </optgroup>
                             <optgroup label="Two Year" class="bg-secondary h5 font-weight-bold text-light">
                                 @foreach (App\Models\Course::where('studing_year',2)->where('semester',1)->get() as $course)
-                                    @if(!count($course->rooms->toArray()))
+                                    @php
+                                        $courses_in_current_rotationTwoOne=App\Models\Course::with('rooms')->whereHas('rooms', function($query) use($course,$rotation){$query->where('rotation_id',$rotation->id)->where('course_id',$course->id);})->where('studing_year',2)->where('semester',1)->get();
+                                    @endphp
+                                    @if(!count($courses_in_current_rotationTwoOne->toArray()))
                                         @once <option class="h5 font-weight-bold text-dark" label="first semester" disabled>&nbsp;&nbsp;</option> @endonce
                                         <option value='{{ $course->id }}'>&nbsp;&nbsp;&nbsp;&nbsp;{{ $course->course_name }}</option>
                                     @endif
                                 @endforeach
                                 
                                 @foreach (App\Models\Course::where('studing_year',2)->where('semester',2)->get() as $course)
-                                    @if(!count($course->rooms->toArray()))
+                                    @php
+                                        $courses_in_current_rotationTwoTwo=App\Models\Course::with('rooms')->whereHas('rooms', function($query) use($course,$rotation){$query->where('rotation_id',$rotation->id)->where('course_id',$course->id);})->where('studing_year',2)->where('semester',2)->get();
+                                    @endphp
+                                    @if(!count($courses_in_current_rotationTwoTwo->toArray()))
                                         @once <option class="h5 font-weight-bold text-dark" label="second semester" disabled>&nbsp;&nbsp;</option> @endonce
                                         <option value='{{ $course->id }}'>&nbsp;&nbsp;&nbsp;&nbsp;{{ $course->course_name }}</option>
                                     @endif
@@ -54,14 +66,20 @@
                             </optgroup>
                             <optgroup label="Third Year" class="bg-success h5 font-weight-bold text-light">
                                 @foreach (App\Models\Course::where('studing_year',3)->where('semester',1)->get() as $course)
-                                    @if(!count($course->rooms->toArray()))
+                                    @php
+                                        $courses_in_current_rotationThreeOne=App\Models\Course::with('rooms')->whereHas('rooms', function($query) use($course,$rotation){$query->where('rotation_id',$rotation->id)->where('course_id',$course->id);})->where('studing_year',3)->where('semester',1)->get();
+                                    @endphp
+                                    @if(!count($courses_in_current_rotationThreeOne->toArray()))
                                         @once <option class="h5 font-weight-bold text-dark" label="first semester" disabled>&nbsp;&nbsp;</option> @endonce
                                         <option value='{{ $course->id }}'>&nbsp;&nbsp;&nbsp;&nbsp;{{ $course->course_name }}</option>
                                     @endif
                                 @endforeach
                                 
                                 @foreach (App\Models\Course::where('studing_year',3)->where('semester',2)->get() as $course)
-                                    @if(!count($course->rooms->toArray()))
+                                    @php
+                                        $courses_in_current_rotationThreeTwo=App\Models\Course::with('rooms')->whereHas('rooms', function($query) use($course,$rotation){$query->where('rotation_id',$rotation->id)->where('course_id',$course->id);})->where('studing_year',3)->where('semester',2)->get();
+                                    @endphp
+                                    @if(!count($courses_in_current_rotationThreeTwo->toArray()))
                                         @once <option class="h5 font-weight-bold text-dark" label="second semester" disabled>&nbsp;&nbsp;</option> @endonce
                                         <option value='{{ $course->id }}'>&nbsp;&nbsp;&nbsp;&nbsp;{{ $course->course_name }}</option>
                                     @endif
@@ -69,14 +87,20 @@
                             </optgroup>
                             <optgroup label="Fourth Year" class="bg-dark h5 font-weight-bold text-light">
                                 @foreach (App\Models\Course::where('studing_year',4)->where('semester',1)->get() as $course)
-                                    @if(!count($course->rooms->toArray()))
+                                    @php
+                                        $courses_in_current_rotationFourthOne=App\Models\Course::with('rooms')->whereHas('rooms', function($query) use($course,$rotation){$query->where('rotation_id',$rotation->id)->where('course_id',$course->id);})->where('studing_year',4)->where('semester',1)->get();
+                                    @endphp
+                                    @if(!count($courses_in_current_rotationFourthOne->toArray()))
                                         @once <option class="h5 font-weight-bold text-light" label="first semester" disabled>&nbsp;&nbsp;</option> @endonce
                                         <option value='{{ $course->id }}'>&nbsp;&nbsp;&nbsp;&nbsp;{{ $course->course_name }}</option>
                                     @endif
                                 @endforeach
 
                                 @foreach (App\Models\Course::where('studing_year',4)->where('semester',2)->get() as $course)
-                                    @if(!count($course->rooms->toArray()))
+                                    @php
+                                        $courses_in_current_rotationFourthTwo=App\Models\Course::with('rooms')->whereHas('rooms', function($query) use($course,$rotation){$query->where('rotation_id',$rotation->id)->where('course_id',$course->id);})->where('studing_year',4)->where('semester',2)->get();
+                                    @endphp
+                                    @if(!count($courses_in_current_rotationFourthTwo->toArray()))
                                         @once <option class="h5 font-weight-bold text-light" label="second semester" disabled>&nbsp;&nbsp;</option> @endonce
                                         <option value='{{ $course->id }}'>&nbsp;&nbsp;&nbsp;&nbsp;{{ $course->course_name }}</option>
                                     @endif
@@ -84,14 +108,20 @@
                             </optgroup>
                             <optgroup label="Fifth Year" class="bg-warning h5 font-weight-bold text-light">
                                 @foreach (App\Models\Course::where('studing_year',5)->where('semester',1)->get() as $course)
-                                    @if(!count($course->rooms->toArray()))
+                                    @php
+                                        $courses_in_current_rotationFifthOne=App\Models\Course::with('rooms')->whereHas('rooms', function($query) use($course,$rotation){$query->where('rotation_id',$rotation->id)->where('course_id',$course->id);})->where('studing_year',5)->where('semester',1)->get();
+                                    @endphp
+                                    @if(!count($courses_in_current_rotationFifthOne->toArray()))
                                         @once <option class="h5 font-weight-bold text-dark" label="first semester" disabled>&nbsp;&nbsp;</option> @endonce
                                         <option value='{{ $course->id }}'>&nbsp;&nbsp;&nbsp;&nbsp;{{ $course->course_name }}</option>
                                     @endif
                                 @endforeach
 
                                 @foreach (App\Models\Course::where('studing_year',5)->where('semester',2)->get() as $course)
-                                    @if(!count($course->rooms->toArray()))
+                                    @php
+                                        $courses_in_current_rotationFifthTwo=App\Models\Course::with('rooms')->whereHas('rooms', function($query) use($course,$rotation){$query->where('rotation_id',$rotation->id)->where('course_id',$course->id);})->where('studing_year',5)->where('semester',2)->get();
+                                    @endphp
+                                    @if(!count($courses_in_current_rotationFifthTwo->toArray()))
                                         @once <option class="h5 font-weight-bold text-dark" label="second semester" disabled>&nbsp;&nbsp;</option> @endonce
                                         <option value='{{ $course->id }}'>&nbsp;&nbsp;&nbsp;&nbsp;{{ $course->course_name }}</option>
                                     @endif
@@ -107,11 +137,11 @@
                 </div>
                 <div class="mb-3">
                     <label for="date" class="form-label">date</label>
-                    <input value="{{ old('date') }}"
+                    <input id="date_picker" value="{{ old('date') }}"
                         type="date"
                         class="form-control"
                         name="date"
-                        placeholder="date" required>
+                        placeholder="date" onclick="myFunction(JSON.stringify({{ $rotation }}))" required>
                     @if ($errors->has('date'))
                         <span class="text-danger text-left">{{ $errors->first('date') }}</span>
                     @endif
@@ -138,41 +168,26 @@
                         <span class="text-danger text-left">{{ $errors->first('students_number') }}</span>
                     @endif
                 </div>
-                <div class="mb-3">
-                    @php 
-                    $latest_rotation=App\Models\Rotation::latest()->first();//latest rotation
-                    @endphp
-                    {{-- @empty(!$latest_rotation) --}}
-                    <label for="rotation_id" class="form-label">Rotation Number :</label>
-                    <select class="form-control" name="rotation_id" class="form-control" required>
-                        <option value="{{ $latest_rotation['id'] }}" >{{ $latest_rotation['name'] }}</option>
-                    </select>
-                    @if ($errors->has('studing_year'))
-                        <span class="text-danger text-left">{{ $errors->first('rotation_id') }}</span>
-                    @endif
-                    {{-- @endempty --}}
-                </div>
-                    {{-- <label for="rooms" class="form-label">rooms :</label>
-                    <div class="mb-3" style="height: 580px;
-                    overflow: scroll;">
-                        <table class="table table-light">
-                            @foreach(App\Models\Room::all() as $room)
-                                <tr style="position: relative;top:-1px;">
-                                    <td>
-                                        <input type="checkbox"
-                                        name="rooms[{{ $room->id }}]"
-                                        value="{{ $room->id }}"
-                                        class='rooms toggler-wrapper style-4'>
-                                    </td>
-                                    <td>{{ $room->room_name }}</td>  
-                                </tr>
-                            @endforeach
-                        </table>
-                    </div> --}}
                 <button type="submit" class="btn btn-primary">Save course</button>
                 {{-- <a href="{{ route('courses.index') }}" class="btn btn-default">Back</a> --}}
             </form>
 
     </div>
 
+@endsection
+@section('scripts')
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+<script>
+    $(document).ready(function () {
+        var current_rotation;
+        myFunction=(x)=>{
+            current_rotation=JSON.parse(x);
+            console.log(current_rotation.start_date+"\n"+current_rotation.end_date);  
+          $('#date_picker').attr('min',current_rotation.start_date);
+          $('#date_picker').attr('max',current_rotation.end_date);
+        }
+
+    });
+</script>
 @endsection

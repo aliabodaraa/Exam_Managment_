@@ -3,14 +3,14 @@
 @section('content')
 
     <div class="bg-light p-4 rounded">
-        <h1>Users Control Page
+        <h1>المستخدمين
             <div style="float: right;">
-                <a href="{{url()->previous()}}" class="btn btn-dark">Back</a>
+                <a href="{{url()->previous()}}" class="btn btn-dark">رجوع</a>
             </div>
         </h1>
         <div class="lead">
             @if(auth()->user()->id==1)
-                <a href="{{ route('users.create') }}" class="btn btn-warning float-right mb-4">Add new user</a>
+                <a href="{{ route('users.create') }}" class="btn btn-warning float-right mb-4">إضافة مستخدم</a>
             @endif
         </div>
 
@@ -19,12 +19,12 @@
         </div>
         {{-- @livewire('search') --}}
         @if(count($users))
-        <table class="table table-warning">
+        <table class="table table-dark">
             <thead>
             <tr>
                 <th scope="col" width="5%">#</th>
-                <th scope="col" width="15%">Email</th>
-                <th scope="col" width="15%">Username</th>
+                <th scope="col" width="20%">Email</th>
+                <th scope="col" width="20%">Username</th>
                 <th scope="col" width="15%">Role</th>
                 @if(auth()->user()->id==1)
                     <th scope="col" width="20%">number observation</th>
@@ -72,29 +72,31 @@
                                     <span class="badge bg-secondary">{{count($dates_distinct)}}</span>
                                 </td>
                             @endif
-                            @if(auth()->user()->id==1)<td><a href="{{ route('users.observations', $user->id) }}" class="btn btn-info btn-sm me-2 btn-close-white">observations</a></td>@endif
-                            <td><a href="{{ route('users.show', $user->id) }}" class="btn btn-warning btn-sm">Show</a></td>
-                            @if(auth()->user()->id==1)
-                                <td style="display:flex;">
-                                        <a href="{{ route('users.edit', $user->id) }}" class="btn btn-info btn-sm me-2" style="height: 32px;">Edit</a>
-                                        {!! Form::open(['method' => 'DELETE','route' => ['users.destroy', $user->id],'style'=>'display:inline']) !!}
-                                        {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
-                                        {!! Form::close() !!}
+                                <td style="display:flex;align-items:baseline;">
+                                            @if(auth()->user()->id==1)
+                                                <a href="{{ route('users.observations', $user->id) }}" class="btn btn-info btn-sm me-2 btn-close-white">observations</a>
+                                            @endif
+                                            <a href="{{ route('users.show', $user->id) }}" class="btn btn-warning btn-sm me-2">Show</a>
+                                            @if(auth()->user()->id==1) 
+                                                <a href="{{ route('users.edit', $user->id) }}" class="btn btn-info btn-sm me-2">Edit</a>
+                                                {!! Form::open(['method' => 'DELETE','route' => ['users.destroy', $user->id],'style'=>'display:inline']) !!}
+                                                {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
+                                                {!! Form::close() !!}
+                                            @endif
                                 </td>
-                            @endif
                         </tr>
                     @endforeach
             </tbody>
         </table>
         @else
-        <div class="alert text-black alert-success" role="alert" style="margin-top: 20px;">
-            <h4 class="alert-heading">Sorry<h4>
-            <p>The Program has not any user yet .</p>
-            <hr>
-            <p class="mb-0">Whenever you need to add a new user, click the yellow button .</p>
-           <h1><a href="{{url()->previous()}}" class="btn btn-secondary"> Back</a></h1>
-           {{-- problem in back --}}
-        </div>
+            <div class="alert text-black alert-success" role="alert" style="margin-top: 20px;">
+                <h4 class="alert-heading">Sorry<h4>
+                <p>The Program has not any user yet .</p>
+                <hr>
+                <p class="mb-0">Whenever you need to add a new user, click the yellow button .</p>
+            <h1><a href="{{url()->previous()}}" class="btn btn-secondary"> Back</a></h1>
+            {{-- problem in back --}}
+            </div>
       @endif
 {{-- added --}}
         {{-- <div class="modal show" id="formModal" aria-hidden="true"> --}}

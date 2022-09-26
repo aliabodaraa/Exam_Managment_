@@ -19,26 +19,18 @@
             @endif
             <form method="POST" action="{{route('rotations.store')}}">
                 @csrf
+                @php
+
+                @endphp
                 <div class="mb-3">
                     <label for="name" class="form-label">Rotation Name</label>
                     <select class="form-control" name="name" class="form-control" required>
-                        <option value='الدورة الفصلية الأولى'>الدورة الفصلية الأولى</option>
-                        <option value='الدورة الفصلية الثانية'>الدورة الفصلية الثانية</option>
-                        <option value='الدورة الفصلية الثالة'>الدورة الفصلية الثالثة</option>
+                                    <option value='الدورة الفصلية الأولى'>الدورة الفصلية الأولى</option>
+                                    <option value='الدورة الفصلية الثانية'>الدورة الفصلية الثانية</option>
+                                    <option value='الدورة الفصلية الثالة'>الدورة الفصلية الثالثة</option>
                     </select>
                     @if ($errors->has('name'))
                         <span class="text-danger text-left">{{ $errors->first('name') }}</span>
-                    @endif
-                </div>
-                <div class="mb-3">
-                    <label for="year" class="form-label">Rotation Year</label>
-                    <input value="<?php echo date('Y')?>"
-                        type="number"
-                        class="form-control"
-                        name="year"
-                        placeholder="year" required disabled>
-                    @if ($errors->has('year'))
-                        <span class="text-danger text-left">{{ $errors->first('year') }}</span>
                     @endif
                 </div>
                 <div class="mb-3">
@@ -61,6 +53,18 @@
                         placeholder="end_date" required>
                     @if ($errors->has('end_date'))
                         <span class="text-danger text-left">{{ $errors->first('end_date') }}</span>
+                    @endif
+                </div>
+                <div class="mb-3">
+                    <label for="year" class="form-label">Rotation Year</label>
+                    <input value="{{ date('Y') }}"
+                    {{-- this value does not transfer to the rotation controller propaply because we use POST Mothod --}}
+                        type="number"
+                        class="form-control"
+                        name="year"
+                        placeholder="year" required disabled>
+                    @if ($errors->has('year'))
+                        <span class="text-danger text-left">{{ $errors->first('year') }}</span>
                     @endif
                 </div>
                 <button type="submit" class="btn btn-primary">Save Rotation</button>

@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="bg-light p-4 rounded">
-        <h1>Rooms Control Page
+        <h1>القاعات الامتحانية
             <div style="float: right;">
                 <a href="{{url()->previous()}}" class="btn btn-dark">Back</a>
             </div>
@@ -14,14 +14,14 @@
         @endif
         @if(auth()->user()->id==1)
             <div class="lead">
-                <a href="{{ route('rooms.create') }}" class="btn btn-warning float-right mb-4">Add new room</a>
+                <a href="{{ route('rooms.create') }}" class="btn btn-warning float-right mb-4">إضافة قاعة</a>
             </div>
         @endif
         <div class="mt-2">
             @include('layouts.partials.messages')
         </div>
     @if(count($rooms))
-        <table class="table table-warning">
+        <table class="table table-dark">
             <thead>
             <tr>
                 <th scope="col" width="20%">room name</th>

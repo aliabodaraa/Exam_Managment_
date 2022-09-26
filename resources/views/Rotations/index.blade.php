@@ -2,14 +2,14 @@
 
 @section('content')
     <div class="bg-light p-4 rounded">
-        <h1>Rotations Control Page
+        <h1>الدورات الامتحانية
             {{-- <div style="float: right;">
                 <a href="{{url()->previous()}}" class="btn btn-dark">Back</a>
             </div> --}}
             @if(auth()->user()->id==1)
                 <div style="float: right;">
                     <div class="lead">
-                        <a href="{{ route('rotations.create') }}" class="btn btn-warning float-right mb-4">Add new rotation</a>
+                        <a href="{{ route('rotations.create') }}" class="btn btn-warning float-right mb-4" style="{{ $count_existing_rotation==3 ?'display: none;':'' }}">إضافة دورة امتحانية</a>
                     </div>
                 </div>
             @endif
@@ -28,32 +28,32 @@
             @include('layouts.partials.messages')
         </div>
     @if(count($rotations))
-        <table class="table table-warning">
+        <table class="table table-dark">
             <thead>
             <tr>
                 <th scope="col" width="20%">rotation name</th>
                 <th scope="col" width="20%">year</th>
                 <th scope="col" width="20%">start_date</th>
                 <th scope="col" width="30%">end_date</th>
-                @if(auth()->user()->id==1)<th scope="col" width="10%">Actions</th>@endif
+                <th scope="col" width="10%">Actions</th>
             </tr>
             </thead>
             <tbody>
                     @foreach($rotations as $rotation)
-                        <tr>
+                        <tr class="{{App\Models\Rotation::latest()->first()->id==$rotation->id? 'text-primary':''}}" id="user{{$rotation->id}}">
                             <td>{{ $rotation->name }}</td>
                             <td>{{ $rotation->year }}</td>
                             <td>{{ $rotation->start_date }}</td>
                             <td>{{ $rotation->end_date }}</td>
-                            @if(auth()->user()->id==1)
-                                <td style="display:flex;align-items:start;">
-                                        <a href="{{ route('rotations.edit', $rotation->id) }}" class="btn btn-success btn-sm me-2" style="width:120px">البرنامج الامتحاني</a>
-                                        <a href="{{ route('rotations.edit', $rotation->id) }}" class="btn btn-info btn-sm me-2 btn-close-white">Edit</a>
-                                        {!! Form::open(['method' => 'DELETE','route' => ['rotations.destroy', $rotation->id],'style'=>'display:inline']) !!}
-                                        {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
-                                        {!! Form::close() !!}
+                                <td style="display:flex;align-items:baseline;">
+                                        <a href="{{ route('rotations.show', $rotation->id) }}" class="btn btn-success btn-sm me-2" style="width:120px">البرنامج الامتحاني</a>
+                                        @if(auth()->user()->id==1)
+                                            <a href="{{ route('rotations.edit', $rotation->id) }}" class="btn btn-info btn-sm me-2 btn-close-white">Edit</a>
+                                            {!! Form::open(['method' => 'DELETE','route' => ['rotations.destroy', $rotation->id],'style'=>'display:inline']) !!}
+                                            {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
+                                            {!! Form::close() !!}
+                                        @endif
                                 </td>
-                            @endif
                         </tr>
                     @endforeach
             </tbody>

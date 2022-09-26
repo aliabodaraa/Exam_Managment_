@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="bg-light p-4 m-4 rounded">
-        <h3>Observations {{$user_name}} :
+        <h3> مراقبات {{$user_name}}
             <div style="float: right;"><a href="{{ URL::previous() }}" class="btn btn-dark">Back</a></div>
         </h3>
         <div class="lead">

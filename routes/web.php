@@ -52,11 +52,11 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
              * Course Routes
              */
             Route::group(['prefix' => 'courses'], function() {
-                Route::get('/index', 'CoursesController@index')->name('courses.index');
+                
                 Route::get('/create', 'CoursesController@create')->name('courses.create');
-                Route::get('/add_course_to_program', 'CoursesController@add_course_to_program')->name('courses.add_course_to_program');
-                Route::post('/store_add_course_to_program', 'CoursesController@store_add_course_to_program')->name('courses.store_add_course_to_program');
-                Route::get('/{course}/delete_course_from_program', 'CoursesController@delete_course_from_program')->name('courses.delete_course_from_program');
+
+
+
                 Route::post('/create', 'CoursesController@store')->name('courses.store');
                 Route::get('/{course}/edit', 'CoursesController@edit')->name('courses.edit');
                 Route::patch('/{course}/update', 'CoursesController@update')->name('courses.update');
@@ -88,8 +88,12 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
                 Route::post('/create', 'RotationsController@store')->name('rotations.store');
                 Route::get('/{rotation}/edit', 'RotationsController@edit')->name('rotations.edit');
                 Route::patch('/{rotation}/update', 'RotationsController@update')->name('rotations.update');
-                Route::get('/{rotation}/show', 'RotationsController@show')->name('rotations.show');
                 Route::delete('/{rotation}/delete', 'RotationsController@destroy')->name('rotations.destroy');
+
+                Route::get('/{rotation}/show', 'RotationsController@show')->name('rotations.show');
+                Route::get('/{rotation}/add_course_to_program', 'RotationsController@add_course_to_program')->name('rotations.add_course_to_program');
+                Route::post('/{rotation}/store_add_course_to_program', 'RotationsController@store_add_course_to_program')->name('rotations.store_add_course_to_program');
+                Route::get('/{rotation}/course/{course}/delete_course_from_program', 'CoursesController@delete_course_from_program')->name('courses.delete_course_from_program');
             });
         });
     });
