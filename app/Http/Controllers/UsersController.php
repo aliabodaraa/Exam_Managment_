@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Room;
+use App\Models\Rotation;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use App\Http\Requests\StoreUserRequest;
@@ -75,33 +76,53 @@ class UsersController extends Controller
     public function observations(User $user)
     {
         $user_name=User::where('id',$user->id)->first()->username;
-        $current_observations_for_all_users=User::with('courses')->whereHas('courses',function($query) use($user) {
+        $all_courses_rows_for_current_user=User::with('courses')->whereHas('courses',function($query) use($user) {
             $query->where('user_id',$user->id);
         })->get();
+
+        $rotations_numbers=[];
         $dates_distinct=[];
         $times_distinct=[];
-        $table=[];
-        $i=0;
-    foreach($current_observations_for_all_users as $current_user)
-        foreach($current_user->courses as $course){
-             if( (!in_array($course->pivot->date,$dates_distinct) && !in_array($course->pivot->time,$times_distinct) ) ||
-                  ( in_array($course->pivot->date,$dates_distinct) && !in_array($course->pivot->time,$times_distinct) ) ||
-                  (!in_array($course->pivot->date,$dates_distinct) &&  in_array($course->pivot->time,$times_distinct) ) ){
-                        array_push($dates_distinct,$course->pivot->date);
-                        array_push($times_distinct,$course->pivot->time); 
-                        $table[$i]['date']=$course->pivot->date;
-                        $table[$i]['time']=$course->pivot->time;
-                        $table[$i]['roleIn']=$course->pivot->roleIn;
-                        $table[$i]['course_name']=$course->course_name;
-                        $table[$i]['room_name']=Room::where('id',$course->pivot->room_id)->first()->room_name;
-            }
-            $i++;
-        }
 
-    //dd($table);
+        //calc rotation for current user
+            foreach($user->rotations as $rotation)
+                array_push($rotations_numbers,$rotation->pivot->rotation_id);
+
+
+        //calc info for each rotation for current user
+        $rotations_table=[];
+        foreach ($rotations_numbers as $rotation_number) {
+            foreach($user->courses as $course){
+                    $table=[];$i=0;
+                    if($course->pivot->rotation_id == $rotation_number){
+                        if( (!in_array($course->pivot->date,$dates_distinct) && !in_array($course->pivot->time,$times_distinct) ) ||
+                            ( in_array($course->pivot->date,$dates_distinct) && !in_array($course->pivot->time,$times_distinct) ) ||
+                            (!in_array($course->pivot->date,$dates_distinct) &&  in_array($course->pivot->time,$times_distinct) ) ){
+                                    array_push($rotations_numbers,$course->pivot->rotation_id);
+                                    array_push($dates_distinct,$course->pivot->date);
+                                    array_push($times_distinct,$course->pivot->time);
+                                    $table['observations'][$i]['date']=$course->pivot->date;
+                                    $table['observations'][$i]['time']=$course->pivot->time;
+                                    $table['observations'][$i]['roleIn']=$course->pivot->roleIn;
+                                    $table['observations'][$i]['course_name']=$course->course_name;
+                                    $table['observations'][$i]['room_name']=Room::where('id',$course->pivot->room_id)->first()->room_name;
+                                    $i++;
+                        }
+                        $rotationInfo=Rotation::where('id',$rotation_number)->first();
+                        $table['name']=$rotationInfo['name'];
+                        $table['year']=$rotationInfo['year'];
+                        $table['start_date']=$rotationInfo['start_date'];
+                        $table['end_date']=$rotationInfo['end_date'];
+                        $rotations_table[$rotation_number]=$table;
+                }
+            }
+        }
+        //dd($rotations_table);
 
         return view('users.observations', [
-            'user_name' => $user_name,'table' => $table
+            'user_name' => $user_name,
+            'rotations_table' => $rotations_table,
+            'rotations_numbers' => $rotations_numbers
         ]);
     }                             
     /**

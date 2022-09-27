@@ -47,15 +47,15 @@
                                     <span class="badge bg-secondary">{{$user->number_of_observation}}</span>
                                 </td>
                                 <td>
-                                    
                                     @php
                                         $current_observations_for_all_users=App\Models\User::with('courses')->whereHas('courses',function($query) use($user) {
                                             $query->where('user_id',$user->id);
                                         })->get();
+                                        //dd($current_observations_for_all_users);
+
                                         $dates_distinct=[];
                                         $times_distinct=[];
                                     @endphp
-
                                     @foreach($current_observations_for_all_users as $current_user)
                                         @foreach($current_user->courses as $course)
                                             @if( (!in_array($course->pivot->date,$dates_distinct) && !in_array($course->pivot->time,$times_distinct) ) ||
