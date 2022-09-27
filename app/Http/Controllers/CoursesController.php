@@ -15,7 +15,7 @@ use Ramsey\Uuid\Type\Integer;
 use Illuminate\Support\Facades\DB;
 class CoursesController extends Controller
 {
-    public function get_room_for_course(Course $course, Room $specific_room){
+    public function get_room_for_course(Rotation $rotation, Course $course, Room $specific_room){
 
 
         $common_rooms=[];
@@ -164,13 +164,12 @@ class CoursesController extends Controller
         $users_will_in_common_ids["Secertary"]=$users_will_in_common_Secertary->pluck('id')->toArray();
         $users_will_in_common_ids["Observer"]=$users_will_in_common_Observer->pluck('id')->toArray();
 
-        return view('courses.edit_course_room',compact('course','specific_room','users_in_rooms','room_Distinct','disabled_rooms','users_will_in_common_ids'
+        return view('courses.edit_course_room',compact('rotation','course','specific_room','users_in_rooms','room_Distinct','disabled_rooms','users_will_in_common_ids'
         ,'disabled_secertaryArr','disabled_roomHeadArr','disabled_observerArr','common_rooms'
         ,'all_common_courses','users_commom_courses'));
     }
 
-    public function customize_room_for_course(Request $request, Course $course, Room $specific_room){
- 
+    public function customize_room_for_course(Request $request, Rotation $rotation, Course $course, Room $specific_room){
         $common_rooms=[];
             //dd($users_in_rooms);
         if(count($course->users->toArray())){
@@ -203,7 +202,6 @@ class CoursesController extends Controller
                 array_push($roomsArr,$room->pivot->room_id);
             }
             $roomsArr=array_unique($roomsArr);
-
             //calc disabled_rooms
             $disabled_rooms=[];
             $date = $course->users[0]->pivot->date;
@@ -222,9 +220,10 @@ class CoursesController extends Controller
                 }
             }
             $disabled_rooms=array_unique($disabled_rooms);
+            //dd($disabled_rooms);
         //calc common_room
         foreach ($course->rooms as $room)
-            if(in_Array($room->id,$disabled_rooms) && in_Array($room->id,$roomsArr))
+            if(in_array($room->id,$disabled_rooms) && in_array($room->id,$roomsArr))
                 array_push($common_rooms,$room->id);
             $common_rooms=array_unique($common_rooms);
 
@@ -313,18 +312,18 @@ class CoursesController extends Controller
                             if($roomp->id == $specific_room->id){
                                 $courseF=Course::find($courseT->id);
                                 $courseF->rooms()->detach($roomp->id);
-                                $courseF->users()->attach($request->get('roomheads'),['num_student_in_room'=>$roomp->pivot->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Room-Head']);
-                                $courseF->users()->attach($request->get('secertaries'),['num_student_in_room'=>$roomp->pivot->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Secertary']);
-                                $courseF->users()->attach($request->get('observers'),['num_student_in_room'=>$roomp->pivot->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Observer']);
+                                $courseF->users()->attach($request->get('roomheads'),['num_student_in_room'=>$roomp->pivot->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Room-Head','rotation_id'=>$rotation->id]);
+                                $courseF->users()->attach($request->get('secertaries'),['num_student_in_room'=>$roomp->pivot->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Secertary','rotation_id'=>$rotation->id]);
+                                $courseF->users()->attach($request->get('observers'),['num_student_in_room'=>$roomp->pivot->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Observer','rotation_id'=>$rotation->id]);
                             }
                     }
                     //for currnt course get the new number
                     foreach ($course->rooms as $roomp)
                         if($roomp->id == $specific_room->id){
                             $course->rooms()->detach($roomp->id);
-                            $course->users()->attach($request->get('roomheads'),['num_student_in_room'=>$request->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Room-Head']);
-                            $course->users()->attach($request->get('secertaries'),['num_student_in_room'=>$request->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Secertary']);
-                            $course->users()->attach($request->get('observers'),['num_student_in_room'=>$request->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Observer']);
+                            $course->users()->attach($request->get('roomheads'),['num_student_in_room'=>$request->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Room-Head','rotation_id'=>$rotation->id]);
+                            $course->users()->attach($request->get('secertaries'),['num_student_in_room'=>$request->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Secertary','rotation_id'=>$rotation->id]);
+                            $course->users()->attach($request->get('observers'),['num_student_in_room'=>$request->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Observer','rotation_id'=>$rotation->id]);
                         }
                 }elseif(in_array($specific_room->id,$disabled_rooms)){//edit before it becomes common "Joining State"
                     $target_saved_courses=Course::with('rooms')->whereHas('rooms', function($query) use($date,$time){$query->where('date',$date)->where('time',$time);})->get();
@@ -333,9 +332,9 @@ class CoursesController extends Controller
                                 if($roomp->id == $specific_room->id){
                                     $courseF=Course::find($courseV->id);
                                     $courseF->rooms()->detach($roomp->id);
-                                    $courseF->users()->attach($request->get('roomheads'),['num_student_in_room'=>$roomp->pivot->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Room-Head']);
-                                    $courseF->users()->attach($request->get('secertaries'),['num_student_in_room'=>$roomp->pivot->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Secertary']);
-                                    $courseF->users()->attach($request->get('observers'),['num_student_in_room'=>$roomp->pivot->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Observer']);
+                                    $courseF->users()->attach($request->get('roomheads'),['num_student_in_room'=>$roomp->pivot->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Room-Head','rotation_id'=>$rotation->id]);
+                                    $courseF->users()->attach($request->get('secertaries'),['num_student_in_room'=>$roomp->pivot->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Secertary','rotation_id'=>$rotation->id]);
+                                    $courseF->users()->attach($request->get('observers'),['num_student_in_room'=>$roomp->pivot->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Observer','rotation_id'=>$rotation->id]);
                                 }
                             }
                      }
@@ -345,38 +344,66 @@ class CoursesController extends Controller
                     $course->users()->attach($request->get('observers'),['num_student_in_room'=>$request->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Observer']);
                     array_push($common_rooms,$specific_room->id);$disabled_rooms=array_diff($disabled_rooms, array($specific_room->id));//dd($common_rooms,$disabled_rooms);
                 }else{//new room
-                        $exist_rooms_before=Course::with('rooms')->whereHas('rooms', function($query) use($date,$time,$specific_room,$course){$query->where('date',$date)->where('time',$time)->where('room_id',$specific_room->id)->where('course_id',$course->id);})->get();
+                        $exist_rooms_before=Course::with('rooms')->whereHas('rooms', function($query) use($date,$time,$specific_room){$query->where('date',$date)->where('time',$time)->where('room_id',$specific_room->id);})->where('id',$course->id)->get();
                         $target_saved_courses=Course::with('rooms')->whereHas('rooms', function($query) use($date,$time){$query->where('date',$date)->where('time',$time);})->get();
+                        //dd($specific_room->id,$request,count($exist_rooms_before),$exist_rooms_before,$target_saved_courses,$rotation->id,$common_rooms,$disabled_rooms);
                         if(count($exist_rooms_before) != 0)
                             foreach ($target_saved_courses as $courseV) {
                                 foreach ($courseV->rooms as $roomp) //for edit the users in the new room after added
                                     if($roomp->id == $specific_room->id){
                                         $courseF=Course::find($courseV->id);
                                         $courseF->rooms()->detach($roomp->id);
-                                        $courseF->users()->attach($request->get('roomheads'),['num_student_in_room'=>$request->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Room-Head']);
-                                        $courseF->users()->attach($request->get('secertaries'),['num_student_in_room'=>$request->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Secertary']);
-                                        $courseF->users()->attach($request->get('observers'),['num_student_in_room'=>$request->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Observer']);
+                                        $courseF->users()->attach($request->get('roomheads'),['num_student_in_room'=>$request->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Room-Head','rotation_id'=>$rotation->id]);
+                                        $courseF->users()->attach($request->get('secertaries'),['num_student_in_room'=>$request->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Secertary','rotation_id'=>$rotation->id]);
+                                        $courseF->users()->attach($request->get('observers'),['num_student_in_room'=>$request->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Observer','rotation_id'=>$rotation->id]);
                                     }
                         }else{//store for edit the users in the first insertion without editing
-                            $course->users()->attach($request->get('roomheads'),['num_student_in_room'=>$request->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Room-Head']);
-                            $course->users()->attach($request->get('secertaries'),['num_student_in_room'=>$request->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Secertary']);
-                            $course->users()->attach($request->get('observers'),['num_student_in_room'=>$request->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Observer']);
+                            $course->users()->attach($request->get('roomheads'),['num_student_in_room'=>$request->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Room-Head','rotation_id'=>$rotation->id]);
+                            $course->users()->attach($request->get('secertaries'),['num_student_in_room'=>$request->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Secertary','rotation_id'=>$rotation->id]);
+                            $course->users()->attach($request->get('observers'),['num_student_in_room'=>$request->num_student_in_room,'room_id'=>$specific_room->id,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Observer','rotation_id'=>$rotation->id]);
                         }
                 }
         }
 
-        return redirect()->route('courses.edit',[$course->id,$specific_room->id])->with('update-course-room','Room '.$specific_room->room_name.' in Course '.$course->course_name.' updated successfully')->with(['disabled_rooms'=>$disabled_rooms,'common_rooms'=>$common_rooms]);
+        return redirect("rotations/$rotation->id/course/$course->id/edit")->with('update-course-room','Room '.$specific_room->room_name.' in Course '.$course->course_name.' updated successfully')->with(['disabled_rooms'=>$disabled_rooms,'common_rooms'=>$common_rooms]);
     }
     public function index()
     {
+    // $courses=DB::select('select * from courses');
+    // dd($courses);
+    $courses=Course::all();
+    $courses_info=[];
+    foreach(Course::with('users')->get() as $course){
+        if($course->users->toArray()){
+            //$courses_info[$course->users[0]->pivot->date][$course->studing_year]['time']=$course->users[0]->pivot->time;
+            if(count(Course::with('users')->whereHas('users',function($query) use($course) {$query->where('date',$course->users[0]->pivot->date)->where('time',$course->users[0]->pivot->time);})->where('studing_year',$course->studing_year)->get())){
+                foreach (Course::with('users')->whereHas('users',function($query) use($course) {$query->where('date',$course->users[0]->pivot->date)->where('time',$course->users[0]->pivot->time);})->where('studing_year',$course->studing_year)->get() as $courses_in_same_date_time) {
+                    $courses_info[$course->users[0]->pivot->date][$course->studing_year][$courses_in_same_date_time->id]=$courses_in_same_date_time->users[0]->pivot->time;
+                }
+            }else{
+                $courses_info[$course->users[0]->pivot->date][$course->studing_year]['course_name']=$course->course_name;
+            }
+            ksort($courses_info[$course->users[0]->pivot->date]);
+        }
+    }
+    ksort($courses_info);
+    //dd($courses_info);
+    //convert from array to json
+    //$countries = array("Mark" => "USA", "Raymond" => "UK", "Jeff" => "JPN", "Mike" => "DE");
+    //dd (json_encode($countries));
 
+
+
+        return view('courses.index',compact('courses_info'));
     }
 
-    public function delete_course_from_program(Rotation $rotation,Course $course){
-        foreach ($rotation->users as $user) {
+
+
+    public function delete_course_from_program(Rotation $rotation, Course $course){
+        foreach ($course->users as $user) {
             $course->users()->detach($user);
         }
-        return redirect()->route('rotations.show',$rotation)
+        return redirect("/rotations/$rotation->id/show")
             ->with('user-delete','Course hided successfully.');
     }
     
@@ -387,13 +414,13 @@ class CoursesController extends Controller
 
     public function store(Request $request)
     {
-        $enterCourse=true;
-        $selected_room_id = 0;
-        $date=$request->date;
-        $time=Carbon::parse($request->time, 'UTC')->isoFormat('h:m');
+         $enterCourse=true;
+         $selected_room_id = 0;
+          $date=$request->date;
+          $time=Carbon::parse($request->time, 'UTC')->isoFormat('h:m');
 
-        //assign Room To the new Course
-        foreach (Room::all() as $room) {
+          //assign Room To the new Course
+           foreach (Room::all() as $room) {
                  $is_available_room = true;
                     foreach ($room->users as $user) {
                         if(($user->pivot->date == $date) && (Carbon::parse($user->pivot->time, 'UTC')->isoFormat('h:m') == $time)){
@@ -540,12 +567,12 @@ class CoursesController extends Controller
             }
     }
 
-    public function show(Course $course)
+    public function show(Rotation $rotation, Course $course)
     {
-        return view('courses.show',compact('course'));
+        return view('courses.show',compact('course','rotation'));
     }
 
-    public function edit(Course $course)
+    public function edit(Rotation $rotation, Course $course)
     {
         //calculate disabled_rooms
         $roomsArr=[];
@@ -720,10 +747,10 @@ foreach ($course->rooms as $key => $room) {
 
 
 
-    return view('courses.edit', compact('course','roomsArr','disabled_rooms','courses_common_rooms','joining_rooms','accual_common_rooms','disabled_common_rooms_send','roomsArr','number_students_in_this_course'));
+    return view('courses.edit', compact('rotation','course','roomsArr','disabled_rooms','courses_common_rooms','joining_rooms','accual_common_rooms','disabled_common_rooms_send','roomsArr','number_students_in_this_course'));
     }
 
-    public function update(Request $request, Course $course)
+    public function update(Request $request,Rotation $rotation, Course $course)
     {
             $course->update($request->only('course_name','studing_year','semester','duration','students_number'));
             //when enabled a checkbox for specific room
@@ -887,11 +914,11 @@ foreach ($course->rooms as $key => $room) {
                      for ($i=0; $i < $course->users->count() ; $i++)
                          $course->users[$i]->courses()->detach($course);
                      foreach ($rooms_assoc_filtered_with_number_users as $roomD=>$roomD_number_users_taken) {
-                         $course->users()->attach($users_in_rooms[$roomD]['roomHeads'],['room_id'=>$roomD,'num_student_in_room'=> $roomD_number_users_taken,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Room-Head']);
-                         $course->users()->attach($users_in_rooms[$roomD]['secertaries'],['room_id'=>$roomD,'num_student_in_room'=> $roomD_number_users_taken ,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Secertary']);
-                         $course->users()->attach($users_in_rooms[$roomD]['observers'],['room_id'=>$roomD,'num_student_in_room'=> $roomD_number_users_taken,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Observer']);
+                         $course->users()->attach($users_in_rooms[$roomD]['roomHeads'],['room_id'=>$roomD,'num_student_in_room'=> $roomD_number_users_taken,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Room-Head','rotation_id'=>$rotation->id]);
+                         $course->users()->attach($users_in_rooms[$roomD]['secertaries'],['room_id'=>$roomD,'num_student_in_room'=> $roomD_number_users_taken ,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Secertary','rotation_id'=>$rotation->id]);
+                         $course->users()->attach($users_in_rooms[$roomD]['observers'],['room_id'=>$roomD,'num_student_in_room'=> $roomD_number_users_taken,'date'=>$request->date,'time'=>$request->time,'roleIn'=>'Observer','rotation_id'=>$rotation->id]);
                         }
-                     return redirect()->route('courses.index')->with('user-update','Course update successfully');
+                     return redirect("/rotations/$rotation->id/course/$course->id/show")->with('user-update','Course update successfully');
                  }else
                      return redirect()->back()->with('detemine-rooms',"The rooms that you have already selected have not any user , Please select One user at least in any room");
          }else{

@@ -101,7 +101,7 @@ function ret_room_info($room,$course){
                 <strong>{{ $message_detemine_rooms }}</strong>
             </div>
             @endif
-            <form method="post" action="{{ route('courses.update', $course->id) }}">
+            <form method="post" action="/rotations/{{ $rotation->id }}/course/{{ $course->id }}/update">
                 @method('patch')
                 @csrf
                 <div class="row">
@@ -240,7 +240,7 @@ function ret_room_info($room,$course){
                                                         <div class="toggler-knob"></div>
                                                     </div>
                                                 </label>
-                                            <!-- End Toggle Button Style 4 -->                                                     --}}
+                                            <!-- End Toggle Button Style 4 -->--}}
                                         </td>
                                         <td>{{ $room->room_name }}</td>
                                         @php if($course->users[0]->toArray()) 
@@ -259,7 +259,7 @@ function ret_room_info($room,$course){
                                                                         $number_taken_in_this_room_course=$onecoom->pivot->num_student_in_room;
                                                                 $num_all_courses_occupied_this_room+=$number_taken_in_this_room_course;
                                                             @endphp
-                                                            <a style="text-decoration: none;" href="/courses/{{ $course_belongs->id }}/edit" class="badge bg-{{($course->id == $course_belongs->id ) ? 'danger': 'secondary'}}">{{$course_belongs->course_name}}</a>
+                                                            <a style="text-decoration: none;" href="/rotations/{{ $rotation->id }}/courses/{{ $course_belongs->id }}/edit" class="badge bg-{{($course->id == $course_belongs->id ) ? 'danger': 'secondary'}}">{{$course_belongs->course_name}}</a>
                                                             <span class="badge bg-danger" style="
                                                             right:14px;
                                                             border-radius: 62px;
@@ -285,11 +285,12 @@ function ret_room_info($room,$course){
                                         <td>
                                             @if(in_array($room->id, array_unique($joining_rooms))) 
                                             {{-- count_taken_student_in_all_rooms_in_this_course--}}
-                                                    <a href="{{ route('courses.room_for_course', ['course'=>$course->id,'specific_room'=>$room->id]) }}" class="btn btn-warning" style="{{$course->students_number>$number_students_in_this_course ? '':'pointer-events: none;background-color: #ffc10773;border-color: #ffc10773;'}}">
+                                                    <a href="/rotations/{{ $rotation->id }}/course/{{ $course->id }}/room/{{ $room->id }}" class="btn btn-warning" style="{{$course->students_number>$number_students_in_this_course ? '':'pointer-events: none;background-color: #ffc10773;border-color: #ffc10773;'}}">
                                                             Joining
                                                     </a>
                                             @endif
-                                            <a href="{{ route('courses.room_for_course', ['course'=>$course->id,'specific_room'=>$room->id]) }}" class="btn @php echo (in_array($room->id,array_unique($accual_common_rooms)))? 'btn-success':'btn-danger'; @endphp"
+                                            <a href="/rotations/{{ $rotation->id }}/course/{{ $course->id }}/room/{{ $room->id }}" class="btn @php echo (in_array($room->id,array_unique($accual_common_rooms)))? 'btn-success':'btn-danger'; @endphp"
+                                                {{-- /{{ route('courses.get_room_for_course', ['rotation'=>$rotation->id,'course'=>$course->id,'specific_room'=>$room->id]) }} --}}
                                             style="{{ (!in_array($room->id, array_unique($accual_common_rooms))&& in_array($room->id,$disabled_common_rooms_send)) ? 'pointer-events: none;background-color:#999' : '' }} ;display:none;">{{(in_array($room->id,array_unique($accual_common_rooms))) ?'Manage':'specify members'}}
                                             </a>
                                         </td>

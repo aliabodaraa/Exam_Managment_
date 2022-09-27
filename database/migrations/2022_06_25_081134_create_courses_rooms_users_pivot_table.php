@@ -26,7 +26,7 @@ class CreateCoursesRoomsUsersPivotTable extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->unsignedBigInteger('rotation_id');
             $table->foreign('rotation_id')->references('id')->on('rotations')->onDelete('cascade')->onUpdate('cascade');
-            $table->unique(['rotation_id','course_id']);//??
+            //$table->unique(['rotation_id','course_id']);//??
             $table->primary(['course_id','room_id','user_id','rotation_id']);
         });
     }

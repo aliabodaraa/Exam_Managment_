@@ -121,9 +121,9 @@
                                     @endphp
                                     </h5>
                                         <div class="controll">
-                                                <a href="/rotations/{{$rotation->id}}/course/{{$id_course}}/show" class="btn btn-warning btn-sm btn-outline-light rounded">Show</a>
+                                                <a href="{{ route('courses.show', $id_course) }}" class="btn btn-warning btn-sm btn-outline-light rounded">Show</a>
                                                 @if(auth()->user()->id==1)
-                                                    <a href="/rotations/{{$rotation->id}}/course/{{$id_course}}/edit" class="btn btn-info btn-sm btn-outline-light rounded">Edit</a>
+                                                    <a href="{{ route('courses.edit', $id_course) }}" class="btn btn-info btn-sm btn-outline-light rounded">Edit</a>
                                                     <a href="/rotations/{{$rotation->id}}/course/{{$id_course}}/delete_course_from_program" class="btn btn-danger btn-sm btn-outline-light rounded">Delete</a>
                                                 @endif
                                               {{-- {!! Form::open(['method' => 'DELETE','route' => ['courses.destroy', $id_course],'style'=>'display:inline']) !!}

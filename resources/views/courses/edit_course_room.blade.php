@@ -169,7 +169,7 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
             </div>
             @endif
             @if($sholder)
-            <form method="post" action="{{ route('courses.room_for_course', [$course->id,$specific_room->id]) }}">
+            <form method="post" action="/rotations/{{ $rotation->id }}/course/{{ $course->id }}/room/{{ $specific_room->id }}">
                 @method('patch')
                 @csrf
                 @if(count($course->users->toArray()))
@@ -365,7 +365,7 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
                 <br>
                 <div class="buttons" style="margin-top: 80px;float: left;margin-bottom: 30px;">
                     <button type="submit" class="btn btn-primary" {{ (!$count_taken_student_in_this_room_in_this_course && $specific_room->capacity == $count_taken_student_in_this_room_in_all_common_courses) ? 'disabled' : '' }}>Update Course</button>
-                    <a href="{{ route('courses.index') }}" class="btn btn-default">Cancel</a>
+                    <a href="{{ URL::previous() }}" class="btn btn-default">Cancel</a>
                 </div>
             </form>
             @endif

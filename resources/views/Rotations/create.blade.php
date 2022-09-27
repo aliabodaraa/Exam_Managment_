@@ -33,9 +33,11 @@
                         <span class="text-danger text-left">{{ $errors->first('name') }}</span>
                     @endif
                 </div>
+                {{-- @dd(date('Y-m-d')) --}}
                 <div class="mb-3">
                     <label for="start_date" class="form-label">start_date</label>
-                    <input value="{{ old('start_date') }}"
+                    <input id="date_pickerStart" onclick="myFunction2()" 
+                        value="{{ old('start_date') }}"
                         type="date"
                         class="form-control"
                         name="start_date"
@@ -46,7 +48,8 @@
                 </div>
                 <div class="mb-3">
                     <label for="end_date" class="form-label">end_date</label>
-                    <input value="{{ old('end_date') }}"
+                    <input id="date_pickerEnd" onclick="myFunction2()" 
+                        value="{{ old('end_date') }}"
                         type="date"
                         class="form-control"
                         name="end_date"
@@ -71,4 +74,38 @@
             </form>
         </div>
     </div>
+@endsection
+@section('scripts')
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+<script>
+    $(document).ready(function () {
+        myFunction2=()=>{
+            today=new Date(),
+            //today=today.toDateString(),
+            month = '' + (today.getMonth() + 1),
+            day = '' + today.getDate(),
+            year = today.getFullYear();
+            
+            if (month.length < 2) 
+                month = '0' + month;
+            if (day.length < 2) 
+                day = '0' + day;
+          $('#date_pickerStart').attr('min',[year, month, day].join('-'));
+          $('#date_pickerEnd').attr('min',[year, month, day].join('-'));
+          console.log([year, month, day].join('-'));  
+            //       var d = new Date(date),
+            //     month = '' + (d.getMonth() + 1),
+            //     day = '' + d.getDate(),
+            //     year = d.getFullYear();
+
+            // if (month.length < 2) 
+            //     month = '0' + month;
+            // if (day.length < 2) 
+            //     day = '0' + day;
+
+            // return [year, month, day].join('-');
+        }
+    });
+</script>
 @endsection

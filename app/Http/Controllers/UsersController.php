@@ -52,7 +52,9 @@ class UsersController extends Controller
                 'email'=> $request->email,
                 'password' => $request['password'],
                 'role' => $request['role'],
-                'number_of_observation' => $request['number_of_observation']
+                'number_of_observation' => $request['number_of_observation'],
+                'temporary_role' => $request['temporary_role'],
+                //'is_active' => 'required',
             ]
         );
         //return Response::json($user);

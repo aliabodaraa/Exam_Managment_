@@ -46,9 +46,9 @@
                             <td>{{ $rotation->start_date }}</td>
                             <td>{{ $rotation->end_date }}</td>
                                 <td style="display:flex;align-items:baseline;">
-                                        <a href="{{ route('rotations.show', $rotation->id) }}" class="btn btn-success btn-sm me-2" style="width:120px">البرنامج الامتحاني</a>
+                                        <a href="/rotations/{{$rotation->id}}/show" class="btn btn-success btn-sm me-2" style="width:120px">البرنامج الامتحاني</a>
                                         @if(auth()->user()->id==1)
-                                            <a href="{{ route('rotations.edit', $rotation->id) }}" class="btn btn-info btn-sm me-2 btn-close-white">Edit</a>
+                                            <a href="/rotations/{{$rotation->id}}/edit" class="btn btn-info btn-sm me-2 btn-close-white">Edit</a>
                                             {!! Form::open(['method' => 'DELETE','route' => ['rotations.destroy', $rotation->id],'style'=>'display:inline']) !!}
                                             {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
                                             {!! Form::close() !!}

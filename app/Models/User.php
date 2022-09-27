@@ -30,7 +30,9 @@ class User extends Authenticatable
         'username',
         'password',
         'role',
-        'number_of_observation'
+        'number_of_observation',
+        'temporary_role',
+        'is_active'
     ];
 
     /**

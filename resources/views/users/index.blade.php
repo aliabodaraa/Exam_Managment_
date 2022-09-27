@@ -19,16 +19,18 @@
         </div>
         {{-- @livewire('search') --}}
         @if(count($users))
-        <table class="table table-dark">
+        <table class="table table-light">
             <thead>
             <tr>
                 <th scope="col" width="5%">#</th>
                 <th scope="col" width="20%">Email</th>
                 <th scope="col" width="20%">Username</th>
                 <th scope="col" width="15%">Role</th>
+                <th scope="col" width="15%">Temporary Role</th>
+                <th scope="col" width="15%">Active</th>
                 @if(auth()->user()->id==1)
-                    <th scope="col" width="20%">number observation</th>
-                    <th scope="col" width="15%">current number_of_observation</th>
+                    <th scope="col" width="5%">number observation</th>
+                    {{-- <th scope="col" width="5%">current number_of_observation</th> --}}
                 @endif
                 <th scope="col" width="15%" colspan="3">Actions</th>
             </tr>
@@ -39,14 +41,25 @@
                             <th scope="row">{{ $user->id }}</th>
                             <td>{{ $user->email }}</td>
                             <td>{{ $user->username }}</td>
-                            <td>
-                                <span class="badge bg-danger">{{$user->role}}</span>
+                            <td><span class="badge bg-danger">{{$user->role}}</span></td>
+                            <td><span class="badge bg-warning">{{ $user->temporary_role }}</span></td>
+                            <td style="display: flex;">
+                                <input type="checkbox"
+                                {{-- name="roomheads[{{ $user->id }}]" --}}
+                                value=""
+                                class='roomheads toggler-wrapper style-4'>
+                                @if($user->is_active==1)
+                                    <img id="img_warning" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 20px;height: 20px;">
+                                    @endif
+                                    @if($user->is_active==0)
+                                    <img id="img_warning" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 20px;height: 20px;">
+                                @endif
                             </td>
                             @if(auth()->user()->id==1)
                                 <td>
                                     <span class="badge bg-secondary">{{$user->number_of_observation}}</span>
                                 </td>
-                                <td>
+                                {{-- <td>
                                     @php
                                         $current_observations_for_all_users=App\Models\User::with('courses')->whereHas('courses',function($query) use($user) {
                                             $query->where('user_id',$user->id);
@@ -70,7 +83,7 @@
                                     @endforeach
 
                                     <span class="badge bg-secondary">{{count($dates_distinct)}}</span>
-                                </td>
+                                </td> --}}
                             @endif
                                 <td style="display:flex;align-items:baseline;">
                                             @if(auth()->user()->id==1)

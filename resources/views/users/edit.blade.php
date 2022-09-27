@@ -36,11 +36,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="role" class="form-label">Role</label>
-                    {{-- @if($user->id==1)
-                        <span class="badge bg-secondary" style="float:right">{{$user->id==1 ?"Admin can't have Role":''}} </span>
-                    @endif --}}
-                    <select class="form-control"
-                        name="role">
+                    <select class="form-control" name="role">
                         <option value="">Select role</option>
                         <option value="Doctor" {{ ($user->role == 'Doctor') ? 'selected': '' }}>Doctor</option>
                         @if($user->id != 1)
@@ -54,11 +50,26 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="number_of_observation" class="form-label">number_of_observation</label>
-                    @if($user->id==1)
-                        <span class="badge bg-secondary" style="float:right">{{$user->id==1 ?"Admin can't have observations":''}} </span>
+                    <label for="temporary_role" class="form-label">temporary role</label>
+                    <select class="form-control"
+                        name="temporary_role" required>
+                        <option value="">Select temporary role</option>
+                        <option value="عميد" {{ ($user->temporary_role == 'عميد') ? 'selected': '' }}>عميد</option>
+                        <option value="نائب إداري" {{ ($user->temporary_role == 'نائب إداري') ? 'selected': '' }}>نائب إداري</option>
+                        <option value="نائب علمي" {{ ($user->temporary_role == 'نائب علمي') ? 'selected': '' }}>نائب علمي</option>
+                        <option value="رئيس قسم" {{ ($user->temporary_role == 'رئيس قسم') ? 'selected': '' }}>رئيس قسم</option>
+                        <option value="رئيس دائرة" {{ ($user->temporary_role == 'رئيس دائرة') ? 'selected': '' }}>رئيس دائرة</option>
+                        <option value="رئيس شعبة الامتحانات" {{ ($user->temporary_role == 'رئيس شعبة الامتحانات') ? 'selected': '' }}>رئيس شعبة الامتحانات</option>
+                        <option value="مراقب دوام" {{ ($user->temporary_role == 'مراقب دوام') ? 'selected': '' }}>مراقب دوام</option>
+                        <option value="رئيس شعبة شؤون الطلاب" {{ ($user->temporary_role == 'رئيس شعبة شؤون الطلاب') ? 'selected': '' }}>رئيس شعبة شؤون الطلاب</option>
+                    </select>
+                    @if ($errors->has('temporary_role'))
+                        <span class="text-danger text-left">{{ $errors->first('temporary_role') }}</span>
                     @endif
-                    <select class="form-control" name="number_of_observation" class="form-control" required  {{$user->id==1 ?'disabled':''}}>
+                </div>
+                <div class="mb-3">
+                    <label for="number_of_observation" class="form-label">number_of_observation</label>
+                    <select class="form-control" name="number_of_observation" class="form-control" required>
                         @for ($i = 1; $i <31; $i++)
                             <option value='{{ $i }}' {{ ($user->number_of_observation == $i) ? 'selected': '' }}>{{ $i }}</option>
                         @endfor

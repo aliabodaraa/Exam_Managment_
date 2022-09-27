@@ -21,6 +21,8 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->integer('number_of_observation')->default(8);
             $table->string('role')->nullable(true);
+            $table->string('temporary_role')->nullable(true);
+            $table->integer('is_active')->default(1);
             $table->rememberToken();
             $table->timestamps();
         });
