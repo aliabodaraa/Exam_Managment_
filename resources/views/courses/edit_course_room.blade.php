@@ -27,29 +27,33 @@ $course_id=$course->id;
         @endphp
         @if($courseN->id == $course->id)
             @foreach ($courseN->rooms as $room)
-                @if(! in_array($room->id, $arr1))
-                    @php
-                        array_push($arr1,$room->id);
-                        $count_taken_student_in_all_rooms_in_this_course+=$room->pivot->num_student_in_room;
-                    @endphp
-                    @if ($room->id == $specific_room->id)
-                        @php $count_taken_student_in_this_room_in_this_course+=$room->pivot->num_student_in_room;
-                        array_push($courses_belongs,$courseN->course_name);@endphp
-                    @else
-                        @php $count_taken_student_not_in_this_room_in_this_course+=$room->pivot->num_student_in_room; @endphp
+                @if($room->pivot->rotation_id== $rotation->id)
+                    @if(! in_array($room->id, $arr1))
+                        @php
+                            array_push($arr1,$room->id);
+                            $count_taken_student_in_all_rooms_in_this_course+=$room->pivot->num_student_in_room;
+                        @endphp
+                        @if ($room->id == $specific_room->id)
+                            @php $count_taken_student_in_this_room_in_this_course+=$room->pivot->num_student_in_room;
+                            array_push($courses_belongs,$courseN->course_name);@endphp
+                        @else
+                            @php $count_taken_student_not_in_this_room_in_this_course+=$room->pivot->num_student_in_room; @endphp
+                        @endif
                     @endif
                 @endif
             @endforeach
         @else
             @foreach ($courseN->rooms as $room)
-                @if(! in_array($room->id, $arr2))
-                    @if ($room->id == $specific_room->id && $room->pivot->date==$course->users[0]->pivot->date && $room->pivot->time==$course->users[0]->pivot->time)
-                        @php
-                            array_push($arr2,$room->id);
-                            $count_taken_student_in_this_room_in_all_common_courses+=$room->pivot->num_student_in_room;
-                            $common[$courseN->course_name]['take']=$room->pivot->num_student_in_room;
-                            array_push($courses_belongs,$courseN->course_name);
-                        @endphp
+                @if($room->pivot->rotation_id == $rotation->id)
+                    @if(! in_array($room->id, $arr2))
+                        @if ($room->id == $specific_room->id && $room->pivot->date==$course->users[0]->pivot->date && $room->pivot->time==$course->users[0]->pivot->time)
+                            @php
+                                array_push($arr2,$room->id);
+                                $count_taken_student_in_this_room_in_all_common_courses+=$room->pivot->num_student_in_room;
+                                $common[$courseN->course_name]['take']=$room->pivot->num_student_in_room;
+                                array_push($courses_belongs,$courseN->course_name);
+                            @endphp
+                        @endif
                     @endif
                 @endif
             @endforeach
@@ -87,12 +91,12 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
             @foreach ($courses_info[$course->course_name]['courses_belongs'] as $course_belongs)
             @if($course->course_name==$course_belongs) @php continue; @endphp @endif
             @php $current_course_belong=App\Models\Course::where('course_name',$course_belongs)->first(); @endphp
-            <h6><a href="/courses/{{ $current_course_belong->id }}/room/{{ $specific_room->id }}" class="badge bg-primary" style="text-decoration: none;">{{$course_belongs}}<span class="badge bg-danger" style="
+            <h6><a href="/rotations/{{$rotation->id}}/course/{{$current_course_belong->id}}/room/{{ $specific_room->id }}" class="badge bg-primary" style="text-decoration: none;">{{$course_belongs}}<span class="badge bg-danger" style="
                 padding: 3px;
                 border-radius: 62px;
                 position: absolute;
                 font-size: 8px;
-                top: 113px;
+                top: 66px;
             "> take  {{$course_info['common-info'][$course_belongs]['take']}}</span></a></h6>
             @endforeach
     </div>
@@ -135,7 +139,7 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
                     <strong>{{ $message_detemine_rooms }}</strong>
                 </div>
             @endif
-            @php $current_num_of_student = App\Models\User::with('rooms')->whereHas('rooms', function($query) use($specific_room,$course){$query->where('date',$course->users[0]->pivot->date)->where('time',$course->users[0]->pivot->time)->where('room_id',$specific_room->id)->where('course_id',$course->id);})->get();
+            @php $current_num_of_student = App\Models\User::with('rooms')->whereHas('rooms', function($query) use($specific_room,$course,$rotation){$query->where('date',$course->users[0]->pivot->date)->where('time',$course->users[0]->pivot->time)->where('room_id',$specific_room->id)->where('course_id',$course->id)->where('rotation_id',$rotation->id);})->get();
             $sholder=10;
             $message='';//dd(count($courses_info[$course->course_name]['courses_belongs']));
             //dd($count_taken_student_in_this_room_in_this_course);
@@ -204,19 +208,20 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
                         <?php if($user->id==1) continue; ?>
 
                         @php
-                            $current_observations_for_all_users=App\Models\User::with('courses')->whereHas('courses',function($query) use($user) {
-                                $query->where('user_id',$user->id);
+                            $current_observations_for_all_users=App\Models\User::with('courses')->whereHas('courses',function($query) use($user,$rotation) {
+                                $query->where('user_id',$user->id)->where('rotation_id',$rotation->id);
                             })->get();
                             $dates_distinct=[];
                             $times_distinct=[];
                             foreach($current_observations_for_all_users as $current_user)
                                 foreach($current_user->courses as $course)
-                                    if( (!in_array($course->pivot->date,$dates_distinct) && !in_array($course->pivot->time,$times_distinct) ) ||
-                                        ( in_array($course->pivot->date,$dates_distinct) && !in_array($course->pivot->time,$times_distinct) ) ||
-                                        (!in_array($course->pivot->date,$dates_distinct) &&  in_array($course->pivot->time,$times_distinct) ) ){
-                                                array_push($dates_distinct,$course->pivot->date);
-                                                array_push($times_distinct,$course->pivot->time); 
-                                    }
+                                    if($course->pivot->rotation_id == $rotation->id)
+                                        if( (!in_array($course->pivot->date,$dates_distinct) && !in_array($course->pivot->time,$times_distinct) ) ||
+                                            ( in_array($course->pivot->date,$dates_distinct) && !in_array($course->pivot->time,$times_distinct) ) ||
+                                            (!in_array($course->pivot->date,$dates_distinct) &&  in_array($course->pivot->time,$times_distinct) ) ){
+                                                    array_push($dates_distinct,$course->pivot->date);
+                                                    array_push($times_distinct,$course->pivot->time); 
+                                        }
                         @endphp
                         @if(true)
                         {{-- @once <span>d1</span>@endonce --}}
@@ -364,7 +369,12 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
                 </div>
                 <br>
                 <div class="buttons" style="margin-top: 80px;float: left;margin-bottom: 30px;">
-                    <button type="submit" class="btn btn-primary" {{ (!$count_taken_student_in_this_room_in_this_course && $specific_room->capacity == $count_taken_student_in_this_room_in_all_common_courses) ? 'disabled' : '' }}>Update Course</button>
+                    <button type="submit" class="btn btn-dark" {{ (!$count_taken_student_in_this_room_in_this_course && $specific_room->capacity == $count_taken_student_in_this_room_in_all_common_courses) ? 'disabled' : '' }} style="    position: fixed;
+                        top: 367px;
+                        right: 0;
+                        border-radius: 63px;
+                        width: 85px;
+                        height: 85px;">Update Course</button>
                     <a href="{{ URL::previous() }}" class="btn btn-default">Cancel</a>
                 </div>
             </form>

@@ -101,7 +101,7 @@ function ret_room_info($room,$course){
                 <strong>{{ $message_detemine_rooms }}</strong>
             </div>
             @endif
-            <form method="post" action="/rotations/{{ $rotation->id }}/course/{{ $course->id }}/update">
+            <form method="post" action="/rotations/{{$rotation->id}}/course/{{$course->id}}/update">
                 @method('patch')
                 @csrf
                 <div class="row">
@@ -244,10 +244,11 @@ function ret_room_info($room,$course){
                                         </td>
                                         <td>{{ $room->room_name }}</td>
                                         @php if($course->users[0]->toArray()) 
-                                        $common_courses=App\Models\Course::with('rooms')->whereHas('rooms',function($query) use($course,$room){$query
+                                        $common_courses=App\Models\Course::with('rooms')->whereHas('rooms',function($query) use($course,$room,$rotation){$query
                                         ->where('room_id',$room->id)
                                         ->where('date',$course->users[0]->pivot->date)
-                                        ->where('time',$course->users[0]->pivot->time); })->get();@endphp
+                                        ->where('time',$course->users[0]->pivot->time)
+                                        ->where('rotation_id',$rotation->id); })->get();@endphp
                                             <td>
                                                 @php $num_all_courses_occupied_this_room=0; @endphp
                                                 <div class="common-courses">
@@ -255,7 +256,7 @@ function ret_room_info($room,$course){
                                                             @php
                                                                 $number_taken_in_this_room_course=0;
                                                                 foreach ($course_belongs->rooms as $onecoom)
-                                                                    if($onecoom->id==$room->id)
+                                                                    if($onecoom->id==$room->id && $onecoom->pivot->rotation_id==$rotation->id)
                                                                         $number_taken_in_this_room_course=$onecoom->pivot->num_student_in_room;
                                                                 $num_all_courses_occupied_this_room+=$number_taken_in_this_room_course;
                                                             @endphp

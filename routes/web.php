@@ -88,9 +88,9 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
                 Route::post('/{rotation}/store_add_course_to_program', 'RotationsController@store_add_course_to_program')->name('rotations.store_add_course_to_program');
                 Route::get('/{rotation}/course/{course}/delete_course_from_program', 'CoursesController@delete_course_from_program')->name('courses.delete_course_from_program');
 
-                Route::get('/{rotation}/course/{course}/edit', 'CoursesController@edit')->name('rotations.edit');
-                Route::patch('/{rotation}/course/{course}/update', 'CoursesController@update')->name('rotations.update');
-                Route::get('/{rotation}/course/{course}/show', 'CoursesController@show')->name('rotations.show');
+                Route::get('/{rotation}/course/{course}/edit', 'CoursesController@edit')->name('rotations.course.edit');
+                Route::patch('/{rotation}/course/{course}/update', 'CoursesController@update')->name('rotations.course.update');
+                Route::get('/{rotation}/course/{course}/show', 'CoursesController@show')->name('rotations.course.show');
                 Route::get('/{rotation}/course/{course}/room/{specific_room}', 'CoursesController@get_room_for_course')->name('rotations.get_room_for_course');
                 Route::patch('/{rotation}/course/{course}/room/{specific_room}', 'CoursesController@customize_room_for_course')->name('rotations.customize_room_for_course');
                 //Route::get('/{rotation}/course/{course}/delete_course_from_program', 'ObjectionsController@delete_course_from_program')->name('courses.delete_course_from_program');

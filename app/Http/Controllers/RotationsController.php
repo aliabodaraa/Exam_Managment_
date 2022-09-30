@@ -82,22 +82,14 @@ class rotationsController extends Controller
     {
         // $courses=DB::select('select * from courses');
         // dd($courses);
-        $courses=Course::with('rotations')
-        ->whereHas('rotations', function($query) use($rotation){$query->where('rotation_id',$rotation->id);})->get();
+
         $courses_info=[];
-        foreach($courses as $course){
-            if($course->users->toArray()){
-                //$courses_info[$course->users[0]->pivot->date][$course->studing_year]['time']=$course->users[0]->pivot->time;
-                if(count(Course::with('users')->whereHas('users',function($query) use($course,$rotation) {$query->where('date',$course->users[0]->pivot->date)->where('time',$course->users[0]->pivot->time)->where('rotation_id',$rotation->id);})->where('studing_year',$course->studing_year)->get())){
-                    foreach (Course::with('users')->whereHas('users',function($query) use($course,$rotation) {$query->where('date',$course->users[0]->pivot->date)->where('time',$course->users[0]->pivot->time)->where('rotation_id',$rotation->id);})->where('studing_year',$course->studing_year)->get() as $courses_in_same_date_time) {
-                        $courses_info[$course->users[0]->pivot->date][$course->studing_year][$courses_in_same_date_time->id]=$courses_in_same_date_time->users[0]->pivot->time;
-                    }
-                }else{
-                    $courses_info[$course->users[0]->pivot->date][$course->studing_year]['course_name']=$course->course_name;
-                }
-                ksort($courses_info[$course->users[0]->pivot->date]);
-            }
+        $courses_info=[];
+        foreach($rotation->courses as $course){
+              $courses_info[$course->pivot->date][$course->studing_year][$course->id]=$course->pivot->time;
+              ksort($courses_info[$course->pivot->date]);
         }
+               // ksort($courses_info[$course->users[0]->pivot->date]);
         ksort($courses_info);
         //dd($courses_info);
         //convert from array to json
