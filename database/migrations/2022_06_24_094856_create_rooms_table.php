@@ -19,6 +19,9 @@ class CreateRoomsTable extends Migration
             $table->integer('capacity')->nullable(false);;
             $table->string('location')->nullable(true);
             $table->string('notes')->nullable(true);
+            $table->integer('is_active')->default(1);
+            $table->unsignedBigInteger('faculty_id')->nullable(true);//for does not miss importing data
+            $table->foreign('faculty_id')->references('id')->on('faculties')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }

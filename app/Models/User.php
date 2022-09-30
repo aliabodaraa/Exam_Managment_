@@ -65,13 +65,22 @@ class User extends Authenticatable
         $this->attributes['password'] = bcrypt($value);
     }
     public function courses(){//many to many between course & user
-        return $this->belongsToMany(Course::class,'course_room_user')->withPivot('user_id','room_id','date','time','roleIn','num_student_in_room','rotation_id');
+        return $this->belongsToMany(Course::class,'course_room_rotation_user')->withPivot('user_id','room_id','date','time','roleIn','num_student_in_room','rotation_id');
     }
     public function rooms(){//many to many between course & user
-        return $this->belongsToMany(Room::class,'course_room_user')->withPivot('user_id','course_id','date','time','roleIn','num_student_in_room','rotation_id');
+        return $this->belongsToMany(Room::class,'course_room_rotation_user')->withPivot('user_id','course_id','date','time','roleIn','num_student_in_room','rotation_id');
     }
     public function rotations(){//many to many between User & Rotation
-        return $this->belongsToMany('App\Models\Rotation','course_room_user')->withPivot('course_id','room_id','date','time','roleIn','num_student_in_room','rotation_id');
+        return $this->belongsToMany('App\Models\Rotation','course_room_rotation_user')->withPivot('course_id','room_id','date','time','roleIn','num_student_in_room','rotation_id');
+    }
+
+
+
+    public function rotationsObservation(){
+        return $this->belongsToMany('App\Models\Rotation','course_rotation_user')->withPivot('course_id','room_id','rotation_id');
+    }
+    public function coursesObservation(){
+        return $this->belongsToMany('App\Models\Course','course_rotation_user')->withPivot('course_id','room_id','rotation_id');
     }
     // public function posts(){//one to many between user & post
     //     return $this->hasMany(Post::class);

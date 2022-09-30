@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateObjectionsTable extends Migration
+class CreateCoursesRotationsUsersPivotTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,17 +13,14 @@ class CreateObjectionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('objections', function (Blueprint $table) {
-            $table->date('date');
-            $table->time('time');
-            $table->string('type');
-            $table->date('suggest_date');
-            $table->time('suggest_time');
+        Schema::create('course_rotation_user', function (Blueprint $table) {
+            $table->unsignedBigInteger('course_id');
+            $table->foreign('course_id')->references('id')->on('courses')->onDelete('cascade')->onUpdate('cascade');
             $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('user_id')->on('course_room_user')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->unsignedBigInteger('rotation_id');
             $table->foreign('rotation_id')->references('id')->on('rotations')->onDelete('cascade')->onUpdate('cascade');
-            $table->primary(['user_id','date','time','rotation_id']);
+            $table->primary(['course_id','user_id','rotation_id']);
         });
     }
 
@@ -34,6 +31,6 @@ class CreateObjectionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('objections');
+        Schema::dropIfExists('course_rotation_user');
     }
 }

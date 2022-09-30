@@ -20,6 +20,8 @@ class CreateRotationsTable extends Migration
             $table->date('start_date');
             $table->date('end_date');
             $table->unique(['name','year']);
+            $table->unsignedBigInteger('faculty_id')->nullable(true);//for does not miss importing data
+            $table->foreign('faculty_id')->references('id')->on('faculties')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }

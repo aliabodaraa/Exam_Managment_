@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCoursesRoomsUsersPivotTable extends Migration
+class CreateCoursesRoomsRotationsUsersPivotTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateCoursesRoomsUsersPivotTable extends Migration
      */
     public function up()
     {
-        Schema::create('course_room_user', function (Blueprint $table) {
+        Schema::create('course_room_rotation_user', function (Blueprint $table) {
             $table->date('date');
             $table->time('time');
             $table->string('roleIn');
@@ -27,7 +27,7 @@ class CreateCoursesRoomsUsersPivotTable extends Migration
             $table->unsignedBigInteger('rotation_id');
             $table->foreign('rotation_id')->references('id')->on('rotations')->onDelete('cascade')->onUpdate('cascade');
             //$table->unique(['rotation_id','course_id']);//??
-            $table->primary(['course_id','room_id','user_id','rotation_id']);
+            $table->primary(['course_id','room_id','user_id','rotation_id'], 'my_long_table_primary');
         });
     }
 
@@ -38,6 +38,6 @@ class CreateCoursesRoomsUsersPivotTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('course_room_user');
+        Schema::dropIfExists('course_room_rotation_user');
     }
 }
