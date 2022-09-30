@@ -23,6 +23,7 @@ class UsersController extends Controller
 
         return view('users.index', compact('users'));
     }
+    
     public function isActive(Request $request, User $user){
         if($user->is_active == true){
             $user->is_active = 0;

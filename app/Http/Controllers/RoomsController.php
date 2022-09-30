@@ -16,6 +16,22 @@ class roomsController extends Controller
         $rooms = room::orderBy('room_name')->get();
         return view('rooms.index', compact('rooms'));
     }
+
+    public function isActive(Request $request, Room $room){
+        if($room->is_active == true){
+            $room->is_active = 0;
+            $room->notes = "القاعة حاليا خارج الخدمة ";
+            $room->save();
+            return redirect()->route('rooms.index')
+            ->withSuccess($room->room_name.' not active now.');
+        }else {   
+            $room->is_active = 1;
+            $room->notes ="";
+            $room->save();
+            return redirect()->route('rooms.index')
+            ->withSuccess($room->room_name.' active now.');
+        }
+    }
     /**
      * Show the form for creating a new resource.
      *

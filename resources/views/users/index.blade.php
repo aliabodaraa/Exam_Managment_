@@ -231,7 +231,7 @@
                 $('#is_active').prop('value', false)
             else
                 $('#is_active').prop('value', true)
-                $('#isActiveForm'+user_id).submit();
+            $('#isActiveForm'+user_id).submit();
         }
         
 

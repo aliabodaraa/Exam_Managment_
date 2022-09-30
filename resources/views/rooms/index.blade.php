@@ -21,13 +21,14 @@
             @include('layouts.partials.messages')
         </div>
     @if(count($rooms))
-        <table class="table table-dark">
+        <table class="table table-light">
             <thead>
             <tr>
-                <th scope="col" width="20%">room name</th>
-                <th scope="col" width="20%">capacity</th>
-                <th scope="col" width="20%">location</th>
-                <th scope="col" width="30%">notes</th>
+                <th scope="col" width="15%">room name</th>
+                <th scope="col" width="15%">capacity</th>
+                <th scope="col" width="10%">is_active</th>
+                <th scope="col" width="15%">location</th>
+                <th scope="col" width="20%">notes</th>
                 @if(auth()->user()->id==1)<th scope="col" width="10%">Actions</th>@endif
             </tr>
             </thead>
@@ -36,10 +37,23 @@
                         <tr>
                             <td>{{ $room->room_name }}</td>
                             <td>{{ $room->capacity }}</td>
+                            <td style="display: flex;">
+                                <form id="isActiveForm{{ $room->id }}" method="post" action="{{ route('rooms.isActive', $room->id) }}">
+                                    @method('patch')
+                                    @csrf
+                                    <input type="checkbox" name="is_active" id="is_active" onclick="isActive({{ $room->id }})" class='toggler-wrapper style-4' {{($room->is_active == 1)? 'checked':'' }}>
+                                </form>
+                                @if($room->is_active==1)
+                                    <img id="img_warning" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 20px;height: 20px;">
+                                    @endif
+                                    @if($room->is_active==0)
+                                    <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="danger" style="width: 20px;height: 20px;">
+                                @endif
+                            </td>
                             <td>{{ $room->location }}</td>
                             <td>{{ $room->notes }}</td>
                             @if(auth()->user()->id==1)
-                                <td style="display:flex;">
+                                <td style="display:flex;align-items:baseline;">
                                         <a href="{{ route('rooms.edit', $room->id) }}" class="btn btn-info btn-sm me-2 btn-close-white">Edit</a>
                                         {!! Form::open(['method' => 'DELETE','route' => ['rooms.destroy', $room->id],'style'=>'display:inline']) !!}
                                         {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
@@ -62,3 +76,24 @@
       @endif
     </div>
 @endsection
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"> </script>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+
+        //is active
+
+        isActive=(room_id)=>{
+            if(! $('#is_active').is(':checked'))
+                $('#is_active').prop('value', false)
+            else
+                $('#is_active').prop('value', true)
+            $('#isActiveForm'+room_id).submit();
+        }
+        
+
+        //is active
+    });
+
+    </script>
