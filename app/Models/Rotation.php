@@ -35,4 +35,9 @@ class Rotation extends Model
     public function coursesObservation(){
         return $this->belongsToMany('App\Models\Course','course_rotation_user')->withPivot('course_id','room_id','rotation_id');
     }
+
+    public function faculty(){//one to many between faculty & rotation
+        return $this->belongsTo(Faculty::class);//->withDefault(['name1'=>'dfd','name2'=>'ks']);// can access to this properties like i name foreginKey dept_id instead of name department_id  if doesn't has any problem i can't access to this properties
+        //when reletionship has a problem the benifit of this to acees to this properties when access to this relationship from any user as   <h1>{{$user->department->name1}}</h1><h1>{{$user->department->name2}}</h1>
+    }
 }

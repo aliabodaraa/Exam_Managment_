@@ -1,7 +1,7 @@
 @extends('layouts.app-master')
 @section('content')
     <div class="bg-light p-2 rounded">
-        <h1>برنامج امتحان {{ $rotation->name }} - {{ $rotation->year }}
+        <h1 class="text-center">{{ $rotation->faculty->name }} - برنامج امتحان {{ $rotation->name }} - {{ $rotation->year }}
             @if(auth()->user()->id==1)
                 <a href="{{ route('rotations.add_course_to_program',$rotation->id) }}" class="btn btn-success float-right me-2 m4-2">Add Course</a>
             @endif

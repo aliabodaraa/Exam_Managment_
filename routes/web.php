@@ -97,7 +97,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
                 Route::get('/{rotation}/course/{course}/show', 'CoursesController@show')->name('rotations.course.show');
                 Route::get('/{rotation}/course/{course}/room/{specific_room}', 'CoursesController@get_room_for_course')->name('rotations.get_room_for_course');
                 Route::patch('/{rotation}/course/{course}/room/{specific_room}', 'CoursesController@customize_room_for_course')->name('rotations.customize_room_for_course');
-                //Route::get('/{rotation}/course/{course}/delete_course_from_program', 'ObjectionsController@delete_course_from_program')->name('courses.delete_course_from_program');
+                
+                Route::get('/{rotation}/objections', 'RotationsController@objections')->name('rotations.objections');
             });
         });
     });

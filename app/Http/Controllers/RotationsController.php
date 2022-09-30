@@ -15,6 +15,19 @@ class rotationsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function objections(Rotation $rotation){
+              // $courses=DB::select('select * from courses');
+        // dd($courses);
+
+        $courses_info=[];
+        $courses_info=[];
+        foreach($rotation->courses as $course){
+              $courses_info[$course->pivot->date][$course->studing_year][$course->id]=$course->pivot->time;
+              ksort($courses_info[$course->pivot->date]);
+        }
+        ksort($courses_info);
+        return view('objections.index',compact('courses_info','rotation'));
+    }
     public function index()
     {
         //$has_program=User::with('rooms','rotations')->get();
