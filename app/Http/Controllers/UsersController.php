@@ -23,7 +23,19 @@ class UsersController extends Controller
 
         return view('users.index', compact('users'));
     }
-
+    public function isActive(Request $request, User $user){
+        if($user->is_active == true){
+            $user->is_active = 0;
+            $user->save();
+            return redirect()->route('users.index')
+            ->withSuccess($user->username.' not active now.');
+        }else {   
+            $user->is_active = 1;
+            $user->save();
+            return redirect()->route('users.index')
+            ->withSuccess($user->username.' active now.');
+        }
+    }
     /**
      * Show form for creating user
      *
@@ -109,13 +121,13 @@ class UsersController extends Controller
                                     $table['observations'][$i]['course_name']=$course->course_name;
                                     $table['observations'][$i]['room_name']=Room::where('id',$course->pivot->room_id)->first()->room_name;
                                     $i++;
+                                    $rotationInfo=Rotation::where('id',$rotation_number)->first();
+                                    $table['name']=$rotationInfo['name'];
+                                    $table['year']=$rotationInfo['year'];
+                                    $table['start_date']=$rotationInfo['start_date'];
+                                    $table['end_date']=$rotationInfo['end_date'];
+                                    $rotations_table[$rotation_number]=$table;
                         }
-                        $rotationInfo=Rotation::where('id',$rotation_number)->first();
-                        $table['name']=$rotationInfo['name'];
-                        $table['year']=$rotationInfo['year'];
-                        $table['start_date']=$rotationInfo['start_date'];
-                        $table['end_date']=$rotationInfo['end_date'];
-                        $rotations_table[$rotation_number]=$table;
                 }
             }
         }

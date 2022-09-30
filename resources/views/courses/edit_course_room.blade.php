@@ -173,6 +173,16 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
             </div>
             @endif
             @if($sholder)
+                <input class="form-control" 
+                type="text" 
+                id="search_user_name" 
+                name="search_user_name" 
+                style="float: right;
+                width: 400px;
+                right: 72px;
+                top: 333px;
+                position: absolute;"
+                onkeyup="myFunction(JSON.stringify({{ App\Models\User::all() }}))" placeholder="Serarch Users">
             <form method="post" action="/rotations/{{ $rotation->id }}/course/{{ $course->id }}/room/{{ $specific_room->id }}">
                 @method('patch')
                 @csrf
@@ -204,6 +214,7 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
                             <h1 id="num_observers" style="margin-top: 9px;"></h1>
                         </div>
                     </div>
+                    @php $counter=0; @endphp
                 @foreach(App\Models\User::all() as $user)
                         <?php if($user->id==1) continue; ?>
 
@@ -225,7 +236,7 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
                         @endphp
                         @if(true)
                         {{-- @once <span>d1</span>@endonce --}}
-                            <div class="d1 bg-white"" style="display: block;border: 1px solid #d5d5d5;cursor: disabled;
+                            <div id="{{$user->id}}" class="user {{$user->id}} d1 bg-white"" style="display: block;border: 1px solid #d5d5d5;cursor: disabled;
                             border-radius: 7px;width:32.5%;position:relative;float:right;right:6px;
                             padding: 20px 20px 20px 0px;margin:5px;height: 100px;border:{{(count($dates_distinct)==$user->number_of_observation)?'1px solid #dc35467c':''}}">
                                 <h5 style="float:right;">Room-Head</h5>
@@ -287,7 +298,7 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
                             </div>
                          @else
                             {{-- @once <span>d2</span>@endonce --}}
-                            <div class="d2">
+                            <div id="{{$user->id}}" class="user {{$user->id}} d2">
                                     <input type="checkbox"
                                     name="roomheads[{{ $user->id }}]"
                                     value="{{ $user->id }}"
@@ -379,6 +390,7 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
                 </div>
             </form>
             @endif
+            <div class="no-results" style="display:none;">No results!</div>
 </div>
 @endsection
 @section('scripts')
@@ -671,6 +683,28 @@ $count_taken_student_in_this_room_in_all_common_courses+=$count_taken_student_in
             }else{
                 $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="success" style="width: 30px;height: 30px;">`);
             }
+            
+
+
+
+
+
+    //Filtering Start
+            myFunction=(x)=>{
+                let users=JSON.parse(x);
+                $(".user").hide();
+                jQuery.each(users, function(id) {
+                    if (users[id]["username"].indexOf($('#search_user_name').val()) > -1 )
+                        $("#"+users[id]["id"]).show();
+                });
+            }
+    //Filtering End
+
     });
+
+
+
+
+    
 </script>
 @endsection

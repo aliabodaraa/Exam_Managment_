@@ -44,15 +44,16 @@
                             <td><span class="badge bg-danger">{{$user->role}}</span></td>
                             <td><span class="badge bg-warning">{{ $user->temporary_role }}</span></td>
                             <td style="display: flex;">
-                                <input type="checkbox"
-                                {{-- name="roomheads[{{ $user->id }}]" --}}
-                                value=""
-                                class='roomheads toggler-wrapper style-4'>
+                                <form id="isActiveForm{{ $user->id }}" method="post" action="{{ route('users.isActive', $user->id) }}">
+                                    @method('patch')
+                                    @csrf
+                                    <input type="checkbox" name="is_active" id="is_active" onclick="isActive({{ $user->id }})" class='toggler-wrapper style-4' {{($user->is_active == 1)? 'checked':'' }}>
+                                </form>
                                 @if($user->is_active==1)
                                     <img id="img_warning" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 20px;height: 20px;">
                                     @endif
                                     @if($user->is_active==0)
-                                    <img id="img_warning" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 20px;height: 20px;">
+                                    <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="danger" style="width: 20px;height: 20px;">
                                 @endif
                             </td>
                             @if(auth()->user()->id==1)
@@ -219,5 +220,22 @@
                 }
             });
         });
+
+
+
+
+        //is active
+
+        isActive=(user_id)=>{
+            if(! $('#is_active').is(':checked'))
+                $('#is_active').prop('value', false)
+            else
+                $('#is_active').prop('value', true)
+                $('#isActiveForm'+user_id).submit();
+        }
+        
+
+        //is active
     });
+
     </script>
