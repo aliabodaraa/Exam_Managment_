@@ -30,10 +30,10 @@ class Course extends Model
 
 
     public function rotationsObservation(){//many to many between course & rotation & user
-        return $this->belongsToMany('App\Models\Rotation','course_rotation_user')->withPivot('course_id','room_id','rotation_id');
+        return $this->belongsToMany('App\Models\Rotation','course_rotation_user')->withPivot('course_id','user_id','rotation_id');
     }
     public function usersObservation(){//many to many between course & rotation & user
-        return $this->belongsToMany('App\Models\User','course_rotation_user')->withPivot('course_id','room_id','rotation_id');
+        return $this->belongsToMany('App\Models\User','course_rotation_user')->withPivot('course_id','user_id','rotation_id');
     }
 
     public function departments(){//many to many between Department & course

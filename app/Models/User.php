@@ -77,10 +77,10 @@ class User extends Authenticatable
 
 
     public function rotationsObservation(){
-        return $this->belongsToMany('App\Models\Rotation','course_rotation_user')->withPivot('course_id','room_id','rotation_id');
+        return $this->belongsToMany('App\Models\Rotation','course_rotation_user')->withPivot('course_id','user_id','rotation_id');
     }
     public function coursesObservation(){
-        return $this->belongsToMany('App\Models\Course','course_rotation_user')->withPivot('course_id','room_id','rotation_id');
+        return $this->belongsToMany('App\Models\Course','course_rotation_user')->withPivot('course_id','user_id','rotation_id');
     }
 
 

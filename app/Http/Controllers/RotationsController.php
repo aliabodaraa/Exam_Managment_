@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class rotationsController extends Controller
 {
@@ -15,19 +16,48 @@ class rotationsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function objections(Rotation $rotation){
-              // $courses=DB::select('select * from courses');
+//objection section start
+    public function objections_create(Rotation $rotation){
+        // $courses=DB::select('select * from courses');
         // dd($courses);
-
-        $courses_info=[];
         $courses_info=[];
         foreach($rotation->courses as $course){
               $courses_info[$course->pivot->date][$course->studing_year][$course->id]=$course->pivot->time;
               ksort($courses_info[$course->pivot->date]);
         }
         ksort($courses_info);
-        return view('objections.index',compact('courses_info','rotation'));
+        return view('objections.create',compact('courses_info','rotation'));
     }
+    public function objections_store(Request $request, Rotation $rotation){
+            //dd($request->get('courses_objections_ids'));
+
+            $rotation->coursesObservation()->attach($request->get('courses_objections_ids'),['user_id'=>Auth::user()->id,'rotation_id'=>$rotation->id]);
+
+            return redirect()->route('rotations.index')
+            ->withSuccess(__('objections created successfully.'));
+    }
+    public function objections_edit(Rotation $rotation){
+            $courses_info=[];
+            foreach($rotation->courses as $course){
+                  $courses_info[$course->pivot->date][$course->studing_year][$course->id]=$course->pivot->time;
+                  ksort($courses_info[$course->pivot->date]);
+            }
+            ksort($courses_info);
+
+            $courses_objections_ids=Course::with('rotationsObservation')->whereHas('rotationsObservation', function($query) use($rotation){
+                $query->where('user_id',Auth::user()->id)->where('rotation_id',$rotation->id);})->pluck('id')->toArray();
+            //dd($courses_objections_ids);
+            return view('objections.edit',compact('courses_info','rotation','courses_objections_ids'));
+    }
+    public function objections_update(Request $request, Rotation $rotation){
+        
+        Auth::user()->rotationsObservation()->detach($rotation->id);
+        $rotation->coursesObservation()->attach($request->get('courses_objections_ids'),['user_id'=>Auth::user()->id,'rotation_id'=>$rotation->id]);
+
+        return redirect()->route('rotations.index')
+        ->withSuccess(__('objections updated successfully.'));
+    }
+    //objection section end
     public function index()
     {
         //$has_program=User::with('rooms','rotations')->get();

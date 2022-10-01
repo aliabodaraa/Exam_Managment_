@@ -1,11 +1,22 @@
 @extends('layouts.app-master')
 @section('content')
     <div class="bg-light p-2 rounded">
-        <h1 class="text-center">{{ $rotation->faculty->name }} - برنامج امتحان {{ $rotation->name }} - {{ $rotation->year }}
+        <h1>
+            @php
+            $num_of_my_courses_objections=App\Models\Course::with('rotationsObservation')->whereHas('rotationsObservation', function($query) use($rotation){
+                $query->where('user_id',Auth::user()->id)->where('rotation_id',$rotation->id);})->pluck('id')->toArray();
+            @endphp
+            @if(!count($num_of_my_courses_objections))
+                <a href="{{ route('rotations.objections_create',$rotation->id) }}"  class="btn btn-danger float-left me-2 m4-2">إنشاء إعتراضات</a>
+            @else
+                <a href="{{ route('rotations.objections_edit',$rotation->id) }}"  class="btn btn-danger float-left me-2 m4-2">تعديل إعتراضاتي</a>
+            @endif
+            <b class="text-center" style="margin-left: 381px;">{{ $rotation->faculty->name }} - برنامج امتحان {{ $rotation->name }} - {{ $rotation->year }}</b>
             @if(auth()->user()->id==1)
                 <a href="{{ route('rotations.add_course_to_program',$rotation->id) }}" class="btn btn-success float-right me-2 m4-2">Add Course</a>
             @endif
         </h1>
+        
         {{-- <div class="lead">
             TIME TABLE . 
                 @if(auth()->user()->id==1)
@@ -112,27 +123,27 @@
                                     $courseQ= App\Models\Course::where('id',$id_course)->first();
                                     @endphp
                                     @if($courseQ)
-                                    <td class="course" align="center" height="100" style="display:{{($year_number==4) ?'inline-block':'float-root';}};{{($courseQ->semester=='2')?'border-radius: 17px;background-color: #6c757d0d;':''}}"><h5 class='course-name'>
+                                        <td class="course" align="center" height="100" style="display:{{($year_number==4) ?'inline-block':'float-root';}};{{($courseQ->semester=='2')?'border-radius: 17px;background-color: #6c757d0d;':''}}">
+                                            <h5 class='course-name'>
+                                                @php
+                                                    if($courseQ)
+                                                        echo $courseQ->course_name;
+                                                @endphp
+                                            </h5>
+                                            <div class="controll">
+                                                    <a href="/rotations/{{$rotation->id}}/course/{{$id_course}}/show" class="btn btn-warning btn-sm btn-outline-light rounded">Show</a>
+                                                    @if(auth()->user()->id==1)
+                                                        <a href="/rotations/{{$rotation->id}}/course/{{$id_course}}/edit" class="btn btn-info btn-sm btn-outline-light rounded">Edit</a>
+                                                        <a href="/rotations/{{$rotation->id}}/course/{{$id_course}}/delete_course_from_program" class="btn btn-danger btn-sm btn-outline-light rounded">Delete</a>
+                                                    @endif
+                                                {{-- {!! Form::open(['method' => 'DELETE','route' => ['courses.destroy', $id_course],'style'=>'display:inline']) !!}
+                                                {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
+                                                {!! Form::close() !!} --}}
+                                                <span class="badge bg-secondary">{{gmdate('H:i A',strtotime($time))}}</span>
+                                            </div>
+                                        </td>
                                     @endif
-                                    @php
-                                    if($courseQ)
-                                    //dd($courseQ);
-                                        echo $courseQ->course_name;
-                                    @endphp
-                                    </h5>
-                                        <div class="controll">
-                                                <a href="/rotations/{{$rotation->id}}/course/{{$id_course}}/show" class="btn btn-warning btn-sm btn-outline-light rounded">Show</a>
-                                                @if(auth()->user()->id==1)
-                                                    <a href="/rotations/{{$rotation->id}}/course/{{$id_course}}/edit" class="btn btn-info btn-sm btn-outline-light rounded">Edit</a>
-                                                    <a href="/rotations/{{$rotation->id}}/course/{{$id_course}}/delete_course_from_program" class="btn btn-danger btn-sm btn-outline-light rounded">Delete</a>
-                                                @endif
-                                              {{-- {!! Form::open(['method' => 'DELETE','route' => ['courses.destroy', $id_course],'style'=>'display:inline']) !!}
-                                              {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
-                                              {!! Form::close() !!} --}}
-                                            <span class="badge bg-secondary">{{gmdate('H:i A',strtotime($time))}}</span>
-                                          </div>
-                                    </td>
-                                    @endforeach
+                                @endforeach
                         @endforeach
                     </tr>
                 @endforeach
