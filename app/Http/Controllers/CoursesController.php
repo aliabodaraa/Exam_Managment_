@@ -394,32 +394,8 @@ class CoursesController extends Controller
     }
     public function index()
     {
-    // // $courses=DB::select('select * from courses');
-    // // dd($courses);
-    // $courses=Course::all();
-    // $courses_info=[];
-    // foreach(Course::with('users')->get() as $course){
-    //     if($course->users->toArray()){
-    //         //$courses_info[$course->users[0]->pivot->date][$course->studing_year]['time']=$course->users[0]->pivot->time;
-    //         if(count(Course::with('users')->whereHas('users',function($query) use($course) {$query->where('date',$course->users[0]->pivot->date)->where('time',$course->users[0]->pivot->time);})->where('studing_year',$course->studing_year)->get())){
-    //             foreach (Course::with('users')->whereHas('users',function($query) use($course) {$query->where('date',$course->users[0]->pivot->date)->where('time',$course->users[0]->pivot->time);})->where('studing_year',$course->studing_year)->get() as $courses_in_same_date_time) {
-    //                 $courses_info[$course->users[0]->pivot->date][$course->studing_year][$courses_in_same_date_time->id]=$courses_in_same_date_time->users[0]->pivot->time;
-    //             }
-    //         }else{
-    //             $courses_info[$course->users[0]->pivot->date][$course->studing_year]['course_name']=$course->course_name;
-    //         }
-    //         ksort($courses_info[$course->users[0]->pivot->date]);
-    //     }
-    // }
-    // ksort($courses_info);
-    // //dd($courses_info);
-    // //convert from array to json
-    // //$countries = array("Mark" => "USA", "Raymond" => "UK", "Jeff" => "JPN", "Mike" => "DE");
-    // //dd (json_encode($countries));
-
-
-
-     //   return view('courses.index',compact('courses_info'));
+        $courses = Course::orderBy('course_name')->get();
+        return view('courses.index', compact('courses'));
     }
 
 
@@ -439,157 +415,23 @@ class CoursesController extends Controller
 
     public function store(Request $request)
     {
-         $enterCourse=true;
-         $selected_room_id = 0;
-          $date=$request->date;
-          $time=Carbon::parse($request->time, 'UTC')->isoFormat('h:m');
-
-          //assign Room To the new Course
-           foreach (Room::all() as $room) {
-                 $is_available_room = true;
-                    foreach ($room->users as $user) {
-                        if(($user->pivot->date == $date) && (Carbon::parse($user->pivot->time, 'UTC')->isoFormat('h:m') == $time)){
-                            $is_available_room = false;
-                            break;
-                        }
-                        if(($user->pivot->date == $date) &&
-                         (gmdate('H:i',strtotime($user->pivot->time) - strtotime($time)) > '22:00' ||
-                          gmdate('H:i',strtotime($user->pivot->time) - strtotime($time)) < '02:00')){
-                            $is_available_room = false;
-                        }
-                    }
-                    if($is_available_room){
-                        $selected_room_id = $room->id;
-                        break;
-                    }
-            }
-            if($selected_room_id == 0){
-                $enterCourse=false;
-                 return redirect()->back()
-                 ->with('retryEntering',"all Room not available with this Date: ".$date .' and Time '.$time.' change them and Try Again');
-            }
-
-          //assign Room-Head To the Room for a new Course
-          $selected_room_head_id = 0;
-          foreach (User::all() as $user) {
-            // if($user->hasRole('Room-Head')){
-                $is_available_room_head = true;
-                foreach ($user->rooms as $room) {
-                    if(($room->pivot->date == $date) && (Carbon::parse($room->pivot->time, 'UTC')->isoFormat('h:m') == $time)){
-                        $is_available_room_head = false;
-                        break;
-                    }
-                    if(($room->pivot->date == $date) &&
-                        (gmdate('H:i',strtotime($room->pivot->time) - strtotime($time)) > '22:00' ||
-                        gmdate('H:i',strtotime($room->pivot->time) - strtotime($time)) < '02:00')){
-                        $is_available_room_head = false;
-                    }
-                }
-                if($is_available_room_head){
-                    //$last_prev_room_time_taken = $room->rooms->last()->pivot->time;
-                    $selected_room_head_id = $user->id;
-                    break;
-                }
-         //   }
-          }
-          if($selected_room_head_id == 0){
-                $enterCourse=false;
-                return redirect()->back()
-                ->with('retryEntering',"There is no Room-Head available Now: ".$date .' and Time '.$time.' change them and Try Again');
-          }
-
-          //assign Secertary To the Room for a new Course
-          $selected_secertary_id = 0;
-          foreach (User::all() as $user) {
-            // if($user->hasRole('Secertary')){
-                if($user->id == $selected_room_head_id )
-                continue;
-                $is_available_secertary = true;
-                foreach ($user->rooms as $room) {
-                    if(($room->pivot->date == $date) && (Carbon::parse($room->pivot->time, 'UTC')->isoFormat('h:m') == $time)){
-                        $is_available_secertary = false;
-                        break;
-                    }
-                    if(($room->pivot->date == $date) &&
-                        (gmdate('H:i',strtotime($room->pivot->time) - strtotime($time)) > '22:00' ||
-                        gmdate('H:i',strtotime($room->pivot->time) - strtotime($time)) < '02:00')){
-                        $is_available_secertary = false;
-                    }
-                }
-                if($is_available_secertary){
-                    //$last_prev_room_time_taken = $room->rooms->last()->pivot->time;
-                    $selected_secertary_id = $user->id;
-                    break;
-                }
-        //    }
-           }
-          if($selected_secertary_id == 0){
-                $enterCourse=false;
-                return redirect()->back()
-                ->with('retryEntering',"There is no Secertary available Now: ".$date .' and Time '.$time.' change them and Try Again');
-          }
-          //assign Observer To the Room for a new Course
-          $selected_observer_id = 0;
-          foreach (User::all() as $user) {
-            // if($user->hasRole('Employee')){
-                if($user->id == $selected_room_head_id || $user->id == $selected_secertary_id )
-                continue;
-                $is_available_observer = true;
-                foreach ($user->rooms as $room) {
-                    if(($room->pivot->date == $date) && (Carbon::parse($room->pivot->time, 'UTC')->isoFormat('h:m') == $time)){
-                        $is_available_observer = false;
-                        break;
-                    }
-                    if(($room->pivot->date == $date) &&
-                        (gmdate('H:i',strtotime($room->pivot->time) - strtotime($time)) > '22:00' ||
-                        gmdate('H:i',strtotime($room->pivot->time) - strtotime($time)) < '02:00')){
-                        $is_available_observer = false;
-                    }
-                }
-                if($is_available_observer){
-                    //$last_prev_room_time_taken = $room->rooms->last()->pivot->time;
-                    $selected_observer_id = $user->id;
-                    break;
-                }
-            // }
-          }
-          if($selected_observer_id == 0){
-                $enterCourse=false;
-                return redirect()->back()
-                ->with('retryEntering',"There is no Observer available Now: ".$date .' and Time '.$time.' change them and Try Again');
-          }
-
-          if($enterCourse){
-                $this->validate($request,[
-                    'course_name' => 'required|min:1|max:40|unique:courses,course_name',
-                ],[
-                    'course_name.unique' => 'the name of course already exist'
-                ]);
-                $course = Course::create(
-                    [
-                        'course_name'=> $request->course_name,
-                        'studing_year'=> $request->studing_year,
-                        'semester' => $request->semester,
-                        'students_number' => $request->students_number,
-                        'duration' => $request->duration
-                    ]
-                );
-                //enter two courses in the same year , same date
-                // if(count(Course::with('users')
-                // ->whereHas('users', function($query) use($date){
-                // $query->where('date',$date);
-                //     })->where('studing_year',$course->studing_year)->get())>1 ){
-                //         $course->delete();
-                //         return redirect()->back()
-                //         ->with('retryEntering',"You çan't create Two courses in the smae year ,same date");
-                //     }
-                    $capacity_for_selected_room=Room::where('id',$selected_room_id)->first()->capacity;
-                    $course->users()->attach($selected_room_head_id,['room_id'=>$selected_room_id,'num_student_in_room'=> $capacity_for_selected_room/2 ,'date'=>$date,'time'=>$time,'roleIn'=>'Room-Head']);
-                    $course->users()->attach($selected_secertary_id,['room_id'=>$selected_room_id, 'num_student_in_room'=> $capacity_for_selected_room/2 ,'date'=>$date,'time'=>$time,'roleIn'=>'Secertary']);
-                    $course->users()->attach($selected_observer_id,['room_id'=>$selected_room_id, 'num_student_in_room'=> $capacity_for_selected_room/2 ,'date'=>$date,'time'=>$time,'roleIn'=>'Observer']);
-                    return redirect()->route('courses.index')
-                        ->with('message','You have successfully create a new course to the room Room'.$selected_room_id);
-            }
+        $this->validate($request,[
+            'course_name' => 'required|min:1|max:40|unique:courses,course_name',
+            'faculty_id' => 'required'
+        ],[
+            'course_name.unique' => 'the name of course already exist'
+        ]);
+        $course = Course::create(
+            [
+                'course_name'=> $request->course_name,
+                'studing_year'=> $request->studing_year,
+                'semester' => $request->semester,
+                'students_number' => $request->students_number,
+                'duration' => $request->duration,
+                'faculty_id' =>  $request->faculty_id,
+            ]
+        );
+        return redirect("/rotations/index")->with('user-update','Course created successfully');
     }
 
     public function show(Rotation $rotation, Course $course)
@@ -707,7 +549,7 @@ class CoursesController extends Controller
 
     public function update(Request $request, Rotation $rotation, Course $course)
     {
-            $course->update($request->only('course_name','studing_year','semester','duration','students_number'));
+            $course->update($request->only('course_name','studing_year','semester','duration','students_number','faculty_id'));
             //when enabled a checkbox for specific room
             $roomHeadArr=[];
             $secertaryArr=[];

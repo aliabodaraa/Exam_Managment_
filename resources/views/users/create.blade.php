@@ -60,7 +60,7 @@
                 <div class="mb-3">
                     <label for="temporary_role" class="form-label">temporary role</label>
                     <select class="form-control"
-                        name="temporary_role" required>
+                        name="temporary_role">
                         <option value="">Select temporary role</option>
                         <option value="عميد">عميد</option>
                         <option value="نائب إداري">نائب إداري</option>
@@ -76,9 +76,20 @@
                     @endif
                 </div>
                 <div class="mb-3">
+                    <label for="faculty_id" class="form-label">faculty_id</label>
+                    <select class="form-control" name="faculty_id" class="form-control" required>
+                        @foreach (App\Models\Faculty::all() as $faculty)
+                            <option value='{{ $faculty->id }}'>{{ $faculty->name }}</option>
+                        @endforeach
+                    </select>
+                    @if ($errors->has('faculty_id'))
+                        <span class="text-danger text-left">{{ $errors->first('faculty_id') }}</span>
+                    @endif
+                </div>
+                <div class="mb-3">
                     <label for="number_of_observation" class="form-label">number_of_observation</label>
                     <select class="form-control" name="number_of_observation" class="form-control" required>
-                        @for ($i = 1; $i <31; $i++)
+                        @for ($i = 0; $i <31; $i++)
                             <option value='{{ $i }}'>{{ $i }}</option>
                         @endfor
                     </select>

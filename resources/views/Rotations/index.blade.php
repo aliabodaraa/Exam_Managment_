@@ -28,13 +28,14 @@
             @include('layouts.partials.messages')
         </div>
     @if(count($rotations))
-        <table class="table table-dark">
+        <table class="table table-light">
             <thead>
             <tr>
                 <th scope="col" width="20%">rotation name</th>
                 <th scope="col" width="20%">year</th>
-                <th scope="col" width="20%">start_date</th>
-                <th scope="col" width="30%">end_date</th>
+                <th scope="col" width="15%">start_date</th>
+                <th scope="col" width="15%">end_date</th>
+                <th scope="col" width="20%">faculty</th>
                 <th scope="col" width="10%">Actions</th>
             </tr>
             </thead>
@@ -45,15 +46,16 @@
                             <td>{{ $rotation->year }}</td>
                             <td>{{ $rotation->start_date }}</td>
                             <td>{{ $rotation->end_date }}</td>
-                                <td style="display:flex;align-items:baseline;">
-                                        <a href="/rotations/{{$rotation->id}}/show" class="btn btn-success btn-sm me-2" style="width:120px">البرنامج الامتحاني</a>
-                                        @if(auth()->user()->id==1)
-                                            <a href="/rotations/{{$rotation->id}}/edit" class="btn btn-info btn-sm me-2 btn-close-white">Edit</a>
-                                            {!! Form::open(['method' => 'DELETE','route' => ['rotations.destroy', $rotation->id],'style'=>'display:inline']) !!}
-                                            {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
-                                            {!! Form::close() !!}
-                                        @endif
-                                </td>
+                            <td>{{ $rotation->faculty->name }}</td>
+                            <td style="display:flex;align-items:baseline;">
+                                    <a href="/rotations/{{$rotation->id}}/show" class="btn btn-success btn-sm me-2" style="width:120px">البرنامج الامتحاني</a>
+                                    @if(auth()->user()->id==1)
+                                        <a href="/rotations/{{$rotation->id}}/edit" class="btn btn-info btn-sm me-2 btn-close-white">Edit</a>
+                                        {!! Form::open(['method' => 'DELETE','route' => ['rotations.destroy', $rotation->id],'style'=>'display:inline']) !!}
+                                        {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
+                                        {!! Form::close() !!}
+                                    @endif
+                            </td>
                         </tr>
                     @endforeach
             </tbody>

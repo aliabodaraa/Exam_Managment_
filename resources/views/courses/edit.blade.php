@@ -188,6 +188,17 @@ function ret_room_info($room,$course){
                             <span class="text-danger text-left">{{ $errors->first('duration') }}</span>
                         @endif
                     </div>
+                    <div class="mb-3">
+                        <label for="faculty_id" class="form-label">faculty_id</label>
+                        <select class="form-control" name="faculty_id" class="form-control" required>
+                            @foreach (App\Models\Faculty::all() as $faculty)
+                                <option value='{{ $faculty->id }}' {{ ($course->faculty->id == $faculty->id) ? 'selected': '' }}>{{ $faculty->name }}</option>
+                            @endforeach
+                        </select>
+                        @if ($errors->has('faculty_id'))
+                            <span class="text-danger text-left">{{ $errors->first('faculty_id') }}</span>
+                        @endif
+                    </div>
                 </div>
                 <div class="right col-sm-9" style="float:right">
                         <label for="rooms" class="form-label">rooms :</label>

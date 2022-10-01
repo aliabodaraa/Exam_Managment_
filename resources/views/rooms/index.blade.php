@@ -27,6 +27,7 @@
                 <th scope="col" width="15%">room name</th>
                 <th scope="col" width="15%">capacity</th>
                 <th scope="col" width="10%">is_active</th>
+                <th scope="col" width="10%">faculty</th>
                 <th scope="col" width="15%">location</th>
                 <th scope="col" width="20%">notes</th>
                 @if(auth()->user()->id==1)<th scope="col" width="10%">Actions</th>@endif
@@ -50,6 +51,7 @@
                                     <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="danger" style="width: 20px;height: 20px;">
                                 @endif
                             </td>
+                            <td>{{ $room->faculty->name }}</td>
                             <td>{{ $room->location }}</td>
                             <td>{{ $room->notes }}</td>
                             @if(auth()->user()->id==1)

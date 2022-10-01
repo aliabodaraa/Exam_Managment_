@@ -31,8 +31,8 @@ class UpdateUserRequest extends FormRequest
             'username' => 'required|unique:users,username,'.$user->id,
             'role' => 'required',
             'number_of_observation' => 'required',
-            'temporary_role' => 'required',
-            //'is_active' => 'required',
+            //'temporary_role' => 'required',
+            'faculty_id' =>  'required',
         ];
     }
 }

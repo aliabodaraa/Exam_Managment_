@@ -67,7 +67,7 @@ class UsersController extends Controller
                 'role' => $request['role'],
                 'number_of_observation' => $request['number_of_observation'],
                 'temporary_role' => $request['temporary_role'],
-                //'is_active' => 'required',
+                'faculty_id' =>  $request['faculty_id'],
             ]
         );
         //return Response::json($user);
@@ -165,9 +165,9 @@ class UsersController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(User $user, UpdateUserRequest $request)
-    {
-        $user->update($request->validated());
-
+    {//dd($request);
+        //$user->update($request->validated());//take only the column that set require in UpdateUserRequest.php
+        $user->update($request->all());
         //$user->syncRoles($request->get('role'));
 
         return redirect()->route('users.index')

@@ -63,6 +63,17 @@
                         <span class="text-danger text-left">{{ $errors->first('notes') }}</span>
                     @endif
                 </div>
+                <div class="mb-3">
+                    <label for="faculty_id" class="form-label">faculty_id</label>
+                    <select class="form-control" name="faculty_id" class="form-control" required>
+                        @foreach (App\Models\Faculty::all() as $faculty)
+                            <option value='{{ $faculty->id }}'>{{ $faculty->name }}</option>
+                        @endforeach
+                    </select>
+                    @if ($errors->has('faculty_id'))
+                        <span class="text-danger text-left">{{ $errors->first('faculty_id') }}</span>
+                    @endif
+                </div>
                 <button type="submit" class="btn btn-primary">Save Room</button>
             </form>
         </div>

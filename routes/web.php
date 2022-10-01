@@ -54,7 +54,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
              * Course Routes
              */
             Route::group(['prefix' => 'courses'], function() {
-                
+                Route::get('/', 'CoursesController@index')->name('courses.index');
                 Route::get('/create', 'CoursesController@create')->name('courses.create');
                 Route::post('/create', 'CoursesController@store')->name('courses.store');
                 Route::delete('/{course}/delete', 'CoursesController@destroy')->name('courses.destroy');

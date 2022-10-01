@@ -14,7 +14,8 @@ class Course extends Model
         'studing_year',
         'semester',
         'students_number',
-        'duration'
+        'duration',
+        'faculty_id'
     ];
 
     public function users(){//many to many between course & user

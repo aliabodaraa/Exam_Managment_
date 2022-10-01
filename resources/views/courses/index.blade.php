@@ -1,149 +1,87 @@
 @extends('layouts.app-master')
+
 @section('content')
-    <div class="bg-light p-2 rounded">
-        <h1>Exam Program</h1>
-        <div class="lead">
-            TIME TABLE .
-                @if(auth()->user()->id==1)
-                    <a href="{{ route('courses.add_course_to_program') }}" class="btn btn-success float-right me-2 m4-2">Add Course</a>
-                @endif
+    <div class="bg-light p-4 rounded">
+        <h1> المقررات
+            <div style="float: right;">
+                <a href="{{url()->previous()}}" class="btn btn-dark">Back</a>
+            </div>
+        </h1>
+        @if ($messageDelete = Session::get('course-delete'))
+        <div class="alert alert-success alert-block">
+            <strong>{{ $messageDelete }}</strong>
         </div>
-        {{-- class="container mt-2" --}}
-        <div class="container-fluid px-2 mt-2">
-            @if ($message = Session::get('message'))
-                <div class="alert alert-success alert-block">
-                    <strong>{{ $message }}</strong>
-                </div>
-            @endif
-            @if ($message = Session::get('user-update'))
-            <div class="alert alert-success alert-block">
-                <strong>{{ $message }}</strong>
+        @endif
+        @if(auth()->user()->id==1)
+            <div class="lead">
+                <a href="{{ route('courses.create') }}" class="btn btn-warning float-right mb-4">إضافة قاعة</a>
             </div>
-            @endif
-            @if ($messageDelete = Session::get('user-delete'))
-            <div class="alert alert-success alert-block">
-                <strong>{{ $messageDelete }}</strong>
-            </div>
-            @endif
-            @if(count($courses_info))
-            <table class="table" class='exam-program'>
+        @endif
+        <div class="mt-2">
+            @include('layouts.partials.messages')
+        </div>
+    @if(count($courses))
+        <table class="table table-light">
             <thead>
-                <tr>
-                    <td align="center" height="100" width="4%"><br>
-                        <b>Day/Period</b></br>
-                    </td>
-                    <td align="center" height="100" width="15%">
-                        <b>I<br>One Year</b>
-                    </td>
-                    <td align="center" height="100" width="15%">
-                        <b>II<br>Two Year</b>
-                    </td>
-                    <td align="center" height="100" width="15%">
-                        <b>III<br>Three Year</b>
-                    </td>
-                    <td align="center" height="100" width="15%">
-                        <b>IV<br>Fourth Year</b>
-                    </td>
-                    <td align="center" height="100" width="15%">
-                        <b>IIV<br>Fifth Year</b>
-                    </td>
-                </tr>
+            <tr>
+                <th scope="col" width="5%">course_name</th>
+                <th scope="col" width="5%">semester</th>
+                <th scope="col" width="10%">faculty</th>
+                <th scope="col" width="5%">duration</th>
+                <th scope="col" width="5%">students_number</th>
+                @if(auth()->user()->id==1)<th scope="col" width="10%">Actions</th>@endif
+            </tr>
             </thead>
             <tbody>
-                {{-- @dd($courses_info) --}}
-                @foreach($courses_info as $date => $all_years)
-                    <tr>
-                        <td class="date" align="center" height="100">
-                            <b>{{ date('l d-m-Y', strtotime($date)) }}</b>
-                        </td>
-                        @php 
-                            $counter_one=0;
-                            $counter_two=0;
-                            $counter_three=0;
-                            $counter_four=0;
-                            $counter_five=0;
-                            $years=[];
-                            foreach($all_years as $year_number => $courses_arrs)
-                                array_push($years, $year_number);
-                        @endphp
-                        @foreach($all_years as $year_number => $courses_numbers_arrs)
-                                @foreach ($courses_numbers_arrs as $id_course => $time)
-                                    @if($year_number==2 && ! $counter_two)
-                                        @if(!in_array(1,$years))
-                                            <td></td>
-                                        @endif
-                                        @php $counter_one++; @endphp
-                                    @elseif($year_number==3 && ! $counter_three)
-                                        @if(!in_array(2,$years) && !in_array(1,$years))
-                                            <td></td><td></td>
-                                        @endif
-                                        @if(!in_array(2,$years) && in_array(1,$years))
-                                            <td></td>
-                                        @endif
-                                        @php $counter_three++; @endphp
-                                    @elseif($year_number==4 && ! $counter_four)
-                                        @if(!in_array(3,$years) && !in_array(2,$years) && !in_array(1,$years))
-                                            <td></td><td></td><td></td>
-                                        @elseif(!in_array(3,$years) && !in_array(2,$years) && in_array(1,$years))
-                                            <td></td><td></td>
-                                        @elseif(!in_array(3,$years) && in_array(2,$years))
-                                            <td></td>
-                                        @endif
-                                        @php $counter_four++; @endphp
-                                    @elseif($year_number==5 && ! $counter_five)
-                                        @if(!in_array(4,$years) && !in_array(3,$years) && !in_array(2,$years) && !in_array(1,$years))
-                                            <td></td><td></td><td></td><td></td>
-                                        @elseif(!in_array(4,$years) && !in_array(3,$years) && !in_array(2,$years) && in_array(1,$years))
-                                            <td></td><td></td><td></td>
-                                        @elseif(!in_array(4,$years) && !in_array(3,$years) && in_array(2,$years))
-                                            <td></td><td></td>
-                                        @elseif(!in_array(4,$years) && in_array(3,$years))
-                                            <td></td>
-                                        @endif
-                                        @php $counter_five++; @endphp
-                                        {{-- @if( count($courses_numbers_arrs['courses']) > 1 && !in_array(4,$years) && !in_array(3,$years) && !in_array(2,$years) && in_array(1,$years) )
-                                            @once<td></td><td></td><td></td>@endonce
-                                        @endif--}}
-                                    @endif
-                                    @php
-                                    $courseQ= App\Models\Course::where('id',$id_course)->first();
-                                    @endphp
-                                    <td class="course" align="center" height="100" style="display:{{($year_number==4) ?'inline-block':'float-root';}};{{($courseQ->semester=='2')?'border-radius: 17px;background-color: #6c757d0d;':''}}"><h5 class='course-name'>
-                                    @php
-                                        echo $courseQ->course_name;
-                                    @endphp
-                                    </h5>
-                                        <div class="controll">
-                                                <a href="{{ route('courses.show', $id_course) }}" class="btn btn-warning btn-sm btn-outline-light rounded">Show</a>
-                                                @if(auth()->user()->id==1)
-                                                    <a href="{{ route('courses.edit', $id_course) }}" class="btn btn-info btn-sm btn-outline-light rounded">Edit</a>
-                                                    <a href="{{ route('courses.delete_course_from_program', $id_course) }}" class="btn btn-danger btn-sm btn-outline-light rounded">Delete</a>
-                                                @endif
-                                              {{-- {!! Form::open(['method' => 'DELETE','route' => ['courses.destroy', $id_course],'style'=>'display:inline']) !!}
-                                              {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
-                                              {!! Form::close() !!} --}}
-                                            <span class="badge bg-secondary">{{gmdate('H:i A',strtotime($time))}}</span>
-                                          </div>
-                                    </td>
-                                    @endforeach
-                        @endforeach
-                    </tr>
-                @endforeach
+                    @foreach($courses as $course)
+                        <tr>
+                            <td>{{ $course->course_name }}</td>
+                            <td>{{ $course->semester }}</td>
+                            <td>{{ $course->faculty->name }}</td>
+                            <td>{{ $course->duration }}</td>
+                            <td>{{ $course->students_number }}</td>
+                            @if(auth()->user()->id==1)
+                                <td style="display:flex;align-items:baseline;">
+                                        {{-- <a href="{{ route('courses.edit', $course->id) }}" class="btn btn-info btn-sm me-2 btn-close-white">Edit</a> --}}
+                                        {!! Form::open(['method' => 'DELETE','route' => ['courses.destroy', $course->id],'style'=>'display:inline']) !!}
+                                        {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
+                                        {!! Form::close() !!}
+                                </td>
+                            @endif
+                        </tr>
+                    @endforeach
             </tbody>
         </table>
         @else
         <div class="alert text-black alert-success" role="alert" style="margin-top: 20px;">
             <h4 class="alert-heading">Sorry<h4>
-            <p>The Program has not any course yet .</p>
+            <p>There are not any course yet .</p>
             <hr>
-            <p class="mb-0">Whenever you need to add a new course, click the green button .</p>
+            <p class="mb-0">Whenever you need to add a new course, click the yellow button .</p>
            <h1><a href="{{url()->previous()}}" class="btn btn-secondary"> Back</a></h1>
            {{-- problem in back --}}
         </div>
       @endif
-      </div>
-      {{-- <div class="d-flex">
-        {!! $courses->links() !!}
-    </div> --}}
     </div>
 @endsection
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"> </script>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+
+        //is active
+
+        isActive=(course_id)=>{
+            if(! $('#is_active').is(':checked'))
+                $('#is_active').prop('value', false)
+            else
+                $('#is_active').prop('value', true)
+            $('#isActiveForm'+course_id).submit();
+        }
+        
+
+        //is active
+    });
+
+    </script>

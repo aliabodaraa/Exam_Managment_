@@ -16,6 +16,7 @@ class Room extends Model
          'capacity',
          'location',
          'notes',
+         'faculty_id'
     ];
     public function courses(){//many to many between Room & Course
         return $this->belongsToMany('App\Models\Course','course_room_rotation_user')->withPivot('user_id','room_id','date','time','roleIn','num_student_in_room','rotation_id');

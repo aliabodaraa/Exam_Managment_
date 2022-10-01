@@ -8,6 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Department extends Model
 {
     use HasFactory;
+
+    protected $fillable=[
+        'name',
+        'faculty_id'
+    ];
+
     public function users(){//one to many between Department & user
         return $this->hasMany(User::class);
      }

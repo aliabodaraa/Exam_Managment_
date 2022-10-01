@@ -53,6 +53,7 @@ class roomsController extends Controller
         $this->validate($request,[
             'room_name' => 'required|min:1|max:20|unique:rooms,room_name',
             'capacity' => 'required|min:1|max:1000',
+            'faculty_id' => 'required'
         ],[
             'room_name.unique'=>'the name of room already exist'
         ]);
@@ -62,6 +63,7 @@ class roomsController extends Controller
                 'capacity'=> $request->capacity,
                 'location'=> $request->location,
                 'notes'=> $request->notes,
+                'faculty_id' =>  $request['faculty_id'],
             ]
         );
         return redirect()->route('rooms.index')
@@ -96,6 +98,7 @@ class roomsController extends Controller
         $this->validate($request,[
             'room_name' => 'required|min:1|max:20',
             'capacity' => 'required|min:1|max:1000',
+            'faculty_id' => 'required'
         ],[
             'room_name.exists'=>'the name of room does not exist'
         ]);

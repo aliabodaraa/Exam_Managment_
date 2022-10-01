@@ -13,6 +13,7 @@ class Rotation extends Model
         'year',
         'start_date',
         'end_date',
+        'faculty_id'
    ];
     public function objections(){//one to many between Rotation & Objection
         return $this->hasMany('App\Models\Objection');

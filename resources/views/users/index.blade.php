@@ -23,15 +23,16 @@
             <thead>
             <tr>
                 <th scope="col" width="5%">#</th>
-                <th scope="col" width="20%">Email</th>
-                <th scope="col" width="20%">Username</th>
-                <th scope="col" width="15%">Role</th>
-                <th scope="col" width="15%">Temporary Role</th>
-                <th scope="col" width="15%">Active</th>
+                <th scope="col" width="15%">Email</th>
+                <th scope="col" width="15%">Username</th>
+                <th scope="col" width="10%">Role</th>
+                <th scope="col" width="10%">Temporary Role</th>
+                <th scope="col" width="10%">Active</th>
                 @if(auth()->user()->id==1)
                     <th scope="col" width="5%">number observation</th>
                     {{-- <th scope="col" width="5%">current number_of_observation</th> --}}
                 @endif
+                <th scope="col" width="15%">faculty</th>
                 <th scope="col" width="15%" colspan="3">Actions</th>
             </tr>
             </thead>
@@ -86,18 +87,19 @@
                                     <span class="badge bg-secondary">{{count($dates_distinct)}}</span>
                                 </td> --}}
                             @endif
-                                <td style="display:flex;align-items:baseline;">
-                                            @if(auth()->user()->id==1)
-                                                <a href="{{ route('users.observations', $user->id) }}" class="btn btn-info btn-sm me-2 btn-close-white">observations</a>
-                                            @endif
-                                            <a href="{{ route('users.show', $user->id) }}" class="btn btn-warning btn-sm me-2">Show</a>
-                                            @if(auth()->user()->id==1) 
-                                                <a href="{{ route('users.edit', $user->id) }}" class="btn btn-info btn-sm me-2">Edit</a>
-                                                {!! Form::open(['method' => 'DELETE','route' => ['users.destroy', $user->id],'style'=>'display:inline']) !!}
-                                                {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
-                                                {!! Form::close() !!}
-                                            @endif
-                                </td>
+                            <td>{{ $user->faculty->name }}</td>
+                            <td style="display:flex;align-items:baseline;">
+                                        @if(auth()->user()->id==1)
+                                            <a href="{{ route('users.observations', $user->id) }}" class="btn btn-info btn-sm me-2 btn-close-white">observations</a>
+                                        @endif
+                                        <a href="{{ route('users.show', $user->id) }}" class="btn btn-primary btn-sm me-2">Show</a>
+                                        @if(auth()->user()->id==1) 
+                                            <a href="{{ route('users.edit', $user->id) }}" class="btn btn-info btn-sm me-2">Edit</a>
+                                            {!! Form::open(['method' => 'DELETE','route' => ['users.destroy', $user->id],'style'=>'display:inline']) !!}
+                                            {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
+                                            {!! Form::close() !!}
+                                        @endif
+                            </td>
                         </tr>
                     @endforeach
             </tbody>

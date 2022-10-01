@@ -50,7 +50,7 @@ class rotationsController extends Controller
             return view('objections.edit',compact('courses_info','rotation','courses_objections_ids'));
     }
     public function objections_update(Request $request, Rotation $rotation){
-        
+
         Auth::user()->rotationsObservation()->detach($rotation->id);
         $rotation->coursesObservation()->attach($request->get('courses_objections_ids'),['user_id'=>Auth::user()->id,'rotation_id'=>$rotation->id]);
 
@@ -106,6 +106,7 @@ class rotationsController extends Controller
             //'year' => 'required',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
+            'faculty_id' => 'required'
         ],[
             'name.unique'=>'اسم الدورة موجود في السنة المحددة'
         ]);
@@ -115,6 +116,7 @@ class rotationsController extends Controller
                 'year'=> $request->year,
                 'start_date'=> $request->start_date,
                 'end_date'=> $request->end_date,
+                'faculty_id' => $request->faculty_id
             ]
         );
         return redirect()->route('rotations.index')
@@ -184,6 +186,7 @@ class rotationsController extends Controller
             ],
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
+            'faculty_id' => $request->faculty_id
         ],[
             'name.unique'=>'هذه السنة موجوده تتضمن الدورة المحددة',
             'year.unique'=>'هذه الدوره موجوده في السنة المحددة'
