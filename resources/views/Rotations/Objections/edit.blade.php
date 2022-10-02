@@ -29,7 +29,7 @@
             </div>
             @endif
             @if(count($courses_info))
-            <form method="POST" action="{{route('rotations.objections_update',$rotation->id)}}">
+            <form method="POST" action="{{route('rotations.objections.update',$rotation->id)}}">
                 @method('patch')
                 @csrf
                 <table class="table" class='exam-program'>

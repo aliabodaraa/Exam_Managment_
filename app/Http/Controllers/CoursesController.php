@@ -39,12 +39,10 @@ class CoursesController extends Controller
                 'course_name'=> $request->course_name,
                 'studing_year'=> $request->studing_year,
                 'semester' => $request->semester,
-                'students_number' => $request->students_number,
-                'duration' => $request->duration,
                 'faculty_id' =>  $request->faculty_id,
             ]
         );
-        return redirect("/rotations/index")->with('user-update','Course created successfully');
+        return redirect("/")->with('user-update','course '.$request->course_name.' created successfully');
     }
 
     public function destroy(Course $course)

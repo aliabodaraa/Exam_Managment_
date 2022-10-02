@@ -16,11 +16,11 @@ class CreateCoursesTable extends Migration
         Schema::create('courses', function (Blueprint $table) {
             $table->id();
             $table->string('course_name');
-            $table->string('semester');
+            $table->integer('semester');
             $table->integer('studing_year');
-            $table->string('duration',5)->default("1:30");
-            $table->bigInteger('students_number');
-            $table->unsignedBigInteger('faculty_id')->nullable(true);//for does not miss importing data
+            // $table->string('duration',5)->default("1:30");
+            // $table->bigInteger('students_number');
+            $table->unsignedBigInteger('faculty_id');//->nullable(true);//for does not miss importing data
             $table->foreign('faculty_id')->references('id')->on('faculties')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });

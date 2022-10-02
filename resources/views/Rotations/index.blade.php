@@ -31,12 +31,12 @@
         <table class="table table-light">
             <thead>
             <tr>
-                <th scope="col" width="20%">rotation name</th>
-                <th scope="col" width="20%">year</th>
-                <th scope="col" width="15%">start_date</th>
-                <th scope="col" width="15%">end_date</th>
-                <th scope="col" width="20%">faculty</th>
-                <th scope="col" width="10%">Actions</th>
+                <th scope="col" width="10%">rotation name</th>
+                <th scope="col" width="10%">year</th>
+                <th scope="col" width="10%">start_date</th>
+                <th scope="col" width="10%">end_date</th>
+                <th scope="col" width="10%">faculty</th>
+                <th scope="col" width="17%">Actions</th>
             </tr>
             </thead>
             <tbody>
@@ -47,10 +47,19 @@
                             <td>{{ $rotation->start_date }}</td>
                             <td>{{ $rotation->end_date }}</td>
                             <td>{{ $rotation->faculty->name }}</td>
-                            <td style="display:flex;align-items:baseline;">
-                                    <a href="/rotations/{{$rotation->id}}/show" class="btn btn-success btn-sm me-2" style="width:120px">البرنامج الامتحاني</a>
+                            <td style="display:inline-block;align-items:baseline;">
+                                    @php
+                                    $num_of_my_courses_objections=App\Models\Course::with('rotationsObservation')->whereHas('rotationsObservation', function($query) use($rotation){
+                                    $query->where('user_id',Auth::user()->id)->where('rotation_id',$rotation->id);})->pluck('id')->toArray();
+                                    @endphp
+                                    @if(!count($num_of_my_courses_objections))
+                                        <a href="{{ route('rotations.objections.create',$rotation->id) }}"  class="btn btn-secondary btn-sm">إنشاء إعتراضات</a>
+                                    @else
+                                        <a href="{{ route('rotations.objections.edit',$rotation->id) }}"  class="btn btn-secondary btn-sm">تعديل إعتراضاتي</a>
+                                    @endif
+                                    <a href="{{ route('rotations.program.show',$rotation->id) }}" class="btn btn-success btn-sm">البرنامج الامتحاني</a>
                                     @if(auth()->user()->id==1)
-                                        <a href="/rotations/{{$rotation->id}}/edit" class="btn btn-info btn-sm me-2 btn-close-white">Edit</a>
+                                        <a href="/rotations/{{$rotation->id}}/edit" class="btn btn-info btn-sm btn-close-white">Edit</a>
                                         {!! Form::open(['method' => 'DELETE','route' => ['rotations.destroy', $rotation->id],'style'=>'display:inline']) !!}
                                         {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
                                         {!! Form::close() !!}

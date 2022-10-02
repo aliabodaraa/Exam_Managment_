@@ -7,13 +7,17 @@
                 $query->where('user_id',Auth::user()->id)->where('rotation_id',$rotation->id);})->pluck('id')->toArray();
             @endphp
             @if(!count($num_of_my_courses_objections))
-                <a href="{{ route('rotations.objections_create',$rotation->id) }}"  class="btn btn-danger float-left me-2 m4-2">إنشاء إعتراضات</a>
+                <a href="{{ route('rotations.objections.create',$rotation->id) }}"  class="btn btn-danger float-left me-2 m4-2">إنشاء إعتراضات</a>
             @else
-                <a href="{{ route('rotations.objections_edit',$rotation->id) }}"  class="btn btn-danger float-left me-2 m4-2">تعديل إعتراضاتي</a>
+                <a href="{{ route('rotations.objections.edit',$rotation->id) }}"  class="btn btn-danger float-left me-2 m4-2">تعديل إعتراضاتي</a>
             @endif
+            <form method="POST" action="{{route('rotations.distributeStudents',$rotation->id)}}" id="coursesForm">
+                @csrf
+                <button type="submit" class="btn btn-danger float-left me-2 m4-2">توزيع الطلاب على القاعات </button>
+            </form>
             <b class="text-center" style="margin-left: 381px;">{{ $rotation->faculty->name }} - برنامج امتحان {{ $rotation->name }} - {{ $rotation->year }}</b>
             @if(auth()->user()->id==1)
-                <a href="{{ route('rotations.add_course_to_program',$rotation->id) }}" class="btn btn-success float-right me-2 m4-2">Add Course</a>
+                <a href="{{ route('rotations.program.add_course_to_the_program',$rotation->id) }}" class="btn btn-success float-right me-2 m4-2">Add Course</a>
             @endif
         </h1>
         

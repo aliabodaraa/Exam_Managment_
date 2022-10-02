@@ -18,16 +18,27 @@ class Room extends Model
          'notes',
          'faculty_id'
     ];
+
+    //distribution_of_students_to_the_rooms2
+    public function distributionCourse(){//2
+        return $this->belongsToMany('App\Models\Course','course_room_rotation')->withPivot('course_id','room_id','rotation_id','num_student_in_room');
+    }
+    public function distributionRotation(){//2
+        return $this->belongsToMany('App\Models\Rotation','course_room_rotation')->withPivot('course_id','room_id','rotation_id','num_student_in_room');
+    }
+    //distribution_of_students_to_the_rooms2
+
+    //assign_users_in_rooms3
     public function courses(){//many to many between Room & Course
-        return $this->belongsToMany('App\Models\Course','course_room_rotation_user')->withPivot('user_id','room_id','date','time','roleIn','num_student_in_room','rotation_id');
+        return $this->belongsToMany('App\Models\Course','course_room_rotation_user')->withPivot('roleIn');
     }
     public function users(){//many to many between Room & User
-        return $this->belongsToMany('App\Models\User','course_room_rotation_user')->withPivot('course_id','room_id','date','time','roleIn','num_student_in_room','rotation_id');
+        return $this->belongsToMany('App\Models\User','course_room_rotation_user')->withPivot('roleIn');
     }
     public function rotations(){//many to many between Room & Rotation
-        return $this->belongsToMany('App\Models\Rotation','course_room_rotation_user')->withPivot('course_id','room_id','date','time','roleIn','num_student_in_room','rotation_id');
+        return $this->belongsToMany('App\Models\Rotation','course_room_rotation_user')->withPivot('roleIn');
     }
-
+    //assign_users_in_rooms3
 
     public function faculty(){//one to many between faculty & room
         return $this->belongsTo(Faculty::class);//->withDefault(['name1'=>'dfd','name2'=>'ks']);// can access to this properties like i name foreginKey dept_id instead of name department_id  if doesn't has any problem i can't access to this properties

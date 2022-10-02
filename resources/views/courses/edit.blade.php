@@ -162,7 +162,7 @@ function ret_room_info($room,$course){
                             <span class="text-danger text-left">{{ $errors->first('time') }}</span>
                         @endif
                     </div>
-                    <div class="mb-3">
+                    {{-- <div class="mb-3">
                         <label for="students_number" class="form-label">students_number :</label>
                         <input value="{{ $course->students_number }}"
                             type="number"
@@ -187,7 +187,7 @@ function ret_room_info($room,$course){
                         @if ($errors->has('duration'))
                             <span class="text-danger text-left">{{ $errors->first('duration') }}</span>
                         @endif
-                    </div>
+                    </div> --}}
                     <div class="mb-3">
                         <label for="faculty_id" class="form-label">faculty_id</label>
                         <select class="form-control" name="faculty_id" class="form-control" required>

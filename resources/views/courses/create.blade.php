@@ -54,55 +54,6 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="date" class="form-label">date</label>
-                    <input value="{{ old('date') }}"
-                        type="date"
-                        class="form-control"
-                        name="date"
-                        placeholder="date" required>
-                    @if ($errors->has('date'))
-                        <span class="text-danger text-left">{{ $errors->first('date') }}</span>
-                    @endif
-                </div>
-                <div class="mb-3">
-                    <label for="time" class="form-label">time</label>
-                    <input value="{{ old('time') }}"
-                        type="time"
-                        class="form-control"
-                        name="time"
-                        placeholder="time" required>
-                    @if ($errors->has('time'))
-                        <span class="text-danger text-left">{{ $errors->first('time') }}</span>
-                    @endif
-                </div>
-
-                <div class="mb-3">
-                    <label for="students_number" class="form-label">students_number</label>
-                    <input value="{{ old('students_number') }}"
-                        type="number"
-                        class="form-control"
-                        name="students_number"
-                        placeholder="students_number" required>
-                    @if ($errors->has('students_number'))
-                        <span class="text-danger text-left">{{ $errors->first('students_number') }}</span>
-                    @endif
-                </div>
-                <div class="mb-3">
-                    <label for="duration" class="form-label">duration</label>
-                    <select class="form-control" name="duration" class="form-control" required>
-                        <option value='01:00'>1 hours</option>
-                        <option value='01:30'>1:30 hours</option>
-                        <option value='02:00'>2 hours</option>
-                        <option value='02:30'>2:30 hours</option>
-                        <option value='03:00'>3 hours</option>
-                        <option value='03:30'>3:30 hours</option>
-                        <option value='04:00'>4 hours</option>
-                    </select>
-                    @if ($errors->has('duration'))
-                        <span class="text-danger text-left">{{ $errors->first('duration') }}</span>
-                    @endif
-                </div>
-                <div class="mb-3">
                     <label for="faculty_id" class="form-label">faculty_id</label>
                     <select class="form-control" name="faculty_id" class="form-control" required>
                         @foreach (App\Models\Faculty::all() as $faculty)

@@ -78,20 +78,27 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
              * Rotation Routes
              */
             Route::group(['prefix' => 'rotations'], function() {
+                //Rotation CURD
                 Route::get('/index', 'RotationsController@index')->name('rotations.index');
                 Route::get('/create', 'RotationsController@create')->name('rotations.create');
                 Route::post('/create', 'RotationsController@store')->name('rotations.store');
                 Route::get('/{rotation}/edit', 'RotationsController@edit')->name('rotations.edit');
                 Route::patch('/{rotation}/update', 'RotationsController@update')->name('rotations.update');
                 Route::delete('/{rotation}/delete', 'RotationsController@destroy')->name('rotations.destroy');
-                Route::get('/{rotation}/show', 'RotationsController@show')->name('rotations.show');
-                Route::get('/{rotation}/add_course_to_program', 'RotationsController@add_course_to_program')->name('rotations.add_course_to_program');
-                Route::post('/{rotation}/store_add_course_to_program', 'RotationsController@store_add_course_to_program')->name('rotations.store_add_course_to_program');
-
-                Route::get('/{rotation}/objections/create', 'RotationsController@objections_create')->name('rotations.objections_create');
-                Route::post('/{rotation}/objections/create', 'RotationsController@objections_store')->name('rotations.objections_store');
-                Route::get('/{rotation}/objections/edit', 'RotationsController@objections_edit')->name('rotations.objections_edit');
-                Route::patch('/{rotation}/objections/update', 'RotationsController@objections_update')->name('rotations.objections_update');
+                //Rotation CURD
+                //Rotation ExamProgram
+                Route::get('/{rotation}/show', 'CourseRotation_ExamProgramController@show')->name('rotations.program.show');
+                Route::get('/{rotation}/create', 'CourseRotation_ExamProgramController@add_course_to_the_program')->name('rotations.program.add_course_to_the_program');
+                Route::post('/{rotation}/store', 'CourseRotation_ExamProgramController@store_course_to_the_program')->name('rotations.program.store_course_to_the_program');
+                Route::get('/{rotation}/course/{course}/delete_course_from_program', 'CourseRotation_ExamProgramController@delete_course_from_program')->name('courses.delete_course_from_program');
+                //Rotation ExamProgram
+                //Rotation Objections
+                Route::get('/{rotation}/objections/create', 'CourseRotationUser_ObjectionController@create')->name('rotations.objections.create');
+                Route::post('/{rotation}/objections/create', 'CourseRotationUser_ObjectionController@store')->name('rotations.objections.store');
+                Route::get('/{rotation}/objections/edit', 'CourseRotationUser_ObjectionController@edit')->name('rotations.objections.edit');
+                Route::patch('/{rotation}/objections/update', 'CourseRotationUser_ObjectionController@update')->name('rotations.objections.update');
+                //Rotation Objections
+                Route::post('/{rotation}/distributeStudents', 'RotationsController@distributeStudents')->name('rotations.distributeStudents');
             });
                         
             /**
@@ -100,7 +107,6 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
             Route::group(['prefix' => 'rotations'], function() {
                 Route::get('/{rotation}/course/{course}/room/{specific_room}', 'CourseRotationController@get_room_for_course')->name('rotations.get_room_for_course');
                 Route::patch('/{rotation}/course/{course}/room/{specific_room}', 'CourseRotationController@customize_room_for_course')->name('rotations.customize_room_for_course');
-                Route::get('/{rotation}/course/{course}/delete_course_from_program', 'CourseRotationController@delete_course_from_program')->name('courses.delete_course_from_program');
                 Route::get('/{rotation}/course/{course}/show', 'CourseRotationController@show')->name('rotations.course.show');
                 Route::get('/{rotation}/course/{course}/edit', 'CourseRotationController@edit')->name('rotations.course.edit');
                 Route::patch('/{rotation}/course/{course}/update', 'CourseRotationController@update')->name('rotations.course.update');

@@ -394,13 +394,6 @@ class CourseRotationController extends Controller
         return redirect("/rotations/$rotation->id/course/$course->id/edit")->with('update-course-room','Room '.$specific_room->room_name.' in Course '.$course->course_name.' updated successfully')->with(['disabled_rooms'=>$disabled_rooms,'common_rooms'=>$common_rooms]);
     }
 
-    public function delete_course_from_program(Rotation $rotation, Course $course){
-        //foreach ($rotation->users as $user) {
-            $rotation->courses()->detach($course);
-        //}
-        return redirect("/rotations/$rotation->id/show")
-            ->with('user-delete','Course hided successfully.');
-    }
     public function show(Rotation $rotation, Course $course)
     {
         return view('courses.show',compact('course'));

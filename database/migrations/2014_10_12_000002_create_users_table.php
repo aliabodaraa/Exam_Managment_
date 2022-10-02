@@ -23,7 +23,9 @@ class CreateUsersTable extends Migration
             $table->string('role')->nullable(true);
             $table->string('temporary_role')->nullable(true);
             $table->integer('is_active')->default(1);
-            $table->unsignedBigInteger('faculty_id')->nullable(true);//for does not miss importing data
+            $table->unsignedBigInteger('department_id')->nullable(true);//for does not miss importing data
+            $table->foreign('department_id')->references('id')->on('departments')->onDelete('cascade')->onUpdate('cascade');
+            $table->unsignedBigInteger('faculty_id');//->nullable(true);//for does not miss importing data
             $table->foreign('faculty_id')->references('id')->on('faculties')->onDelete('cascade')->onUpdate('cascade');
             $table->rememberToken();
             $table->timestamps();
