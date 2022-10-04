@@ -75,7 +75,8 @@ class CourseRotationUser_ObjectionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Rotation $rotation){
+    public function edit(Rotation $rotation){        
+        //dd($rotation->coursesObservation()->get());
         $courses_info=[];
         foreach($rotation->coursesProgram as $course){
               $courses_info[$course->pivot->date][$course->studing_year][$course->id]=$course->pivot->time;
