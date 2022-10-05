@@ -1340,12 +1340,11 @@
 
 /@import url("https://fonts.googleapis.com/css?family=Roboto:300,500,700,900");
 body {
-  font-family: 'Roboto', sans-serif;
   background-color: #fcfcfc;
   font-weight: 300;
   color: #333;
 }
-
+*{  font-family: "Simplified Arabic","Times New Roman", "Arial", serif;}
 h1,
 h2,
 h3,

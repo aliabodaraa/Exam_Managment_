@@ -90,7 +90,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
                 Route::get('/{rotation}/show', 'CourseRotation_ExamProgramController@show')->name('rotations.program.show');
                 Route::get('/{rotation}/create', 'CourseRotation_ExamProgramController@add_course_to_the_program')->name('rotations.program.add_course_to_the_program');
                 Route::post('/{rotation}/store', 'CourseRotation_ExamProgramController@store_course_to_the_program')->name('rotations.program.store_course_to_the_program');
-                Route::get('/{rotation}/course/{course}/delete_course_from_program', 'CourseRotation_ExamProgramController@delete_course_from_program')->name('courses.delete_course_from_program');
+                Route::get('/{rotation}/course/{course}/delete_course_from_program', 'CourseRotation_ExamProgramController@delete_course_from_program')->name('rotations.course.delete_course_from_program');
                 //Rotation ExamProgram
                 //Rotation Objections
                 Route::get('/{rotation}/objections/create', 'CourseRotationUser_ObjectionController@create')->name('rotations.objections.create');

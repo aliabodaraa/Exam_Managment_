@@ -34,7 +34,7 @@
                 <table class="table" class='exam-program'>
                 <thead>
                     <tr>
-                        <td align="center" height="100" width="5%" style="padding-left: 60px;"><br>
+                        <td align="center" height="100" width="10%" style="padding-left: 60px;"><br>
                             <b>Day/Period</b></br>
                         </td><div class="vr d-flex"></div>
                         <td align="center" height="100" width="18%">
@@ -59,14 +59,14 @@
                     @php $counter=0; @endphp
                     @foreach($courses_info as $date => $all_years)
                         <tr>
-                            <td class="date" align="center" height="100"  style="padding-left: 60px;">
+                            <td class="date" align="center" height="100">
                                 <input type="checkbox" id="day{{++$counter}}" class="toggler-wrapper style-4"  style="float:right;display: block;
                                 width: 200px;
-                                height: 55px;
+                                height: 40px;
                                 cursor: pointer;
-                                left:-10px;
+                                left:-16px;
                                 position: absolute;" onclick="select_all_courses_in_day({{ $counter }})">
-                                <b style="margin-top:5px">{{ date('l d-m-Y', strtotime($date)) }}</b>
+                                <b style="margin:0 0 0 35px">{{ date('l d-m-Y', strtotime($date)) }}</b>
                             </td>
                             @php 
                                 $counter_one=0;
@@ -122,24 +122,29 @@
                                         @endphp
                                         @if($courseQ)
                                             <td id="course{{ $courseQ->id }}" class="course" align="center" height="100">
-                                                    <input type="checkbox" style="float:right;display: block;    margin-left: -30px;
-                                                    width: 200px;
-                                                    height: 55px;
-                                                    cursor: pointer;
-                                                    position: absolute;"
+                                                <div class="course-name-checkbox-wrapper" style="
+                                                position: relative;
+                                                width: 200px;
+                                                height: 40px;">
+                                                    <input type="checkbox" style="
+                                                        width: 40px;
+                                                        height: 40px;
+                                                        cursor: pointer;
+                                                        position: absolute;
+                                                        left: 10px;"
                                                     name="courses_objections_ids[{{ $courseQ->id }}]"
                                                     value="{{ $courseQ->id }}"
                                                     class='course_in_day{{$counter}} toggler-wrapper style-3'>
 
-                                                <h5 class='course-name' onclick="selectCourseFunction({{ $courseQ->id }})">
-                                                    @php
-                                                        if($courseQ)
-                                                            echo $courseQ->course_name;
-                                                    @endphp
-                                                </h5>
-                                            
+                                                    <h5 class='course-name' onclick="selectCourseFunction({{ $courseQ->id }})">
+                                                        @php
+                                                            if($courseQ)
+                                                                echo $courseQ->course_name;
+                                                        @endphp
+                                                    </h5>
+                                                </div>
                                                 <div class="controll">
-                                                    <span class="badge bg-warning">{{gmdate('H:i A',strtotime($time))}}</span>
+                                                    <span class="badge bg-secondary">{{gmdate('H:i A',strtotime($time))}}</span><span class="badge bg-dark">{{gmdate('H:i A',strtotime($time)+strtotime($rotation->coursesProgram()->where('id',$courseQ->id)->get()[0]->pivot->duration))}}</span>
                                                 </div>
                                             </td>
                                         @endif

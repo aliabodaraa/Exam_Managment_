@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 use App\Models\Rotation;
 use App\Models\Room;
 use App\Models\Course;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Auth;
-
+use App\Http\Controllers\MaxMinRoomsCapacity\Stock;
 class rotationsController extends Controller
 {
+
+
     public function isAvailableRoom($rotation, $course, $room){
 
         $curr_date=Course::with('rotationsProgram')->whereHas('rotationsProgram', function($query) use($course,$rotation){$query->where('course_id',$course->id)->where('rotation_id',$rotation->id);})->first()->rotationsProgram[0]->pivot->date;
@@ -18,67 +18,45 @@ class rotationsController extends Controller
         $curr_duration=Course::with('rotationsProgram')->whereHas('rotationsProgram', function($query) use($course,$rotation){$query->where('course_id',$course->id)->where('rotation_id',$rotation->id);})->first()->rotationsProgram[0]->pivot->duration;
         
         foreach (Course::with('distributionRoom')->whereHas('distributionRoom', function($query) use($room,$rotation){
-        $query->where('room_id',$room->id)->where('rotation_id',$rotation->id);})->get() as $roomM){
-                if((count($rotation->coursesProgram()->wherePivot('date',$curr_date)->wherePivot('time','>=',$curr_time)->wherePivot('time','<=',gmdate('H:i:s',strtotime($curr_time)+strtotime($curr_duration)))->where('id',$roomM->id)->get()->toArray())
-                ||  count($rotation->coursesProgram()->wherePivot('date',$curr_date)->wherePivot('time','<=',$curr_time)->wherePivot('time','>=',gmdate('H:i:s',strtotime($curr_time)-strtotime($curr_duration)))->where('id',$roomM->id)->get()->toArray()))){
-                    dump(Course::with(['rotationsProgram','distributionRoom'])->whereHas('rotationsProgram', function($q)  use($rotation,$roomM){
-                        $q->where('rotation_id',$rotation->id)->whereHas('distributionRoom', function($query) use($roomM){
-                            $query->where('room_id', $roomM->id);
-                        });
-                    })->get());
-                    return false;
-                }
-        }
-        return true;
+        $query->where('room_id',$room->id)->where('rotation_id',$rotation->id);})->get() as $courseM)
+                if((count($rotation->coursesProgram()->wherePivot('date',$curr_date)->wherePivot('time','>=',$curr_time)->wherePivot('time','<=',gmdate('H:i:s',strtotime($curr_time)+strtotime($curr_duration)))->where('id',$courseM->id)->get()->toArray())
+                ||  count($rotation->coursesProgram()->wherePivot('date',$curr_date)->wherePivot('time','<=',$curr_time)->wherePivot('time','>=',gmdate('H:i:s',strtotime($curr_time)-strtotime($curr_duration)))->where('id',$courseM->id)->get()->toArray())))
+                        return false;
+
+                return true;
     }
-
-
-    
+    public function distribute($rotation,$course,$roomBase,$temporory_counter,$temp){
+            if($temporory_counter >= $temp){
+                $temporory_counter-=$temp;
+                $course->distributionRoom()->attach($roomBase->id,['rotation_id'=>$rotation->id,'course_id'=>$course->id,'num_student_in_room'=> $temp]);
+            }else{
+                $course->distributionRoom()->attach($roomBase->id,['rotation_id'=>$rotation->id,'course_id'=>$course->id,'num_student_in_room'=> $temporory_counter]);
+                $temporory_counter=0;
+            }
+        return $temporory_counter;
+    }
     public function distributeStudents(Rotation $rotation){
         foreach ($rotation->coursesProgram as $course) {
             $curr_students_number=Course::with('rotationsProgram')->whereHas('rotationsProgram', function($query) use($course,$rotation){$query->where('course_id',$course->id)->where('rotation_id',$rotation->id);})->first()->rotationsProgram[0]->pivot->students_number;
             $temporory_counter=$curr_students_number;
             $rotation = Rotation::find($rotation->id);
-            //dump($rotation->distributionCourse,$rotation,$curr_students_number);
-            foreach (Room::all() as $roomBase) {
+            foreach (Room::all() as $roomBase)
                 if($this->isAvailableRoom($rotation, $course, $roomBase) && $roomBase->is_active){
-                    if($temporory_counter >= $roomBase->capacity/2){
-                        $temporory_counter-=$roomBase->capacity/2;
-                        $course->distributionRoom()->attach($roomBase->id,['rotation_id'=>$rotation->id,'course_id'=>$course->id,'num_student_in_room'=> $roomBase->capacity/2]);
-                    }else{
-                        $course->distributionRoom()->attach($roomBase->id,['rotation_id'=>$rotation->id,'course_id'=>$course->id,'num_student_in_room'=> $temporory_counter]);
-                        $temporory_counter=0;
-                    }
+                    if($curr_students_number <= Stock::getMinDistribution())//it is garantee that the curr_students_number is less than $this->getMaxDistribution() that is done in the method in controller CourseRotation_ExamProgram/store_course_to_the_program
+                        if(in_array($course->studing_year, [4,5]))
+                            $temporory_counter=$this->distribute($rotation,$course,$roomBase,$temporory_counter,($roomBase->capacity+$roomBase->extra_capacity)/2);
+                        else
+                            $temporory_counter=$this->distribute($rotation,$course,$roomBase,$temporory_counter,$roomBase->capacity);
+                    else
+                        $temporory_counter=$this->distribute($rotation,$course,$roomBase,$temporory_counter,$roomBase->capacity+$roomBase->extra_capacity);
+                        
                     if(!$temporory_counter) break;
                 }
-            }
         }
-        dd(33);
         return redirect("/rotations/$rotation->id/show")
         ->with('message','You have successfully distribute all students to the sutable rooms');
     }
 
-    public function store_add_course_to_program(Request $request,Rotation $rotation){
-        
-        $curr_students_number=Course::with('rotationsProgram')->whereHas('rotationsProgram', function($query) use($course,$rotation){$query->where('course_id',$course->id)->where('rotation_id',$rotation->id);})->first()->rotationsProgram[0]->pivot->students_number;
-        $temporory_counter=$curr_students_number;
-        foreach ($rotation->coursesProgram as $course) {
-            foreach (Room::all() as $roomBase) {
-                if(isAvailableRoom($rotation, $course, $roomBase) && $roomBase->is_active){
-                    if($temporory_counter >= $roomBase->capacity/2){
-                        $temporory_counter-=$roomBase->capacity/2;
-                        $course->distributionRoom()->attach($roomBase->id,['rotation_id'=>$rotation->id,'course_id'=>$course->id,'num_student_in_room'=> $roomBase->capacity/2]);
-                    }else{
-                        $course->distributionRoom()->attach($roomBase->id,['rotation_id'=>$rotation->id,'course_id'=>$course->id,'num_student_in_room'=> $temporory_counter]);
-                        $temporory_counter=0;
-                    }
-                    if(!$temporory_counter) break;
-                }
-            }
-        }
-        return redirect("/rotations/$rotation->id/show")
-        ->with('message','You have successfully distribute all students to the sutable rooms');
-        }
     /**
      * Display a listing of the resource.
      *

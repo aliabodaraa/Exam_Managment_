@@ -4,15 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Rotation;
 use App\Models\Course;
-use App\Models\Department;
-use App\Models\Room;
-use App\Models\Lecture;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
-use Ramsey\Uuid\Type\Integer;
-use Illuminate\Support\Facades\DB;
-
+use App\Http\Controllers\MaxMinRoomsCapacity\Stock;
 class CourseRotation_ExamProgramController extends Controller
 {
     /**
@@ -43,15 +35,16 @@ class CourseRotation_ExamProgramController extends Controller
      */
     public function store_course_to_the_program(Request $request,Rotation $rotation)
     {
-        //dd($request);
-        if($request->course_id =='none')
-            return redirect()->back()
-            ->with('retryEntering',"Please Detemine which course you need to add .");
+        // if($request->course_id =='none')
+        //     return redirect()->back()
+        //     ->with('retryEntering',"Please Detemine which course you need to add .");
+        if((int)$request->students_number > Stock::getMaxDistribution())
+                 return redirect()->back()->with('big_num_of_students',Stock::getMaxDistribution()." لا يمكنك تجاوز السعة العظمى للتخزين في القاعات");
         $selected_course=Course::where('id',$request['course_id'])->first();
         $selected_course->rotationsProgram()->attach($rotation->id,['students_number'=> $request['students_number'],'duration'=> $request['duration'] ,'date'=>$request['date'],'time'=>$request['time']]);
 
         return redirect()->route("rotations.program.show",$rotation->id)
-        ->with('message','You have successfully create a new course to the room Room');
+        ->with('message','تم إضافة '.Course::find($request->course_id)->course_name.' إلى البرنامج ');
     }
 
     /**
@@ -111,7 +104,7 @@ class CourseRotation_ExamProgramController extends Controller
      */
     public function delete_course_from_program(Rotation $rotation, Course $course)
     {
-        $rotation->coursesProgram()->detach($course);
+        $rotation->distributionCourse()->detach($course->id);
         return redirect()->route("rotations.program.show",$rotation->id)
             ->with('user-delete','Course hided successfully.');
     }

@@ -13,7 +13,7 @@
             @endif
             <form method="POST" action="{{route('rotations.distributeStudents',$rotation->id)}}" id="coursesForm">
                 @csrf
-                <button type="submit" class="btn btn-danger float-left me-2 m4-2">توزيع الطلاب على القاعات </button>
+                <button type="submit" class="btn btn-success float-left me-2 m4-2">توزيع الطلاب على القاعات </button>
             </form>
             <b class="text-center" style="margin-left: 381px;">{{ $rotation->faculty->name }} - برنامج امتحان {{ $rotation->name }} - {{ $rotation->year }}</b>
             @if(auth()->user()->id==1)
@@ -134,17 +134,14 @@
                                                         echo $courseQ->course_name;
                                                 @endphp
                                             </h5>
-                                            <div class="controll">
-                                                    <a href="/rotations/{{$rotation->id}}/course/{{$id_course}}/show" class="btn btn-warning btn-sm btn-outline-light rounded">Show</a>
+                                            <div class="controll" style="{{ count($rotation->distributionRoom()->wherePivot('course_id',$courseQ->id)->get()->toArray()) ?'':'display:none' }}">
                                                     @if(auth()->user()->id==1)
-                                                        <a href="/rotations/{{$rotation->id}}/course/{{$id_course}}/edit" class="btn btn-info btn-sm btn-outline-light rounded">Edit</a>
-                                                        <a href="/rotations/{{$rotation->id}}/course/{{$id_course}}/delete_course_from_program" class="btn btn-danger btn-sm btn-outline-light rounded">Delete</a>
+                                                        <a href="{{route('rotations.course.show',['rotation'=>$rotation->id,'course'=>$courseQ->id])}}" class="btn btn-warning btn-sm btn-outline-light rounded">Show</a>
+                                                        <a href="{{route('rotations.course.edit',['rotation'=>$rotation->id,'course'=>$courseQ->id])}}" class="btn btn-info btn-sm btn-outline-light rounded">Edit</a>
+                                                        <a href="{{route('rotations.course.delete_course_from_program',['rotation'=>$rotation->id,'course'=>$id_course])}}" class="btn btn-danger btn-sm btn-outline-light rounded">Delete</a>
                                                     @endif
-                                                {{-- {!! Form::open(['method' => 'DELETE','route' => ['courses.destroy', $id_course],'style'=>'display:inline']) !!}
-                                                {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
-                                                {!! Form::close() !!} --}}
-                                                <span class="badge bg-secondary">{{gmdate('H:i A',strtotime($time))}}</span>
                                             </div>
+                                            <span class="badge bg-secondary">{{gmdate('H:i A',strtotime($time))}}</span>
                                         </td>
                                     @endif
                                 @endforeach

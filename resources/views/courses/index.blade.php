@@ -14,7 +14,7 @@
         @endif
         @if(auth()->user()->id==1)
             <div class="lead">
-                <a href="{{ route('courses.create') }}" class="btn btn-warning float-right mb-4">إضافة قاعة</a>
+                <a href="{{ route('courses.create') }}" class="btn btn-warning float-right mb-4">إضافة مقرر</a>
             </div>
         @endif
         <div class="mt-2">
@@ -24,11 +24,9 @@
         <table class="table table-light">
             <thead>
             <tr>
-                <th scope="col" width="5%">course_name</th>
-                <th scope="col" width="5%">semester</th>
-                <th scope="col" width="10%">faculty</th>
-                <th scope="col" width="5%">duration</th>
-                <th scope="col" width="5%">students_number</th>
+                <th scope="col" width="25%">course_name</th>
+                <th scope="col" width="25%">semester</th>
+                <th scope="col" width="50%">faculty</th>
                 @if(auth()->user()->id==1)<th scope="col" width="10%">Actions</th>@endif
             </tr>
             </thead>
@@ -38,8 +36,6 @@
                             <td>{{ $course->course_name }}</td>
                             <td>{{ $course->semester }}</td>
                             <td>{{ $course->faculty->name }}</td>
-                            <td>{{ $course->duration }}</td>
-                            <td>{{ $course->students_number }}</td>
                             @if(auth()->user()->id==1)
                                 <td style="display:flex;align-items:baseline;">
                                         {{-- <a href="{{ route('courses.edit', $course->id) }}" class="btn btn-info btn-sm me-2 btn-close-white">Edit</a> --}}
