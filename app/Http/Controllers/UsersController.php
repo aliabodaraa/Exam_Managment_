@@ -116,8 +116,8 @@ class UsersController extends Controller
                                     array_push($rotations_numbers,$course->pivot->rotation_id);
                                     array_push($dates_distinct,$course->pivot->date);
                                     array_push($times_distinct,$course->pivot->time);
-                                    $table['observations'][$i]['date']=$course->pivot->date;
-                                    $table['observations'][$i]['time']=$course->pivot->time;
+                                    $table['observations'][$i]['date']=$course->rotationsProgram()->where('id',$rotation->id)->get()[0]->pivot->date;
+                                    $table['observations'][$i]['time']=$course->rotationsProgram()->where('id',$rotation->id)->get()[0]->pivot->time;
                                     $table['observations'][$i]['roleIn']=$course->pivot->roleIn;
                                     $table['observations'][$i]['course_name']=$course->course_name;
                                     $table['observations'][$i]['room_name']=Room::where('id',$course->pivot->room_id)->first()->room_name;

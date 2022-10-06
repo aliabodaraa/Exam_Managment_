@@ -11,7 +11,7 @@
             @auth
                     <li class="<?php if(URL::full()=='http://127.0.0.1:8000/users'){ echo'Active';}else{echo '';}?>"><a href="{{ route('users.index') }}" class="nav-link px-2 text-white">المستخدمين</a></li>
                     <li class="<?php if(URL::full()=='http://127.0.0.1:8000/rooms/index'){ echo'Active';}else{echo '';}?>"><a href="{{ route('rooms.index') }}" class="nav-link px-2 text-white">القاعات</a></li>
-                    <li class="<?php if(URL::full()=='http://127.0.0.1:8000/courses/index'){ echo'Active';}else{echo '';}?>"><a href="{{ route('courses.index') }}" class="nav-link px-2 text-white">المقررات</a></li>
+                    <li class="<?php if(URL::full()=='http://127.0.0.1:8000/courses'){ echo'Active';}else{echo '';}?>"><a href="{{ route('courses.index') }}" class="nav-link px-2 text-white">المقررات</a></li>
                     {{-- <li class="<?php if(URL::full()=='http://127.0.0.1:8000/courses/index'){ echo'Active';}else{echo '';}?>"><a href="{{ route('courses.index') }}" class="nav-link px-2 text-white">البرنامج الامتحاني للدوره الحالية</a></li> --}}
                     <li class="<?php if(URL::full()=='http://127.0.0.1:8000/rotations/index'){ echo'Active';}else{echo '';}?>"><a href="{{ route('rotations.index') }}" class="nav-link px-2 text-white">الدورات الامتحانية</a></li>
             @endauth

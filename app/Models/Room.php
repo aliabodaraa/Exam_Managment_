@@ -30,13 +30,13 @@ class Room extends Model
 
     //assign_users_in_rooms3
     public function courses(){//many to many between Room & Course
-        return $this->belongsToMany('App\Models\Course','course_room_rotation_user')->withPivot('roleIn');
+        return $this->belongsToMany('App\Models\Course','course_room_rotation_user')->withPivot('rotation_id','course_id','room_id','user_id','roleIn');
     }
     public function users(){//many to many between Room & User
-        return $this->belongsToMany('App\Models\User','course_room_rotation_user')->withPivot('roleIn');
+        return $this->belongsToMany('App\Models\User','course_room_rotation_user')->withPivot('rotation_id','course_id','room_id','user_id','roleIn');
     }
     public function rotations(){//many to many between Room & Rotation
-        return $this->belongsToMany('App\Models\Rotation','course_room_rotation_user')->withPivot('roleIn');
+        return $this->belongsToMany('App\Models\Rotation','course_room_rotation_user')->withPivot('rotation_id','course_id','room_id','user_id','roleIn');
     }
     //assign_users_in_rooms3
 

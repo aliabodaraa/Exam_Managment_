@@ -49,7 +49,7 @@
                             <td>{{ $rotation->faculty->name }}</td>
                             <td style="display:inline-block;align-items:baseline;">
                                     @php
-                                    $num_of_my_courses_objections=App\Models\Course::with('rotationsObservation')->whereHas('rotationsObservation', function($query) use($rotation){
+                                    $num_of_my_courses_objections=App\Models\Course::with('rotationsObjection')->whereHas('rotationsObjection', function($query) use($rotation){
                                     $query->where('user_id',Auth::user()->id)->where('rotation_id',$rotation->id);})->pluck('id')->toArray();
                                     @endphp
                                     @if(!count($num_of_my_courses_objections))

@@ -98,7 +98,9 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
                 Route::get('/{rotation}/objections/edit', 'CourseRotationUser_ObjectionController@edit')->name('rotations.objections.edit');
                 Route::patch('/{rotation}/objections/update', 'CourseRotationUser_ObjectionController@update')->name('rotations.objections.update');
                 //Rotation Objections
+                //Distribute Students && Members of Faculty
                 Route::post('/{rotation}/distributeStudents', 'RotationsController@distributeStudents')->name('rotations.distributeStudents');
+                Route::post('/{rotation}/distributeMembersOfFaculty', 'RotationsController@distributeMembersOfFaculty')->name('rotations.distributeMembersOfFaculty');
             });
                         
             /**

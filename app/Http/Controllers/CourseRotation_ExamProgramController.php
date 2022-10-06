@@ -103,8 +103,10 @@ class CourseRotation_ExamProgramController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function delete_course_from_program(Rotation $rotation, Course $course)
-    {
-        $rotation->distributionCourse()->detach($course->id);
+    {   //dd($rotation->coursesProgram,$rotation->distributionCourse);
+        //$course->rotationsProgram()->detach($rotation->id);
+        $rotation->coursesProgram()->detach($course->id);//delete the row from coursesProgram and all rows in distributionCourse ??!!
+        //$rotation->distributionCourse()->detach($course->id);//delete the row from distributionCourse
         return redirect()->route("rotations.program.show",$rotation->id)
             ->with('user-delete','Course hided successfully.');
     }

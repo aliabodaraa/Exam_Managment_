@@ -48,10 +48,11 @@
                     <select class="form-control"
                         name="role" required>
                         <option value="">Select role</option>
-                        <option value="Doctor">Doctor</option>
-                        <option value="Master's student">Master's student</option>
-                        <option value="teacher">teacher</option>
-                        <option value="administrative employee">administrative employee</option>
+                        <option value="Professor">بروفيسور</option>
+                        <option value="Doctor">دكتور</option>
+                        <option value="teacher">مهندس</option>
+                        <option value="Master's student">طالب دراسات</option>
+                        <option value="administrative employee">موظف إداري</option>
                     </select>
                     @if ($errors->has('role'))
                         <span class="text-danger text-left">{{ $errors->first('role') }}</span>

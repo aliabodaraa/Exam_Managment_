@@ -38,12 +38,11 @@
                     <label for="role" class="form-label">Role</label>
                     <select class="form-control" name="role">
                         <option value="">Select role</option>
-                        <option value="Doctor" {{ ($user->role == 'Doctor') ? 'selected': '' }}>Doctor</option>
-                        @if($user->id != 1)
-                            <option value="Master's student" {{ ($user->role == "Master's student") ? 'selected': '' }}>Master's student</option>
-                        @endif
-                        <option value="teacher" {{ ($user->role == "teacher") ? 'selected': '' }}>teacher</option>
-                        <option value="administrative employee" {{ ($user->role == 'administrative employee') ? 'selected': '' }}>administrative employee</option>
+                        <option value="Professor"  {{ ($user->role == 'Professor') ? 'selected': '' }}>بروفيسور</option>
+                        <option value="Doctor" {{ ($user->role == 'Doctor') ? 'selected': '' }}>دكتور</option>
+                        <option value="Master's student" {{ ($user->role == "Master's student") ? 'selected': '' }}>طالب دراسات</option>
+                        <option value="teacher" {{ ($user->role == "Engineer") ? 'selected': '' }}>مهندس</option>
+                        <option value="administrative employee" {{ ($user->role == 'administrative employee') ? 'selected': '' }}> موظف إداري</option>
                     </select>
                     @if ($errors->has('role'))
                         <span class="text-danger text-left">{{ $errors->first('role') }}</span>

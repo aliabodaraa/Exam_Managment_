@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\Rotation;
 use App\Models\Room;
+use App\Models\User;
 use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -10,7 +11,7 @@ use App\Http\Controllers\MaxMinRoomsCapacity\Stock;
 class rotationsController extends Controller
 {
 
-
+//distribute students into rooms
     public function isAvailableRoom($rotation, $course, $room){
 
         $curr_date=Course::with('rotationsProgram')->whereHas('rotationsProgram', function($query) use($course,$rotation){$query->where('course_id',$course->id)->where('rotation_id',$rotation->id);})->first()->rotationsProgram[0]->pivot->date;
@@ -37,9 +38,10 @@ class rotationsController extends Controller
     }
     public function distributeStudents(Rotation $rotation){
         foreach ($rotation->coursesProgram as $course) {
+            $course->distributionRoom()->wherePivot('rotation_id',$rotation->id)->detach();//clear the previous distribution
             $curr_students_number=Course::with('rotationsProgram')->whereHas('rotationsProgram', function($query) use($course,$rotation){$query->where('course_id',$course->id)->where('rotation_id',$rotation->id);})->first()->rotationsProgram[0]->pivot->students_number;
             $temporory_counter=$curr_students_number;
-            $rotation = Rotation::find($rotation->id);
+            $rotation = Rotation::find($rotation->id);//high level we reget it because we modified it in the function isAvailableRoom line 23 24
             foreach (Room::all() as $roomBase)
                 if($this->isAvailableRoom($rotation, $course, $roomBase) && $roomBase->is_active){
                     if($curr_students_number <= Stock::getMinDistribution())//it is garantee that the curr_students_number is less than $this->getMaxDistribution() that is done in the method in controller CourseRotation_ExamProgram/store_course_to_the_program
@@ -56,7 +58,40 @@ class rotationsController extends Controller
         return redirect("/rotations/$rotation->id/show")
         ->with('message','You have successfully distribute all students to the sutable rooms');
     }
+//distribute students into rooms 
+//distributeMembersOfFaculty
+public function current_user_observations($user){
+    return $user->id;
+}
+public function distributeMembersOfFaculty(Rotation $rotation){
+    $distict_arr=[];
+    foreach ($rotation->distributionRoom as $room) {
+        $room->users()->wherePivot('rotation_id',$rotation->id)->detach();//clear the previous distribution
+        $take_three=1;
+        foreach (User::all() as $user){
+            if($take_three == 4) break;
+            if($take_three==1)$cur_roleIn='Room-Head';
+            elseif($take_three==2)$cur_roleIn='Secertary';
+            else $cur_roleIn='Observer';
+            if(!in_array($user->id, $distict_arr) &&( ($user->role!='Doctor' && $take_three != 1) || $user->role=='Doctor' && $take_three == 1 ) ){
+                array_push($distict_arr,$user->id);
+                if( $user->is_active && !$user->temporary_role &&
+                $user->faculty_id == auth()->user()->faculty->id /*&&
+                $user->number_of_observation <= $this->current_user_observations($user)*/ ){
+                                $take_three++;
+                                array_push($distict_arr,$user->id);
+                                $room->users()->attach($user->id,['rotation_id'=>$rotation->id,'course_id'=>$room->pivot->course_id,'roleIn'=>$cur_roleIn]);
+                    } 
+            }
+        }
+    }
+    return redirect("/rotations/$rotation->id/show")
+    ->with('message','You have successfully distribute all Members to the sutable rooms');
+}
 
+
+
+//distributeMembersOfFaculty
     /**
      * Display a listing of the resource.
      *
@@ -64,7 +99,8 @@ class rotationsController extends Controller
      */
 
     public function index()
-    {
+    {//$x=NULL;$x='2000'-'1997';dd($x);
+
         //$has_program=User::with('rooms','rotations')->get();
         //dd($has_program);
         $existing_rotation=Rotation::where('year',date("Y"))->pluck('year','name')->map(function($i){

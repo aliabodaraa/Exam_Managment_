@@ -1,9 +1,9 @@
 @extends('layouts.app-master')
 @section('content')
     <div class="bg-light p-2 rounded">
-        <h1>
+        <h1 style="display: inline-flex;">
             @php
-            $num_of_my_courses_objections=App\Models\Course::with('rotationsObservation')->whereHas('rotationsObservation', function($query) use($rotation){
+            $num_of_my_courses_objections=App\Models\Course::with('rotationsObjection')->whereHas('rotationsObjection', function($query) use($rotation){
                 $query->where('user_id',Auth::user()->id)->where('rotation_id',$rotation->id);})->pluck('id')->toArray();
             @endphp
             @if(!count($num_of_my_courses_objections))
@@ -13,8 +13,14 @@
             @endif
             <form method="POST" action="{{route('rotations.distributeStudents',$rotation->id)}}" id="coursesForm">
                 @csrf
-                <button type="submit" class="btn btn-success float-left me-2 m4-2">توزيع الطلاب على القاعات </button>
+                <button type="submit" class="btn btn-secondary float-left me-2 m4-2">توزيع الطلاب على القاعات </button>
             </form>
+            <form method="POST" action="{{route('rotations.distributeMembersOfFaculty',$rotation->id)}}" id="coursesForm">
+                @csrf
+                <button type="submit" class="btn btn-primary float-left me-2 m4-2">توزيع الأعضاء على القاعات </button>
+            </form>
+        </h1>
+        <h1>
             <b class="text-center" style="margin-left: 381px;">{{ $rotation->faculty->name }} - برنامج امتحان {{ $rotation->name }} - {{ $rotation->year }}</b>
             @if(auth()->user()->id==1)
                 <a href="{{ route('rotations.program.add_course_to_the_program',$rotation->id) }}" class="btn btn-success float-right me-2 m4-2">Add Course</a>

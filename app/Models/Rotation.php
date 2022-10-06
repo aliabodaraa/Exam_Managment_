@@ -32,23 +32,23 @@ class Rotation extends Model
     }
     //distribution_of_students_to_the_rooms2
     //observation2
-    public function usersObservation(){
+    public function usersObjection(){
         return $this->belongsToMany('App\Models\User','course_rotation_user')->withPivot('course_id','user_id','rotation_id');
     }
-    public function coursesObservation(){
+    public function coursesObjection(){
         return $this->belongsToMany('App\Models\Course','course_rotation_user')->withPivot('course_id','user_id','rotation_id');
     }
     //observation2
 
     //assign_users_in_rooms3
     public function users(){//many to many between Rotation & User
-        return $this->belongsToMany('App\Models\User','course_room_rotation_user')->withPivot('course_id','room_id','date','time','roleIn','num_student_in_room');
+        return $this->belongsToMany('App\Models\User','course_room_rotation_user')->withPivot('rotation_id','course_id','room_id','user_id','roleIn');
     }
     public function courses(){//many to many between Rotation & Course
-        return $this->belongsToMany(Course::class,'course_room_rotation_user')->withPivot('user_id','room_id','date','time','roleIn','num_student_in_room','rotation_id');
+        return $this->belongsToMany('App\Models\Course','course_room_rotation_user')->withPivot('rotation_id','course_id','room_id','user_id','roleIn');
     }
     public function rooms(){//many to many between Rotation & Room
-        return $this->belongsToMany(Room::class,'course_room_rotation_user')->withPivot('user_id','course_id','date','time','roleIn','num_student_in_room','rotation_id');
+        return $this->belongsToMany('App\Models\Room','course_room_rotation_user')->withPivot('rotation_id','course_id','room_id','user_id','roleIn');
     }
     //assign_users_in_rooms3
 

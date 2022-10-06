@@ -52,7 +52,7 @@ class CourseRotationUser_ObjectionController extends Controller
     public function store(Request $request, Rotation $rotation){
         //dd($request->get('courses_objections_ids'));
 
-        $rotation->coursesObservation()->attach($request->get('courses_objections_ids'),['user_id'=>Auth::user()->id,'rotation_id'=>$rotation->id]);
+        $rotation->coursesObjection()->attach($request->get('courses_objections_ids'),['user_id'=>Auth::user()->id,'rotation_id'=>$rotation->id]);
 
         return redirect()->route('rotations.index',$rotation->id)
         ->withSuccess(__('objections created successfully.'));
@@ -76,7 +76,7 @@ class CourseRotationUser_ObjectionController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit(Rotation $rotation){        
-        //dd($rotation->coursesObservation()->get());
+        //dd($rotation->coursesObjection()->get());
         $courses_info=[];
         foreach($rotation->coursesProgram as $course){
               $courses_info[$course->pivot->date][$course->studing_year][$course->id]=$course->pivot->time;
@@ -84,7 +84,7 @@ class CourseRotationUser_ObjectionController extends Controller
         }
         ksort($courses_info);
 
-        $courses_objections_ids=Course::with('rotationsObservation')->whereHas('rotationsObservation', function($query) use($rotation){
+        $courses_objections_ids=Course::with('rotationsObjection')->whereHas('rotationsObjection', function($query) use($rotation){
             $query->where('user_id',Auth::user()->id)->where('rotation_id',$rotation->id);})->pluck('id')->toArray();
         //dd($courses_objections_ids);
         return view('Rotations.Objections.edit',compact('courses_info','rotation','courses_objections_ids'));
@@ -99,8 +99,8 @@ class CourseRotationUser_ObjectionController extends Controller
      */
     public function update(Request $request, Rotation $rotation){
 
-        Auth::user()->rotationsObservation()->detach($rotation->id);
-        $rotation->coursesObservation()->attach($request->get('courses_objections_ids'),['user_id'=>Auth::user()->id,'rotation_id'=>$rotation->id]);
+        Auth::user()->rotationsObjection()->detach($rotation->id);
+        $rotation->coursesObjection()->attach($request->get('courses_objections_ids'),['user_id'=>Auth::user()->id,'rotation_id'=>$rotation->id]);
 
         return redirect()->route('rotations.index')->withSuccess(__('objections updated successfully.'));
     }
