@@ -33,7 +33,8 @@ class User extends Authenticatable
         'number_of_observation',
         'temporary_role',
         'is_active',
-        'faculty_id'
+        'faculty_id',
+        'department_id'
     ];
 
     /**

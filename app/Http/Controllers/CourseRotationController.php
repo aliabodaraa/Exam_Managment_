@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Rotation;
 use App\Models\Course;
 use App\Models\Room;
+use App\Models\User;
 use App\Http\Controllers\MaxMinRoomsCapacity\Stock;
 class CourseRotationController extends Controller
 {
@@ -75,6 +76,13 @@ class CourseRotationController extends Controller
         elseif($request->get('observers') == null)
             return redirect()->back()->with('select-members',"عذرا يجب أن تحدد مراقب واحد على الأقل");
 
+
+        //verify roomheads passed - must be Doctors
+        foreach ($request->get('roomheads') as $room_head_user_id) {
+            $room_head_user=User::find($room_head_user_id);
+            if($room_head_user->role != "Doctor")
+                return redirect()->back()->with('select-members',"عذرا رئيس القاعة يجب أن يكون دكتور");
+        }
         if(!in_array($specific_room->id,$rooms_this_course) && !in_array($specific_room->id, $joining_rooms)){//New Room
             //Done
             $course->distributionRoom()->attach($specific_room->id, ['rotation_id'=>$rotation->id,'num_student_in_room'=> $request['num_student_in_room']]);

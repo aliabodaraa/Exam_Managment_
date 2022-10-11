@@ -122,6 +122,20 @@ class Stock extends Controller
     }
     //calc Joining rooms and disabled rooms and courses_common_with_time
 
+    //get common rooms as string
+    public static function getNamesSharedCoursesWithCommonRoom($rotation, $course, $room){
+        $arr_common_names=$course->course_name;
+        $common_course_name_once=[];
+        list($accual_common_rooms_for_specific_course, $common_rooms_ids)=Stock::getAccualCommonRoomsForSpecificRotationCourse($rotation, $course);
+        foreach ($accual_common_rooms_for_specific_course as $course_id => $room_ids_array) {
+            if(array_key_exists($room->id, $accual_common_rooms_for_specific_course[$course_id])){
+                $arr_common_names.=" / ".Course::find($course_id)->course_name;
+                array_push($common_course_name_once, $course_id);
+            }
+        }
+        return array($arr_common_names, $common_course_name_once);
+    }
+
     //calc accual_common_rooms_for_specific_course
     public static function getAccualCommonRoomsForSpecificRotationCourse($rotation, $course){
         $accual_common_rooms_for_specific_course=[];

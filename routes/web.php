@@ -47,6 +47,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
                 Route::patch('/{user}/update', 'UsersController@update')->name('users.update');
                 Route::delete('/{user}/delete', 'UsersController@destroy')->name('users.destroy');
                 Route::patch('/{user}/isActive', 'UsersController@isActive')->name('users.isActive');
+                Route::get('/{user}/profile', 'UsersController@profile')->name('users.profile');
             });
 
             /**

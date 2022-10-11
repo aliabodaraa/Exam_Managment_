@@ -10,6 +10,7 @@ use Spatie\Permission\Models\Role;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use Illuminate\Support\Facades\Response;
+use App\Http\Controllers\MaxMinRoomsCapacity\Stock;
 class UsersController extends Controller
 {
     /**
@@ -23,7 +24,6 @@ class UsersController extends Controller
 
         return view('users.index', compact('users'));
     }
-    
     public function isActive(Request $request, User $user){
         if($user->is_active == true){
             $user->is_active = 0;
@@ -88,6 +88,12 @@ class UsersController extends Controller
             'user' => $user
         ]);
     }
+    public function profile(User $user)
+    {
+        return view('users.profile', [
+            'user' => $user
+        ]);
+    }
     public function observations(User $user)
     {
         $user_name=User::where('id',$user->id)->first()->username;
@@ -95,45 +101,30 @@ class UsersController extends Controller
             $query->where('user_id',$user->id);
         })->get();
 
-        $rotations_numbers=[];
-        $dates_distinct=[];
-        $times_distinct=[];
-
-        //calc rotation for current user
-            foreach($user->rotations as $rotation)
-                array_push($rotations_numbers,$rotation->pivot->rotation_id);
-
-
+        $rotations_numbers=[];$rotations_table=[];
         //calc info for each rotation for current user
-        $rotations_table=[];
-        foreach ($rotations_numbers as $rotation_number) {
-            foreach($user->courses as $course){
-                    $table=[];$i=0;
-                    if($course->pivot->rotation_id == $rotation_number){
-                        if( (!in_array($course->pivot->date,$dates_distinct) && !in_array($course->pivot->time,$times_distinct) ) ||
-                            ( in_array($course->pivot->date,$dates_distinct) && !in_array($course->pivot->time,$times_distinct) ) ||
-                            (!in_array($course->pivot->date,$dates_distinct) &&  in_array($course->pivot->time,$times_distinct) ) ){
-                                    array_push($rotations_numbers,$course->pivot->rotation_id);
-                                    array_push($dates_distinct,$course->pivot->date);
-                                    array_push($times_distinct,$course->pivot->time);
-                                    $table['observations'][$i]['date']=$course->rotationsProgram()->where('id',$rotation->id)->get()[0]->pivot->date;
-                                    $table['observations'][$i]['time']=$course->rotationsProgram()->where('id',$rotation->id)->get()[0]->pivot->time;
-                                    $table['observations'][$i]['roleIn']=$course->pivot->roleIn;
-                                    $table['observations'][$i]['course_name']=$course->course_name;
-                                    $table['observations'][$i]['room_name']=Room::where('id',$course->pivot->room_id)->first()->room_name;
-                                    $i++;
-                                    $rotationInfo=Rotation::where('id',$rotation_number)->first();
-                                    $table['name']=$rotationInfo['name'];
-                                    $table['year']=$rotationInfo['year'];
-                                    $table['start_date']=$rotationInfo['start_date'];
-                                    $table['end_date']=$rotationInfo['end_date'];
-                                    $rotations_table[$rotation_number]=$table;
-                        }
-                }
+        foreach (array_unique($user->rotations->pluck('id')->toArray()) as $rotation_number) {
+            $rotationInfo=Rotation::where('id',$rotation_number)->first();
+            $table=[];
+            $table['name']=$rotationInfo->name;
+            $table['year']=$rotationInfo->year;
+            $table['start_date']=$rotationInfo->start_date;
+            $table['end_date']=$rotationInfo->end_date;
+            array_push($rotations_numbers, $rotation_number);
+            $common_course_name_once=[];
+            foreach($user->courses()->wherePivot('rotation_id',$rotation_number)->get() as $i => $course){
+                if(in_array($course->id, $common_course_name_once)) continue;
+                $table['observations'][$i]['date']=$course->rotationsProgram()->where('id',$rotation_number)->get()[0]->pivot->date;
+                $table['observations'][$i]['time']=$course->rotationsProgram()->where('id',$rotation_number)->get()[0]->pivot->time;
+                $table['observations'][$i]['roleIn']=$course->pivot->roleIn;
+                $room=Room::where('id',$course->pivot->room_id)->first();
+                $table['observations'][$i]['room_name']=Room::where('id',$course->pivot->room_id)->first()->room_name;
+                list($arr_common_names, $get_common_course_name_once)=Stock::getNamesSharedCoursesWithCommonRoom($rotationInfo, $course, $room);
+                $table['observations'][$i]['course_name']=$arr_common_names;
+                $common_course_name_once=array_merge($common_course_name_once, $get_common_course_name_once);
             }
+            $rotations_table[$rotation_number]=$table;
         }
-        //dd($rotations_table);
-
         return view('users.observations', [
             'user_name' => $user_name,
             'rotations_table' => $rotations_table,
