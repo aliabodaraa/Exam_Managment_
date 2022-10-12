@@ -26,6 +26,7 @@ class rotationsController extends Controller
 
                 return true;
     }
+
     public function distribute($rotation,$course,$roomBase,$temporory_counter,$temp){
             if($temporory_counter >= $temp){
                 $temporory_counter-=$temp;
@@ -36,6 +37,7 @@ class rotationsController extends Controller
             }
         return $temporory_counter;
     }
+
     public function distributeStudents(Rotation $rotation){
         foreach ($rotation->coursesProgram as $course) {
             $course->distributionRoom()->wherePivot('rotation_id',$rotation->id)->detach();//clear the previous distribution
@@ -108,7 +110,8 @@ public function distributeMembersOfFaculty(Rotation $rotation){
         })->toArray();
         $count_existing_rotation=count($existing_rotation);
         $rotations = Rotation::orderBy('id','DESC')->get();
-        return view('rotations.index', compact('rotations','count_existing_rotation'));
+        list($all_rotations_table, $observations_number_in_latest_rotation)=Stock::calcInfoForEachRotationForSpecificuser(auth()->user());
+        return view('rotations.index', compact('rotations','count_existing_rotation','observations_number_in_latest_rotation'));
     }
     /**
      * Show the form for creating a new resource.
@@ -117,15 +120,13 @@ public function distributeMembersOfFaculty(Rotation $rotation){
      */
     public function create()
     {
-        $existing_rotation=Rotation::where('year',date("Y"))->pluck('year','name')->map(function($i){
+        $existing_rotation=Rotation::where('year',date("Y"))->pluck(/*'year',*/'name')->map(function($i){
             return $i;
-        })->toArray();//dd($existing_rotation);
-         foreach ($existing_rotation as $key => $value) {
-            // dd($value);
-         }
-        //dd(count($existing_rotation));
-        if(count($existing_rotation)<3)
-            return view('rotations.create',compact('existing_rotation'));
+        })->toArray();
+        $general_rotations=['الدورة الفصلية الأولى','الدورة الفصلية الثانية','الدورة الفصلية الثالثة'];
+        $insertion_enabled_rotation = array_diff($general_rotations, $existing_rotation);
+
+        return view('rotations.create',compact('insertion_enabled_rotation'));
     }
 
     /**

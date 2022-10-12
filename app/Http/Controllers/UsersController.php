@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 use App\Http\Controllers\MaxMinRoomsCapacity\Stock;
 class UsersController extends Controller
@@ -90,45 +91,31 @@ class UsersController extends Controller
     }
     public function profile(User $user)
     {
-        return view('users.profile', [
-            'user' => $user
-        ]);
+        list($all_rotations_table, $observations_number_in_latest_rotation)=Stock::calcInfoForEachRotationForSpecificuser($user);
+        if(array_key_exists(Rotation::latest()->get()[0]->id,$all_rotations_table))
+            return view('users.profile', [
+                'user' => $user,
+                'rotations_in_lastet_rotation_table' => $all_rotations_table[Rotation::latest()->get()[0]->id],
+                'observations_number_in_latest_rotation' => $observations_number_in_latest_rotation
+            ]);
+        else
+            return view('users.profile', [
+                'user' => $user,
+                'rotations_in_lastet_rotation_table' => [],
+                'observations_number_in_latest_rotation' => $observations_number_in_latest_rotation
+            ]);
     }
     public function observations(User $user)
     {
         $user_name=User::where('id',$user->id)->first()->username;
-        $all_courses_rows_for_current_user=User::with('courses')->whereHas('courses',function($query) use($user) {
-            $query->where('user_id',$user->id);
-        })->get();
 
-        $rotations_numbers=[];$rotations_table=[];
-        //calc info for each rotation for current user
-        foreach (array_unique($user->rotations->pluck('id')->toArray()) as $rotation_number) {
-            $rotationInfo=Rotation::where('id',$rotation_number)->first();
-            $table=[];
-            $table['name']=$rotationInfo->name;
-            $table['year']=$rotationInfo->year;
-            $table['start_date']=$rotationInfo->start_date;
-            $table['end_date']=$rotationInfo->end_date;
-            array_push($rotations_numbers, $rotation_number);
-            $common_course_name_once=[];
-            foreach($user->courses()->wherePivot('rotation_id',$rotation_number)->get() as $i => $course){
-                if(in_array($course->id, $common_course_name_once)) continue;
-                $table['observations'][$i]['date']=$course->rotationsProgram()->where('id',$rotation_number)->get()[0]->pivot->date;
-                $table['observations'][$i]['time']=$course->rotationsProgram()->where('id',$rotation_number)->get()[0]->pivot->time;
-                $table['observations'][$i]['roleIn']=$course->pivot->roleIn;
-                $room=Room::where('id',$course->pivot->room_id)->first();
-                $table['observations'][$i]['room_name']=Room::where('id',$course->pivot->room_id)->first()->room_name;
-                list($arr_common_names, $get_common_course_name_once)=Stock::getNamesSharedCoursesWithCommonRoom($rotationInfo, $course, $room);
-                $table['observations'][$i]['course_name']=$arr_common_names;
-                $common_course_name_once=array_merge($common_course_name_once, $get_common_course_name_once);
-            }
-            $rotations_table[$rotation_number]=$table;
-        }
+        list($all_rotations_table, $observations_number_in_latest_rotation)=Stock::calcInfoForEachRotationForSpecificuser($user);
+        //dd( $observations_number_in_latest_rotation);
         return view('users.observations', [
             'user_name' => $user_name,
-            'rotations_table' => $rotations_table,
-            'rotations_numbers' => $rotations_numbers
+            'all_rotations_table' => $all_rotations_table,
+            'rotations_numbers' => array_unique($user->rotations->pluck('id')->toArray()),
+            'observations_number_in_latest_rotation' => $observations_number_in_latest_rotation
         ]);
     }                             
     /**
@@ -156,13 +143,23 @@ class UsersController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(User $user, UpdateUserRequest $request)
-    {//dd($request);
-        //$user->update($request->validated());//take only the column that set require in UpdateUserRequest.php
+    {   //dd(bcrypt($request['old_password'])==$user->password);
+        //dd(Auth::attempt(['email'=>$user->email,'password'=>$request['old_password']]), $request['new_password'] , $request['new_password_verification']);
+        if($request['old_password'] && $request['new_password'] && $request['new_password_verification']){
+            if(Auth::attempt(['email'=>$user->email,'password'=>$request['old_password']])){
+                if($request['new_password'] == $request['new_password_verification']){
+                    $user->update(['password' => $request['new_password']]);
+                }else{
+                return redirect()->back()->with('password-message','incorrect verification password.');
+                }
+            }else{
+                return redirect()->back()->with('password-message','incorrect old password.');
+            }
+        }
         $user->update($request->all());
         //$user->syncRoles($request->get('role'));
 
-        return redirect()->route('users.index')
-            ->withSuccess(__('User updated successfully.'));
+        return redirect()->route('users.index')->withSuccess(__('User updated successfully.'));
     }
 
     /**

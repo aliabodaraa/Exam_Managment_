@@ -25,9 +25,9 @@
                 <div class="mb-3">
                     <label for="name" class="form-label">Rotation Name</label>
                     <select class="form-control" name="name" class="form-control" required>
-                                    <option value='الدورة الفصلية الأولى'>الدورة الفصلية الأولى</option>
-                                    <option value='الدورة الفصلية الثانية'>الدورة الفصلية الثانية</option>
-                                    <option value='الدورة الفصلية الثالة'>الدورة الفصلية الثالثة</option>
+                        @foreach ($insertion_enabled_rotation as $rot)
+                            <option value='{{ $rot }}'>{{ $rot }}</option>
+                        @endforeach
                     </select>
                     @if ($errors->has('name'))
                         <span class="text-danger text-left">{{ $errors->first('name') }}</span>

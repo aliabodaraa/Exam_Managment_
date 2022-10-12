@@ -1,35 +1,53 @@
 @extends('layouts.app-master')
 @section('content')
     <div class="bg-light p-2 rounded">
-        <h1 style="display: inline-flex;">
-            @php
-            $num_of_my_courses_objections=App\Models\Course::with('rotationsObjection')->whereHas('rotationsObjection', function($query) use($rotation){
-                $query->where('user_id',Auth::user()->id)->where('rotation_id',$rotation->id);})->pluck('id')->toArray();
-            @endphp
-            @if(!count($num_of_my_courses_objections))
-                <a href="{{ route('rotations.objections.create',$rotation->id) }}"  class="btn btn-danger float-left me-2 m4-2">إنشاء إعتراضات</a>
+        @if(Auth::user()->id == 1)
+            <h1 style="display: inline-flex;">
+                @php
+                $num_of_my_courses_objections=App\Models\Course::with('rotationsObjection')->whereHas('rotationsObjection', function($query) use($rotation){
+                    $query->where('user_id',Auth::user()->id)->where('rotation_id',$rotation->id);})->pluck('id')->toArray();
+                @endphp
+                @if(!count($num_of_my_courses_objections))
+                    <a href="{{ route('rotations.objections.create',$rotation->id) }}"  class="btn btn-secondary float-left me-2 m4-2">إنشاء إعتراضات</a>
+                @else
+                    <a href="{{ route('rotations.objections.edit',$rotation->id) }}"  class="btn btn-secondary float-left me-2 m4-2">تعديل إعتراضاتي</a>
+                @endif
+                <form method="POST" action="{{route('rotations.distributeStudents',$rotation->id)}}" id="coursesForm">
+                    @csrf
+                    <button type="submit" class="btn btn-secondary float-left me-2 m4-2">توزيع الطلاب على القاعات </button>
+                </form>
+                <form method="POST" action="{{route('rotations.distributeMembersOfFaculty',$rotation->id)}}" id="coursesForm">
+                    @csrf
+                    <button type="submit" class="btn btn-primary float-left me-2 m4-2">توزيع الأعضاء على القاعات </button>
+                </form>
+            </h1>
             @else
-                <a href="{{ route('rotations.objections.edit',$rotation->id) }}"  class="btn btn-danger float-left me-2 m4-2">تعديل إعتراضاتي</a>
-            @endif
-            <form method="POST" action="{{route('rotations.distributeStudents',$rotation->id)}}" id="coursesForm">
-                @csrf
-                <button type="submit" class="btn btn-secondary float-left me-2 m4-2">توزيع الطلاب على القاعات </button>
-            </form>
-            <form method="POST" action="{{route('rotations.distributeMembersOfFaculty',$rotation->id)}}" id="coursesForm">
-                @csrf
-                <button type="submit" class="btn btn-primary float-left me-2 m4-2">توزيع الأعضاء على القاعات </button>
-            </form>
-        </h1>
+            {{-- <h1 style="display: inline-flex;">
+                @php
+                $num_of_my_courses_objections=App\Models\Course::with('rotationsObjection')->whereHas('rotationsObjection', function($query) use($rotation){
+                    $query->where('user_id',Auth::user()->id)->where('rotation_id',$rotation->id);})->pluck('id')->toArray();
+                @endphp
+                @if(!count($num_of_my_courses_objections))
+                    <a href="{{ route('rotations.objections.create',$rotation->id) }}"  class="btn btn-secondary float-left me-2 m4-2">إنشاء إعتراضات</a>
+                @else
+                    <a href="{{ route('rotations.objections.edit',$rotation->id) }}"  class="btn btn-secondary float-left me-2 m4-2">تعديل إعتراضاتي</a>
+                @endif
+            </h1> --}}
+        @endif
         <h1>
             <b class="text-center" style="margin-left: 381px;">{{ $rotation->faculty->name }} - برنامج امتحان {{ $rotation->name }} - {{ $rotation->year }}</b>
-            @if(auth()->user()->id==1)
+            @if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
                 <a href="{{ route('rotations.program.add_course_to_the_program',$rotation->id) }}" class="btn btn-success float-right me-2 m4-2">Add Course</a>
             @endif
         </h1>
-        
+        @if ($createUpdateObjections = Session::get('createUpdateObjections'))
+        <div class="alert alert-success alert-block">
+            <strong>{{ $createUpdateObjections }}</strong>
+        </div>
+        @endif
         {{-- <div class="lead">
             TIME TABLE . 
-                @if(auth()->user()->id==1)
+                @if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
                     <a href="{{ route('rotations.add_course_to_program',$rotation->id) }}" class="btn btn-success float-right me-2 m4-2">Add Course</a>
                 @endif
         </div>--}}
@@ -141,7 +159,7 @@
                                                 @endphp
                                             </h5>
                                             <div class="controll" style="{{ count($rotation->distributionRoom()->wherePivot('course_id',$courseQ->id)->get()->toArray()) ?'':'display:none' }}">
-                                                    @if(auth()->user()->id==1)
+                                                    @if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
                                                         <a href="{{route('rotations.course.show',['rotation'=>$rotation->id,'course'=>$courseQ->id])}}" class="btn btn-warning btn-sm btn-outline-light rounded">Show</a>
                                                         <a href="{{route('rotations.course.edit',['rotation'=>$rotation->id,'course'=>$courseQ->id])}}" class="btn btn-info btn-sm btn-outline-light rounded">Edit</a>
                                                         <a href="{{route('rotations.course.delete_course_from_program',['rotation'=>$rotation->id,'course'=>$id_course])}}" class="btn btn-danger btn-sm btn-outline-light rounded">Delete</a>
@@ -157,15 +175,15 @@
             </tbody>
         </table>
         @else
-        <div class="alert text-black alert-success" role="alert" style="margin-top: 20px;">
-            <h4 class="alert-heading">Sorry<h4>
-            <p>The Program has not any course yet .</p>
-            <hr>
-            <p class="mb-0">Whenever you need to add a new course, click the green button .</p>
-           <h1><a href="{{url()->previous()}}" class="btn btn-secondary"> Back</a></h1>
-           {{-- problem in back --}}
-        </div>
-      @endif
+            <div class="alert text-black alert-success" role="alert" style="margin-top: 20px;">
+                <h4 class="alert-heading">Sorry<h4>
+                <p>The Program has not any course yet .</p>
+                <hr>
+                <p class="mb-0">Whenever you need to add a new course, click the green button .</p>
+            <h1><a href="{{url()->previous()}}" class="btn btn-secondary"> Back</a></h1>
+            {{-- problem in back --}}
+            </div>
+        @endif
       </div>
       {{-- <div class="d-flex">
         {!! $courses->links() !!}

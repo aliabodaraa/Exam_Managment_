@@ -54,8 +54,8 @@ class CourseRotationUser_ObjectionController extends Controller
 
         $rotation->coursesObjection()->attach($request->get('courses_objections_ids'),['user_id'=>Auth::user()->id,'rotation_id'=>$rotation->id]);
 
-        return redirect()->route('rotations.index',$rotation->id)
-        ->withSuccess(__('objections created successfully.'));
+        return redirect()->route('rotations.program.show',$rotation->id)
+        ->with('createUpdateObjections','your objections created successfully.');
     }
 
     /**
@@ -102,7 +102,8 @@ class CourseRotationUser_ObjectionController extends Controller
         Auth::user()->rotationsObjection()->detach($rotation->id);
         $rotation->coursesObjection()->attach($request->get('courses_objections_ids'),['user_id'=>Auth::user()->id,'rotation_id'=>$rotation->id]);
 
-        return redirect()->route('rotations.index')->withSuccess(__('objections updated successfully.'));
+        return redirect()->route('rotations.program.show',$rotation->id)
+        ->with('createUpdateObjections','your objections updated successfully.');
     }
 
     /**

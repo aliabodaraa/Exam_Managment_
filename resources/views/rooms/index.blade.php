@@ -30,7 +30,9 @@
                 <th scope="col" width="10%">faculty</th>
                 <th scope="col" width="15%">location</th>
                 <th scope="col" width="20%">notes</th>
-                @if(auth()->user()->id==1)<th scope="col" width="10%">Actions</th>@endif
+                @if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
+                    <th scope="col" width="10%">Actions</th>
+                @endif
             </tr>
             </thead>
             <tbody>

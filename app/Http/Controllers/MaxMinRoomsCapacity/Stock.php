@@ -5,7 +5,8 @@ namespace App\Http\Controllers\MaxMinRoomsCapacity;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Room;
-use App\Models\course;
+use App\Models\Course;
+use App\Models\Rotation;
 
 class Stock extends Controller
 {
@@ -122,20 +123,6 @@ class Stock extends Controller
     }
     //calc Joining rooms and disabled rooms and courses_common_with_time
 
-    //get common rooms as string
-    public static function getNamesSharedCoursesWithCommonRoom($rotation, $course, $room){
-        $arr_common_names=$course->course_name;
-        $common_course_name_once=[];
-        list($accual_common_rooms_for_specific_course, $common_rooms_ids)=Stock::getAccualCommonRoomsForSpecificRotationCourse($rotation, $course);
-        foreach ($accual_common_rooms_for_specific_course as $course_id => $room_ids_array) {
-            if(array_key_exists($room->id, $accual_common_rooms_for_specific_course[$course_id])){
-                $arr_common_names.=" / ".Course::find($course_id)->course_name;
-                array_push($common_course_name_once, $course_id);
-            }
-        }
-        return array($arr_common_names, $common_course_name_once);
-    }
-
     //calc accual_common_rooms_for_specific_course
     public static function getAccualCommonRoomsForSpecificRotationCourse($rotation, $course){
         $accual_common_rooms_for_specific_course=[];
@@ -160,6 +147,53 @@ class Stock extends Controller
     }
     //calc accual_common_rooms_for_specific_course
 //////////////////edit___________________///////////////////
+
+//////////////////User's observations function___________________///////////////////
+    //get common rooms as string
+    public static function getNamesSharedCoursesWithCommonRoom($rotation, $course, $room){
+        $arr_common_names=$course->course_name;
+        $common_course_name_once=[];
+        list($accual_common_rooms_for_specific_course, $common_rooms_ids)=Stock::getAccualCommonRoomsForSpecificRotationCourse($rotation, $course);
+        foreach ($accual_common_rooms_for_specific_course as $course_id => $room_ids_array) {
+            if(array_key_exists($room->id, $accual_common_rooms_for_specific_course[$course_id])){
+                $arr_common_names.=" / ".Course::find($course_id)->course_name;
+                array_push($common_course_name_once, $course_id);
+            }
+        }
+        return array($arr_common_names, $common_course_name_once);
+    }
+    public static function calcInfoForEachRotationForSpecificuser($user){
+        //$rotations_numbers=[];
+        $all_rotations_table=[];
+        $observations_number_in_latest_rotation=0;
+        //calc info for each rotation for current user
+        foreach (array_unique($user->rotations->pluck('id')->toArray()) as $rotation_id) {
+            $rotationInfo=Rotation::where('id',$rotation_id)->first();
+            $table=[];
+            $table['name']=$rotationInfo->name;
+            $table['year']=$rotationInfo->year;
+            $table['start_date']=$rotationInfo->start_date;
+            $table['end_date']=$rotationInfo->end_date;
+            //array_push($rotations_numbers, $rotation_id);
+            $common_course_name_once=[];
+            foreach($user->courses()->wherePivot('rotation_id',$rotation_id)->get() as $i => $course){
+                if(in_array($course->id, $common_course_name_once)) continue;
+                $table['observations'][$i]['date']=$course->rotationsProgram()->where('id',$rotation_id)->get()[0]->pivot->date;
+                $table['observations'][$i]['time']=$course->rotationsProgram()->where('id',$rotation_id)->get()[0]->pivot->time;
+                $table['observations'][$i]['roleIn']=$course->pivot->roleIn;
+                $room=Room::where('id',$course->pivot->room_id)->first();
+                $table['observations'][$i]['room_name']=Room::where('id',$course->pivot->room_id)->first()->room_name;
+                list($arr_common_names, $get_common_course_name_once)=Stock::getNamesSharedCoursesWithCommonRoom($rotationInfo, $course, $room);
+                $table['observations'][$i]['course_name']=$arr_common_names;
+                $common_course_name_once=array_merge($common_course_name_once, $get_common_course_name_once);
+                if($rotation_id == Rotation::latest()->get()[0]->id)
+                    $observations_number_in_latest_rotation++;
+            }
+            $all_rotations_table[$rotation_id]=$table;
+        }
+        return array($all_rotations_table, $observations_number_in_latest_rotation);
+    }
+//////////////////User's observations function___________________///////////////////
 
 
 //////////////////update///////////////////

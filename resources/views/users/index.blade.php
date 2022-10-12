@@ -89,12 +89,17 @@
                             @endif
                             <td>{{ $user->faculty->name }}</td>
                             <td style="display:flex;align-items:baseline;">
-                                        @if(auth()->user()->id==1)
+                                         @if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
                                             <a href="{{ route('users.observations', $user->id) }}" class="btn btn-info btn-sm me-2 btn-close-white">observations</a>
                                         @endif
-                                        <a href="{{ route('users.show', $user->id) }}" class="btn btn-primary btn-sm me-2">Show</a>
-                                        @if(auth()->user()->id==1) 
-                                            <a href="{{ route('users.edit', $user->id) }}" class="btn btn-info btn-sm me-2">Edit</a>
+                                        <a href="{{ route('users.profile', $user->id) }}" class="btn btn-primary btn-sm me-2">profile</a>
+                                        {{-- <a href="{{ route('users.show', $user->id) }}" class="btn btn-primary btn-sm me-2">Show</a> --}}
+
+                                        @if(Auth::user()->id == $user->id)
+                                        <a href="{{ route('users.edit', $user->id) }}" class="btn btn-info btn-sm me-2">Edit</a>
+                                        @endif
+
+                                         @if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
                                             {!! Form::open(['method' => 'DELETE','route' => ['users.destroy', $user->id],'style'=>'display:inline']) !!}
                                             {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
                                             {!! Form::close() !!}

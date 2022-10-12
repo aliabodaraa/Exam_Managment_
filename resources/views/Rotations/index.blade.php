@@ -6,7 +6,7 @@
             {{-- <div style="float: right;">
                 <a href="{{url()->previous()}}" class="btn btn-dark">Back</a>
             </div> --}}
-            @if(auth()->user()->id==1)
+            @if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
                 <div style="float: right;">
                     <div class="lead">
                         <a href="{{ route('rotations.create') }}" class="btn btn-warning float-right mb-4" style="{{ $count_existing_rotation==3 ?'display: none;':'' }}">إضافة دورة امتحانية</a>
@@ -19,7 +19,7 @@
             <strong>{{ $messageDelete }}</strong>
         </div>
         @endif
-        {{-- @if(auth()->user()->id==1)
+        {{--@if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
             <div class="lead">
                 <a href="{{ route('rotations.create') }}" class="btn btn-warning float-right mb-4">Add new rotation</a>
             </div>
@@ -48,6 +48,7 @@
                             <td>{{ $rotation->end_date }}</td>
                             <td>{{ $rotation->faculty->name }}</td>
                             <td style="display:inline-block;align-items:baseline;">
+                                @if(!$observations_number_in_latest_rotation && auth()->user()->number_of_observation && auth()->user()->is_active  && !auth()->user()->temporary_role)
                                     @php
                                     $num_of_my_courses_objections=App\Models\Course::with('rotationsObjection')->whereHas('rotationsObjection', function($query) use($rotation){
                                     $query->where('user_id',Auth::user()->id)->where('rotation_id',$rotation->id);})->pluck('id')->toArray();
@@ -57,8 +58,9 @@
                                     @else
                                         <a href="{{ route('rotations.objections.edit',$rotation->id) }}"  class="btn btn-secondary btn-sm">تعديل إعتراضاتي</a>
                                     @endif
+                                @endif    
                                     <a href="{{ route('rotations.program.show',$rotation->id) }}" class="btn btn-success btn-sm">البرنامج الامتحاني</a>
-                                    @if(auth()->user()->id==1)
+                                    @if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
                                         <a href="/rotations/{{$rotation->id}}/edit" class="btn btn-info btn-sm btn-close-white">Edit</a>
                                         {!! Form::open(['method' => 'DELETE','route' => ['rotations.destroy', $rotation->id],'style'=>'display:inline']) !!}
                                         {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}

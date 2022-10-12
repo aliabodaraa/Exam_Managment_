@@ -12,7 +12,7 @@
             <strong>{{ $messageDelete }}</strong>
         </div>
         @endif
-        @if(auth()->user()->id==1)
+        @if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
             <div class="lead">
                 <a href="{{ route('courses.create') }}" class="btn btn-warning float-right mb-4">إضافة مقرر</a>
             </div>
@@ -27,7 +27,9 @@
                 <th scope="col" width="25%">course_name</th>
                 <th scope="col" width="25%">semester</th>
                 <th scope="col" width="50%">faculty</th>
-                @if(auth()->user()->id==1)<th scope="col" width="10%">Actions</th>@endif
+                @if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
+                    <th scope="col" width="10%">Actions</th>
+                @endif
             </tr>
             </thead>
             <tbody>
@@ -36,8 +38,8 @@
                             <td>{{ $course->course_name }}</td>
                             <td>{{ $course->semester }}</td>
                             <td>{{ $course->faculty->name }}</td>
-                            @if(auth()->user()->id==1)
-                                <td style="display:flex;align-items:baseline;">
+                            @if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
+                            <td style="display:flex;align-items:baseline;">
                                         {{-- <a href="{{ route('courses.edit', $course->id) }}" class="btn btn-info btn-sm me-2 btn-close-white">Edit</a> --}}
                                         {!! Form::open(['method' => 'DELETE','route' => ['courses.destroy', $course->id],'style'=>'display:inline']) !!}
                                         {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
