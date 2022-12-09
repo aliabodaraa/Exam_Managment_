@@ -9,14 +9,9 @@
                     <a href="{{ URL::previous() }}" class="btn btn-dark">Back</a>
                 </div>
             </h1>
-            <div class="lead">
-                
+            <div class="mt-2">
+                @include('layouts.partials.messages')
             </div>
-            @if ($message = Session::get('retryEntering'))
-                <div class="alert alert-danger alert-block">
-                    <strong>{{ $message }}</strong>
-                </div>
-            @endif
             <form method="POST" action="{{route('rotations.store')}}">
                 @csrf
                 @php

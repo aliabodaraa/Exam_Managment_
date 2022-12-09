@@ -28,21 +28,25 @@ $remaining_places_in_room=$total_capacity-$num_places_occupied_in_this_room;
 @php $num_all_courses_occupied_this_room=0; @endphp
 
 <div class="bg-light rounded">
-        <button id="scroll_buttom_button" style="position: fixed;
+        <button class="scroll_buttom_button" style="position: fixed;
         top: 367px;
         right: 0;
         border-radius: 63px;border: 1px solid #eaeaea;
         width: 63px;
         height: 63px;
-        z-index: 999;">to down</button>
-        <button id="scroll_top_button" style="position: fixed;
+        z-index: 999;">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13l-3 3m0 0l-3-3m3 3V8m0 13a9 9 0 110-18 9 9 0 010 18z"></path></svg>
+        </button>
+        <button class="scroll_top_button" style="position: fixed;
         top: 167px;
         right: 0;
         border-radius: 63px;
         border: 1px solid #eaeaea;
         width: 63px;
         height: 63px;
-        z-index: 999;">to top</button>
+        z-index: 999;">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path></svg>
+        </button>
         <div class="row">
             <div class="col-sm-6 info-room mt-2" style="display: -webkit-inline-box;">
                 <h4><span class="badge bg-secondary">Room Name : {{$specific_room->room_name}}</span></h4>
@@ -119,49 +123,62 @@ $remaining_places_in_room=$total_capacity-$num_places_occupied_in_this_room;
                 </div>
                 {{-- progress --}}
                 {{-- fly code to top --}}
-
         </div>
             <h2 class="m-4"> تعديل القاعة <b>{{$specific_room->room_name}}</b> في مقرر <b>{{$course->course_name}}</b> 
-
                 <div class="" style="float: right;">
                     <a href="{{ URL::previous() }}" class="btn btn-dark">Back</a>
                 </div>
             </h2>
-            @if ($message_select_members = Session::get('select-members'))
-            <div class="alert alert-warning alert-block">
-                <strong>{{ $message_select_members }}</strong>
+            <div class="mt-2">
+                @include('layouts.partials.messages')
             </div>
-            @endif
-                <form method="post" action="/rotations/{{ $rotation->id }}/course/{{ $course->id }}/room/{{ $specific_room->id }}">
+            <form method="post" action="/rotations/{{ $rotation->id }}/course/{{ $course->id }}/room/{{ $specific_room->id }}">
                     @method('patch')
                     @csrf
                     <div class="row m-2">
-                        <div class="col-sm-9">
-                            <label for="num_student_in_room" class="form-label">Number Students In Room <mark>{{$specific_room->room_name}}</mark>  :</label>
-                            <select class="form-control" name="num_student_in_room" class="form-control" required>
-                                @if($occupied_number_of_students_in_this_course_not_in_this_room + $remaining_places_in_room <= $occupied_number_of_students_in_this_course)
-                                    @for ($i = 1; $i <= $remaining_places_in_room; $i++)
-                                        <option value="{{$i}}" {{ ($occupied_number_of_students_in_this_course_in_this_room == $i)?'selected':'' }}>{{$i}}</option>
-                                    @endfor
-                                @else
-                                    @for ($i = 1; $i <= ($entered_students_number - $occupied_number_of_students_in_this_course_not_in_this_room); $i++)
-                                        <option value="{{$i}}" {{ ($occupied_number_of_students_in_this_course_in_this_room == $i)?'selected':'' }}>{{$i}}</option>
-                                    @endfor
+                            <div class="col-sm-9">
+                                <label for="num_student_in_room" class="form-label">Number Students In Room <mark>{{$specific_room->room_name}}</mark>  :</label>
+                                <select class="form-control" name="num_student_in_room" class="form-control" required>
+                                    @if($entered_students_number - ($occupied_number_of_students_in_this_course_not_in_this_room +$occupied_number_of_students_in_this_course_in_this_room) <= $total_capacity)
+
+                                        @if($occupied_number_of_students_in_this_course_in_this_room)
+                                            {{-- <option>11</option> --}}
+                                            @for ($i = 1; $i <= $occupied_number_of_students_in_this_course_in_this_room; $i++)
+                                                <option value="{{$i}}" {{ $occupied_number_of_students_in_this_course_in_this_room == $i ? 'selected':'' }}>{{$i}}</option>
+                                            @endfor
+                                        @else
+                                           {{-- <option>22</option> --}}
+                                            @for ($i = 1; $i <= ($entered_students_number - ($occupied_number_of_students_in_this_course_not_in_this_room +$occupied_number_of_students_in_this_course_in_this_room)); $i++)
+                                                <option value="{{$i}}">{{$i}}</option>
+                                            @endfor
+                                        @endif
+                                    @else
+                                    @if($occupied_number_of_students_in_this_course_in_this_room)
+                                        {{-- <option>111</option> --}}
+                                        @for ($i = 1; $i <= $total_capacity; $i++)
+                                            <option value="{{$i}}" {{ $occupied_number_of_students_in_this_course_in_this_room == $i ? 'selected':'' }}>{{$i}}</option>
+                                        @endfor
+                                    @else
+                                        {{-- <option>222</option> --}}
+                                        @for ($i = 1; $i <= ($total_capacity); $i++)
+                                            <option value="{{$i}}">{{$i}}</option>
+                                        @endfor
+                                    @endif
+                                    @endif
+                                </select>
+                                @if ($errors->has('num_student_in_room'))
+                                    <span class="text-danger text-left">{{ $errors->first('num_student_in_room') }}</span>
                                 @endif
-                            </select>
-                            @if ($errors->has('num_student_in_room'))
-                                <span class="text-danger text-left">{{ $errors->first('num_student_in_room') }}</span>
-                            @endif
-                        </div>
+                            </div>
+
                         <div class="col-sm-3">
                             {{-- That is not related with controller - Only for Js --}}
                             <label for="search_user_name" class="form-label">Search for members :</label>
                             <input class="form-control" 
                             type="text" 
                             id="search_user_name" 
-                            name="search_user_name" 
-                            onkeyup="myFunction(JSON.stringify({{ App\Models\User::all() }}))" placeholder="Serarch Users">
-                           </div>
+                            onkeyup="searchForUserName(JSON.stringify({{ App\Models\User::all() }}))" placeholder="Serarch Users">
+                        </div>
                     </div>
   
                     <label for="members" class="form-label" style="margin-left:16px;margin-top:16px">members :</label>
@@ -270,404 +287,8 @@ $remaining_places_in_room=$total_capacity-$num_places_occupied_in_this_room;
                     <button type="submit" class="btn btn-dark" {{ (!$occupied_number_of_students_in_this_course_in_this_room && $specific_room->capacity == $occupied_number_of_students_in_this_room_in_all_common_courses) ? 'disabled' : '' }}>Update Course</button>
                     <a href="{{ URL::previous() }}" class="btn btn-default">Cancel</a>
                 </div>
-            </form>
-            <div class="no-results" style="display:none;">No results!</div>
+        </form>
+        <div class="no-results" style="display:none;">No results!</div>
                                 
 </div>
-@endsection
-@section('scripts')
-<script type="text/javascript">
-    $(document).ready(function() {
-        $('[name="all_roomheads"]').on('click', function() {
-
-            if($(this).is(':checked')) {
-                $.each($('.roomheads'), function() {
-                    if (!this.disabled)
-                        $(this).prop('checked',true);
-                });
-            } else {
-                $.each($('.roomheads'), function() {
-                    $(this).prop('checked',false);
-                });
-            }
-
-        });
-        $('[name="all_secertaries"]').on('click', function() {
-            if($(this).is(':checked')) {
-                $.each($('.secertaries'), function() {
-                    if (!this.disabled)
-                            $(this).prop('checked',true);
-                });
-            } else {
-                $.each($('.secertaries'), function() {
-                    $(this).prop('checked',false);
-                });
-            }
-            });
-            $('[name="all_observers"]').on('click', function() {
-
-            if($(this).is(':checked')) {
-                $.each($('.observers'), function() {
-                    if (!this.disabled)
-                            $(this).prop('checked',true);
-                });
-            } else {
-                $.each($('.observers'), function() {
-                    $(this).prop('checked',false);
-                });
-            }
-        });
-
-        //calc number of secertaries that checked
-        let number_of_secertaries_that_checked=0;
-        let number_of_secertaries_that_not_checked=0;
-
-        let number_of_observers_that_checked=0;
-        let number_of_roomheads_that_checked=0;
-        $(".secertaries").each(function(){
-            if($(this).is(':checked'))
-                number_of_secertaries_that_checked++;
-            else
-                number_of_secertaries_that_not_checked++;
-        });
-
-        if(number_of_secertaries_that_checked>=2){
-                $(".secertaries").each(function(){
-                    if(!$(this).is(':checked'))
-                        $(this).prop('disabled',true);
-                });
-            }else{
-                $(".secertaries").each(function(){
-                    if(!$(this).is(':checked')&& !$(this).prev().prev().prop('disabled') && !$(this).next().next().prop('disabled'))
-                        $(this).prop('disabled',false);
-                });
-            }
-
-
-        console.log(number_of_secertaries_that_checked,number_of_secertaries_that_not_checked);  
-        $(".observers").each(function(){
-            if($(this).is(':checked'))
-            number_of_observers_that_checked++;
-        });
-        $(".roomheads").each(function(){
-            if($(this).is(':checked'))
-            number_of_roomheads_that_checked++;
-        });
-
-                
-            $('#num_roomHeads').text(`${number_of_roomheads_that_checked} roomHeads`);
-            $('#num_secertaries').text(`${number_of_secertaries_that_checked} secertaries`);
-            $('#num_observers').text(`${number_of_observers_that_checked} observers`)
-        
-        //prevent two checkboxes or more clicked in the same row
-        $(".roomheads").on( 'click', function () {
-            if($(this).is(':checked')){
-                number_of_roomheads_that_checked=1;
-                //prevent take more than one Room-Head in the same column
-                $.each($('.roomheads'), function() {
-                    if (!this.disabled)
-                        $(this).prop('checked',false);
-                });
-                //end prevent
-                if($(this).next().next().next().next().prop('checked')){
-                    number_of_observers_that_checked--;
-                    $(this).next().next().next().next().prop('checked',false);
-                }
-                //$(this).next().next().prop('checked',false);
-                $(this).prop('checked',true);
-                if($(this).next().next().prop('checked')){
-                    $(this).next().next().prop('checked',false);
-                    number_of_secertaries_that_not_checked++;
-                    number_of_secertaries_that_checked--;
-                    //when you swich betwen secertary to observer in the same person
-                    if(number_of_secertaries_that_checked>=2){
-                        $(".secertaries").each(function(){
-                            if(!$(this).is(':checked'))
-                                $(this).prop('disabled',true);
-                        });
-                    }else{
-                        $(".secertaries").each(function(){
-                            if(!$(this).is(':checked')&& !$(this).prev().prev().prop('disabled') && !$(this).next().next().prop('disabled'))
-                                $(this).prop('disabled',false);
-                        });
-                    }
-                }
-            }else{
-                number_of_roomheads_that_checked--;
-            }
-            //number_of_roomheads_that_checked++;
-            if(number_of_roomheads_that_checked ==1){
-                $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
-            }else if(number_of_roomheads_that_checked ==0){
-                $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_danger" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 30px;height: 30px;">`);
-            }
-            if(number_of_secertaries_that_checked ==2){
-                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
-            }else if(number_of_secertaries_that_checked ==0){
-                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_danger" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 30px;height: 30px;">`);
-            }else{
-                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="success" style="width: 30px;height: 30px;">`);
-            }
-            if(number_of_observers_that_checked >=2){
-                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
-            }else if(number_of_observers_that_checked ==0){
-                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_danger" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 30px;height: 30px;">`);
-            }else{
-                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="success" style="width: 30px;height: 30px;">`);
-            }
-        });
-
-
-
-        //let x=0;
-        $(".secertaries").on( 'click', function () {
-            if($(this).is(':checked') && $(this).next().next().prop('checked')){
-                number_of_observers_that_checked--;
-            }
-            if($(this).is(':checked') && $(this).prev().prev().prop('checked')){
-                number_of_roomheads_that_checked--;
-            }
-            if($(this).is(':checked') && number_of_secertaries_that_checked < 2){
-                // if($(this).next().next().prop('checked')){
-                //     number_of_observers_that_checked--;
-                // }else if($(this).prev().prev().prop('checked')){
-                //     number_of_roomheads_that_checked--;
-                // }
-                $(this).prev().prev().prop('checked',false);
-                $(this).next().next().prop('checked',false);
-                $(this).prop('checked',true);
-                number_of_secertaries_that_checked++;
-                number_of_secertaries_that_not_checked--;
-                console.log('err1');
-            }else if($(this).is(':checked') && number_of_secertaries_that_checked >= 2){
-                $(this).prev().prev().prop('checked',false);
-                $(this).next().next().prop('checked',false);
-                $(this).prop('checked',true);
-                number_of_secertaries_that_checked++;
-                number_of_secertaries_that_not_checked--;console.log('err2');
-            }else if(!$(this).is(':checked') && number_of_secertaries_that_checked < 2){
-                number_of_secertaries_that_checked--;
-                number_of_secertaries_that_not_checked++;console.log('err3');
-            }else{
-                //$(this).prop('checked',false);
-                number_of_secertaries_that_not_checked++;
-                number_of_secertaries_that_checked--;console.log('err4');
-            }
-            console.log(number_of_secertaries_that_checked,number_of_secertaries_that_not_checked);
-            if(number_of_secertaries_that_checked>=2){
-                $(".secertaries").each(function(){
-                    if(!$(this).is(':checked'))
-                        $(this).prop('disabled',true);
-                });
-            }else{
-                $(".secertaries").each(function(){
-                    if(!$(this).is(':checked')&& !$(this).prev().prev().prop('disabled') && !$(this).next().next().prop('disabled'))
-                        $(this).prop('disabled',false);
-                });
-            }
-            if(number_of_roomheads_that_checked ==1){
-                $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
-            }else if(number_of_roomheads_that_checked ==0){
-                $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_danger" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 30px;height: 30px;">`);
-            }
-            if(number_of_secertaries_that_checked ==2){
-                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
-            }else if(number_of_secertaries_that_checked ==0){
-                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_danger" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 30px;height: 30px;">`);
-            }else{
-                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="success" style="width: 30px;height: 30px;">`);
-            }
-            if(number_of_observers_that_checked >=2){
-                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
-            }else if(number_of_observers_that_checked ==0){
-                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_danger" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 30px;height: 30px;">`);
-            }else{
-                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="success" style="width: 30px;height: 30px;">`);
-            }
-        });
-        $(".observers").on( 'click', function () {
-            if($(this).is(':checked')){
-                number_of_observers_that_checked++;
-                if($(this).prev().prev().prop('checked')){
-                    $(this).prev().prev().prop('checked',false);
-                    number_of_secertaries_that_not_checked++;
-                    number_of_secertaries_that_checked--;
-                    //when you swich betwen secertary to observer in the same person
-                    if(number_of_secertaries_that_checked>=2){
-                    $(".secertaries").each(function(){
-                        if(!$(this).is(':checked'))
-                            $(this).prop('disabled',true);
-                    });
-                    }else{
-                        $(".secertaries").each(function(){
-                            if(!$(this).is(':checked')&& !$(this).prev().prev().prop('disabled') && !$(this).next().next().prop('disabled'))
-                                $(this).prop('disabled',false);
-                        });
-                    }
-                }else if($(this).prev().prev().prev().prev().prop('checked')){
-                    $(this).prev().prev().prev().prev().prop('checked',false);
-                        number_of_roomheads_that_checked--;
-                }
-            }else if(!$(this).is(':checked')){
-                number_of_observers_that_checked--;
-            }
-            if(number_of_roomheads_that_checked ==1){
-                $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
-            }else if(number_of_roomheads_that_checked ==0){
-                $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_danger" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 30px;height: 30px;">`);
-            }
-            if(number_of_secertaries_that_checked ==2){
-                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
-            }else if(number_of_secertaries_that_checked ==0){
-                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_danger" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 30px;height: 30px;">`);
-            }else{
-                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="success" style="width: 30px;height: 30px;">`);
-            }
-            if(number_of_observers_that_checked >=2){
-                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
-            }else if(number_of_observers_that_checked ==0){
-                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_danger" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 30px;height: 30px;">`);
-            }else{
-                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="success" style="width: 30px;height: 30px;">`);
-            }
-        });
-         let num_observers=`<h6><span class="badge bg-dark">${number_of_observers_that_checked}</span></h6>`;
-         let num_secertaries=`<h6><span class="badge bg-dark">${number_of_secertaries_that_checked}</span></h6>`;
-        // var $newdiv1 = $( `<div id='yy'>${num-observers}</div>` );
-        // $( "span" ).append($newdiv1);
-        // $('.rounded').prepend(`<span> I have been appended ${num_observers}</span>`);
-        // $('.rounded').prepend(`<span> I have been appended ${num_secertaries}</span>`);
-        // let i=0;
-        // const timer=setInterval(()=>{
-        // ++i;
-        // if(i === 1000){
-        // clearInterval(timer);
-        // }
-        // $('.rounded').prepend(`<span>${num_observers}</span>`);
-        // $('.rounded').prepend(`<span>${num_secertaries}</span>`);
-        // },200);
-        if(number_of_roomheads_that_checked ==1){
-                $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
-            }else if(number_of_roomheads_that_checked ==0){
-                $('#num_roomHeads').html(`${number_of_roomheads_that_checked} roomHeads <img id="img_danger" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 30px;height: 30px;">`);
-            }
-            if(number_of_secertaries_that_checked ==2){
-                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
-            }else if(number_of_secertaries_that_checked ==0){
-                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_danger" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 30px;height: 30px;">`);
-            }else{
-                $('#num_secertaries').html(`${number_of_secertaries_that_checked} secertaries <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="success" style="width: 30px;height: 30px;">`);
-            }
-            if(number_of_observers_that_checked >=2){
-                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_success" src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 30px;height: 30px;">`);
-            }else if(number_of_observers_that_checked ==0){
-                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_danger" src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 30px;height: 30px;">`);
-            }else{
-                $('#num_observers').html(`${number_of_observers_that_checked} observers <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="success" style="width: 30px;height: 30px;">`);
-            }
-            
-
-
-
-
-
-    //Filtering Start
-            myFunction=(x)=>{
-                let users=JSON.parse(x);
-                $(".user").hide();
-                jQuery.each(users, function(id) {
-                    if (users[id]["username"].indexOf($('#search_user_name').val()) > -1 )
-                        $("#"+users[id]["id"]).show();
-                });
-            }
-    //Filtering End
-
-    });
-
-
-
-
-    
-</script>
-{{-- progress js --}}
-<script type="text/javascript">
-    $(function() {
-    
-    $(".progress").each(function() {
-    
-      var value = $(this).attr('data-value');
-      var left = $(this).find('.progress-left .progress-bar');
-      var right = $(this).find('.progress-right .progress-bar');
-    
-      if (value > 0) {
-        if (value <= 50) {
-          right.css('transform', 'rotate(' + percentageToDegrees(value) + 'deg)')
-        } else {
-          right.css('transform', 'rotate(180deg)')
-          left.css('transform', 'rotate(' + percentageToDegrees(value - 50) + 'deg)')
-        }
-      }
-    
-    })
-    
-    function percentageToDegrees(percentage) {
-    
-      return percentage / 100 * 360
-    
-    }
-         //increase slowly
-         progress_remaining_to_full = parseInt($("#progress_remaining_to_full").text());
-         //console.log(typeof(progress_remaining_to_full))
-         var i=0;
-         const timer1=setInterval(()=>{
-            i+=1;
-            $("#progress_value").text(i);
-            if(i == 100-progress_remaining_to_full){
-            clearInterval(timer1);
-            }
-         },30);
-
-                  //increase slowly
-                  progress_remaining_to_full = parseInt($("#progress_remaining_to_full").text());
-         //console.log(typeof(progress_remaining_to_full))
-         var k=0;
-         const timer3=setInterval(()=>{
-            var value = $("#progress_line").attr('data-value');console.log(value)
-            var left = $("#progress_line").find('.progress-left .progress-bar');
-            var right = $("#progress_line").find('.progress-right .progress-bar');
-            left.css('transform', 'rotate(0deg)')
-            k+=1;
-            if (k > 0) {
-                if (k <= 50) {
-                right.css('transform', 'rotate(' + percentageToDegrees(k) + 'deg)')
-                } else {
-                //right.css('transform', `rotate(180deg)`)
-                left.css('transform', 'rotate(' + percentageToDegrees(k+50) + 'deg)')
-                }
-            }
-            if(k == value){
-                clearInterval(timer3);
-            }
-         },30);
-    });
-
-
-    $("#scroll_top_button").hide();
-    //Scroll to the bottom
-    $("#scroll_buttom_button").click(function() {
-        $("html, body").animate({
-        scrollTop: $('html, body').get(0).scrollHeight
-        }, 200);
-        $("#scroll_buttom_button").fadeOut(1000);
-        $("#scroll_top_button").fadeIn(1000);
-    });
-    //Scroll to the top
-    $("#scroll_top_button").click(function() {
-        $('html, body').animate({
-            scrollTop: $(window).get(0).top
-        }, 200);
-        $("#scroll_top_button").fadeOut(1000);
-        $("#scroll_buttom_button").fadeIn(1000);
-    });
-    </script>
 @endsection

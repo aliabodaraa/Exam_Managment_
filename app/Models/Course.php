@@ -18,6 +18,12 @@ class Course extends Model
         'faculty_id'
     ];
 
+    public function TeachesBy(){
+        return $this->belongsToMany('App\Models\User','course_teacher')->withPivot('course_id','user_id','section_type');
+        //->where('role','Doctor')->orWhere('role','Engineer');
+    }
+
+
     //program1
     public function rotationsProgram(){//1
         return $this->belongsToMany('App\Models\Rotation','course_rotation')->withPivot('course_id','rotation_id','date','time','students_number','duration');
@@ -25,10 +31,10 @@ class Course extends Model
     //program1
     //observation2
     public function rotationsObjection(){//many to many between course & rotation & user
-        return $this->belongsToMany('App\Models\Rotation','course_rotation_user')->withPivot('course_id','user_id','rotation_id');
+        return $this->belongsToMany('App\Models\Rotation','course_rotation_user')->withPivot('course_id','user_id','rotation_id')->withTimestamps();
     }
     public function usersObjection(){//many to many between course & rotation & user
-        return $this->belongsToMany('App\Models\User','course_rotation_user')->withPivot('course_id','user_id','rotation_id');
+        return $this->belongsToMany('App\Models\User','course_rotation_user')->withPivot('course_id','user_id','rotation_id')->withTimestamps();
     }
     //observation2
     //distribution_of_students_to_the_rooms2

@@ -2,9 +2,11 @@
 
 @section('content')
     <div class="bg-light p-4 rounded">
-
         <h1>
             Update Course
+            @if($occupied_number_of_students_in_this_course === $entered_students_number)
+                <span class="badge bg-danger">Course Full</span>
+            @endif
             <div class="float-right">
                 <a href="{{ URL::previous() }}" class="btn btn-dark">Back</a>
             </div>
@@ -19,28 +21,20 @@
                 <strong>{{ $message_update_course_room }}</strong>
             </div>
             @endif
-            @if ($ss = Session::get('disabled_rooms'))
-                <!-- when you submit -->
-                @foreach (array_unique($disabled_common_rooms_send) as $itemArr)
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <strong>{{$ss}}Stop trying to submit The<b>@php $room_name=App\Models\Room::where('id',$itemArr)->first();echo $room_name->room_name; @endphp</b>reserves now in anothor course it will free after now for this reason either Un-checked the room Or make both courses in the same time</strong>
-                        <button type="button" class="btn-close mt-1" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endforeach
-            {{-- @elseif($disabled_common_rooms_send)
-                <!-- when you go to edit page -->
-                @foreach (array_unique($disabled_common_rooms_send) as $itemArr)
-                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                        <strong>The<b>@php $room_name=App\Models\Room::where('id',$itemArr)->first();echo $room_name->room_name; @endphp</b>reserves now in anothor course it will free after now for this reason either Un-checked the room Or make both courses in the same time</strong>
-                        <button type="button" class="btn-close mt-1" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endforeach --}}
-            @endif
-            @if ($message_detemine_rooms = Session::get('detemine-rooms'))
-            <div class="alert alert-success alert-block">
-                <strong>{{ $message_detemine_rooms }}</strong>
+            {{-- What this --}}
+                @if ($ss = Session::get('disabled_rooms'))
+                    <!-- when you submit -->
+                    @foreach (array_unique($disabled_common_rooms_send) as $itemArr)
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>{{$ss}}Stop trying to submit The<b>@php $room_name=App\Models\Room::where('id',$itemArr)->first();echo $room_name->room_name; @endphp</b>reserves now in anothor course it will free after now for this reason either Un-checked the room Or make both courses in the same time</strong>
+                            <button type="button" class="btn-close mt-1" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endforeach
+                @endif
+            {{-- What this --}}
+            <div class="mt-2">
+                @include('layouts.partials.messages')
             </div>
-            @endif
             <form method="post" action="/rotations/{{$rotation->id}}/course/{{$course->id}}/update">
                 @method('patch')
                 @csrf
@@ -135,11 +129,16 @@
                         overflow: scroll;">
                             <table class="table table-light">
                                 <thead>
-                                    <th scope="col" width="1%"><input type="checkbox" name="all_rooms" class="toggler-wrapper style-4"></th>
+                                    <th scope="col" width="1%">
+                                        <input type="checkbox" name="all_rooms" class="toggler-wrapper style-4"
+                                        {{$occupied_number_of_students_in_this_course === $entered_students_number ? 'disabled': '' }}
+                                        >
+                                    </th>
                                     <th scope="col" width="9%">Rooms</th>
                                     <th scope="col" width="20%">common with</th>
                                     <th scope="col" width="10%">Capacity/Occupied</th>
                                     <th scope="col" width="10%">status</th>
+                                    <th scope="col" width="10%">number of members</th>
                                     <th scope="col" width="30%">Action</th>
                                     {{-- @if($disabled_common_rooms_send)
                                     <th scope="col" width="20%">Warrning Message</th>
@@ -147,26 +146,26 @@
                                 </thead>
                                 @php $num_all_courses_occupied_in_all_rooms=0; @endphp
                                 @foreach(App\Models\Room::all() as $room)
-                                    {{-- info rooms --}}
-
-                                    {{-- info rooms --}}
                                     <tr style="position: relative;top:-1px;">
                                         <td>
                                         {{-- <label class="toggler-wrapper style-4"> --}}
-                                            <input type="checkbox"
-                                            name="rooms[{{ $room->id }}]"
-                                            value="{{ $room->id }}"
-                                            class='rooms toggler-wrapper style-4'
-                                            {{ in_array($room->id, array_unique($rooms_this_course))
-                                                ? 'checked'
-                                                : '' }}
-                                            {{ (in_array($room->id, array_unique($disabled_rooms)) &&
-                                            ! in_array($room->id, array_unique($common_rooms_ids)))
-                                                ? 'disabled'
-                                                : '' }}
-                                                    <div class="toggler-slider">
-                                                        <div class="toggler-knob"></div>
-                                                    </div>
+                                            @if($room->is_active)
+                                                <input type="checkbox"
+                                                name="rooms[{{ $room->id }}]"
+                                                value="{{ $room->id }}"
+                                                class='rooms toggler-wrapper style-4'
+                                                {{ in_array($room->id, array_unique($rooms_this_course))
+                                                    ? 'checked'
+                                                    : '' }}
+                                                {{ (in_array($room->id, array_unique($disabled_rooms)) &&
+                                                ! in_array($room->id, array_unique($common_rooms_ids)))
+                                                    ? 'disabled'
+                                                    : '' }}
+                                                {{(!in_array($room->id, array_unique($rooms_this_course)) && ! in_array($room->id, array_unique($common_rooms_ids)) && $occupied_number_of_students_in_this_course === $entered_students_number)? 'disabled': '' }}
+                                                >
+                                            @else
+                                                <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="danger" style="margin-left:10px; width: 25px;height: 25px;">
+                                            @endif
                                         </td>
                                         <td>{{ $room->room_name }}</td>
                                          @php 
@@ -219,15 +218,25 @@
                                             @endif
                                         </td>
                                         <td>
+                                            @php
+                                                $num_members_in_room=count($course->users()->wherePivot('rotation_id',$rotation->id)->wherePivot('room_id',$room->id)->get());
+                                            @endphp
+                                            @if(in_array($room->id, array_unique($rooms_this_course)))
+                                            <span class="badge bg-{{($num_members_in_room)? 'success':'warning' }}">
+                                                {{ $num_members_in_room }} {{ Str::plural("person",$num_members_in_room)}}
+                                            </span>
+                                            @endif
+                                        </td>
+                                        <td>
                                             @if(in_array($room->id, array_unique($joining_rooms))) 
                                             {{-- count_taken_student_in_all_rooms_in_this_course--}}
-                                                    <a href="/rotations/{{ $rotation->id }}/course/{{ $course->id }}/room/{{ $room->id }}" class="btn btn-warning" style="
-                                                    {{true ? '':'pointer-events: none;background-color: #ffc10773;border-color: #ffc10773;'}}
+                                                    <a href="/rotations/{{ $rotation->id }}/course/{{ $course->id }}/room/{{ $room->id }}" class="btn-sm btn btn-warning" style="
+                                                    {{  ($occupied_number_of_students_in_this_course === $entered_students_number) ? 'pointer-events: none;background-color: #ffc10773;border-color: #ffc10773;':''}}
                                                     ">
                                                             Joining
                                                     </a>
                                             @endif
-                                            <a href="/rotations/{{ $rotation->id }}/course/{{ $course->id }}/room/{{ $room->id }}" class="btn @php echo (in_array($room->id,array_unique($common_rooms_ids)))? 'btn-success':'btn-danger'; @endphp"
+                                            <a href="/rotations/{{ $rotation->id }}/course/{{ $course->id }}/room/{{ $room->id }}" class="btn-sm btn @php echo (in_array($room->id,array_unique($common_rooms_ids)))? 'btn-success':'btn-danger'; @endphp"
                                                 {{-- /{{ route('courses.get_room_for_course', ['rotation'=>$rotation->id,'course'=>$course->id,'specific_room'=>$room->id]) }} --}}
                                             style="{{ (!in_array($room->id, array_unique($common_rooms_ids))&& in_array($room->id,$disabled_common_rooms_send)) ? 'pointer-events: none;background-color:#999' : '' }} ;display:none;">{{(in_array($room->id,array_unique($common_rooms_ids))) ?'Manage':'specify members'}}
                                             </a>
@@ -246,9 +255,9 @@
                                    position: absolute;
                                    padding: 2px 25px 2px 2px;
                                    z-index: 9;
-                                   right: 40%;
+                                   right: 20%;
                                    height: 90px;
-                                   top: 100px;">
+                                   top: 90px;">
                                         {{-- <h2 class="h6 font-weight-bold text-center">{{ $course->course_name }} progress</h2> --}}
                                        <!-- Progress bar 1 -->
                                        <div id="progress_line" class="col-sm-3 progress mx-1 mt-2" data-value='{{number_format((int)(($occupied_number_of_students_in_this_course/$entered_students_number)*100), 0, '.', '')}}'>
@@ -263,7 +272,6 @@
                                            </div>
                                        </div>
                                        <!-- END -->
-                                   
                                        <!-- Demo info -->
                                        <div class="col-sm-8">
                                            <div class="row text-center mt-3">
@@ -293,109 +301,4 @@
         </div>
 
     </div>
-@endsection
-@section('scripts')
-    <script type="text/javascript">
-           $(document).ready(function() {
-            //show button when rendering the page
-                $.each($(".rooms"), function() {
-                    if($(this).is(':checked'))
-                        $(this).parent().siblings().last().children(":last-child").css({'display': 'initial'});
-                });
-
-                $('[name="all_rooms"]').on('click', function() {
-                if($(this).is(':checked')) {
-                    $.each($('.rooms'), function() {
-                        if (!this.disabled)
-                            $(this).prop('checked',true);
-                    });
-                } else {
-                    $.each($('.rooms'), function() {
-                        $(this).prop('checked',false);
-                    });
-                }
-            });
-            //show the button when ckick the checkbox
-            $(".rooms").on( 'click', function () {
-                    //$(this).parent().siblings().last().css('backgroundColor', 'red');
-                    if($(this).is(':checked')){
-                        $.each($(this), function() {
-                            $(this).parent().siblings().last().children(":last-child").css({'display': 'initial'});
-                            $(this).parent().siblings().next().children(".common-courses").css({'display': 'initial'});
-                            });
-                    } else {
-                        $.each($(this), function() {
-                            $(this).parent().siblings().last().children(":last-child").css({'display': 'none'});
-                            $(this).parent().siblings().next().children(".common-courses").css({'display': 'none'});
-                        });
-                    }
-            });
-        });
-    </script>
-
-
-{{-- progress js --}}
-<script type="text/javascript">
-    $(function() {
-    
-    $(".progress").each(function() {
-    
-      var value = $(this).attr('data-value');
-      var left = $(this).find('.progress-left .progress-bar');
-      var right = $(this).find('.progress-right .progress-bar');
-    
-      if (value > 0) {
-        if (value <= 50) {
-          right.css('transform', 'rotate(' + percentageToDegrees(value) + 'deg)')
-        } else {
-          right.css('transform', 'rotate(180deg)')
-          left.css('transform', 'rotate(' + percentageToDegrees(value - 50) + 'deg)')
-        }
-      }
-    
-    })
-    
-    function percentageToDegrees(percentage) {
-    
-      return percentage / 100 * 360
-    
-    }
-         //increase slowly
-         progress_remaining_to_full = parseInt($("#progress_remaining_to_full").text());
-         //console.log(typeof(progress_remaining_to_full))
-         var i=0;
-         const timer1=setInterval(()=>{
-            i+=1;
-            $("#progress_value").text(i);
-            if(i == 100-progress_remaining_to_full){
-            clearInterval(timer1);
-            }
-         },30);
-
-                  //increase slowly
-                  progress_remaining_to_full = parseInt($("#progress_remaining_to_full").text());
-         //console.log(typeof(progress_remaining_to_full))
-         var k=0;
-         const timer3=setInterval(()=>{
-            var value = $("#progress_line").attr('data-value');console.log(value)
-            var left = $("#progress_line").find('.progress-left .progress-bar');
-            var right = $("#progress_line").find('.progress-right .progress-bar');
-            left.css('transform', 'rotate(0deg)')
-            k+=1;
-            if (k > 0) {
-                if (k <= 50) {
-                right.css('transform', 'rotate(' + percentageToDegrees(k) + 'deg)')
-                } else {
-                //right.css('transform', `rotate(180deg)`)
-                left.css('transform', 'rotate(' + percentageToDegrees(k+50) + 'deg)')
-                }
-            }
-            if(k == value){
-                clearInterval(timer3);
-            }
-         },30);
-    });
-    
-    
-    </script>
 @endsection

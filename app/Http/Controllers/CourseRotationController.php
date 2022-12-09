@@ -62,26 +62,26 @@ class CourseRotationController extends Controller
         
         //verify members passed
         if($request->get('roomheads') == null && $request->get('secertaries') == null && $request->get('observers') == null)
-            return redirect()->back()->with('select-members',"عذرا يجب أن تحدد رئيس قاعة واحد وأمين سر واحد ومراقب واحد على الأقل");
+            return redirect()->back()->withDanger(__("عذرا يجب أن تحدد رئيس قاعة واحد وأمين سر واحد ومراقب واحد على الأقل"));
         elseif($request->get('secertaries') == null && $request->get('observers') == null)
-            return redirect()->back()->with('select-members',"عذرا يجب أن تحدد أمين سر واحد ومراقب واحد على الأقل");
+            return redirect()->back()->withDanger(__("عذرا يجب أن تحدد أمين سر واحد ومراقب واحد على الأقل"));
         elseif($request->get('roomheads') == null && $request->get('secertaries') == null)
-            return redirect()->back()->with('select-members',"عذرا يجب أن تحدد رئيس قاعة واحد وأمين سر واحد على الأقل");
+            return redirect()->back()->withDanger(__("عذرا يجب أن تحدد رئيس قاعة واحد وأمين سر واحد على الأقل"));
         elseif($request->get('roomheads') == null && $request->get('observers') == null)
-            return redirect()->back()->with('select-members',"عذرا يجب أن تحدد رئيس قاعة واحد ومراقب واحد على الأقل");
+            return redirect()->back()->withDanger(__("عذرا يجب أن تحدد رئيس قاعة واحد ومراقب واحد على الأقل"));
         elseif($request->get('roomheads') == null)
-            return redirect()->back()->with('select-members',"عذرا يجب أن تحدد رئيس قاعة واحد على الأقل");
+            return redirect()->back()->withWarning(__("عذرا يجب أن تحدد رئيس قاعة واحد على الأقل"));
         elseif($request->get('secertaries') == null)
-            return redirect()->back()->with('select-members',"عذرا يجب أن تحدد أمين سر واحد على الأقل");
+            return redirect()->back()->withWarning(__("عذرا يجب أن تحدد أمين سر واحد على الأقل"));
         elseif($request->get('observers') == null)
-            return redirect()->back()->with('select-members',"عذرا يجب أن تحدد مراقب واحد على الأقل");
+            return redirect()->back()->withWarning(__("عذرا يجب أن تحدد مراقب واحد على الأقل"));
 
 
         //verify roomheads passed - must be Doctors
         foreach ($request->get('roomheads') as $room_head_user_id) {
             $room_head_user=User::find($room_head_user_id);
-            if($room_head_user->role != "Doctor")
-                return redirect()->back()->with('select-members',"عذرا رئيس القاعة يجب أن يكون دكتور");
+            if($room_head_user->role != "دكتور")
+                return redirect()->back()->withWarning(__("عذرا رئيس القاعة يجب أن يكون دكتور"));
         }
         if(!in_array($specific_room->id,$rooms_this_course) && !in_array($specific_room->id, $joining_rooms)){//New Room
             //Done
@@ -130,7 +130,8 @@ class CourseRotationController extends Controller
         }
 
 
-        return redirect("/rotations/$rotation->id/course/$course->id/edit");//->with('update-course-room','Room '.$specific_room->room_name.' in Course '.$course->course_name.' updated successfully')->with(['disabled_rooms'=>$disabled_rooms,'common_rooms'=>$common_rooms]);
+        return redirect("/rotations/$rotation->id/course/$course->id/edit")
+        ->withSuccess(__('Room '.$specific_room->room_name.' in Course '.$course->course_name.' updated successfully'));
     }
 
     public function show(Rotation $rotation, Course $course)
@@ -227,11 +228,12 @@ class CourseRotationController extends Controller
                         $current_room->users()->attach($members_taken_in_requested_rooms[$roomD][1],['rotation_id'=>$rotation->id,'course_id'=>$course->id,'roleIn'=>'Secertary']);
                         $current_room->users()->attach($members_taken_in_requested_rooms[$roomD][2],['rotation_id'=>$rotation->id,'course_id'=>$course->id,'roleIn'=>'Observer']);
                         }
-                     return redirect()->route("rotations.program.show",[$rotation->id])->with('user-update',' تم تعديل مقرر'.$course->course_name.' بنجاح ');
+                     return redirect()->route("rotations.program.show",[$rotation->id])
+                     ->withSuccess(__(' تم تعديل مقرر'.$course->course_name.' بنجاح '));
                  }else
-                     return redirect()->back()->with('detemine-rooms',"The rooms that you have already selected have not any user , Please select One user at least in any room");
+                     return redirect()->back()->withWarning(__("The rooms that you have already selected have not any user , Please select One user at least in any room"));
          }else{
-            return redirect()->back()->with('detemine-rooms',"عذرا يجب أن تحدد مادة على الأقل");
+            return redirect()->back()->withDanger(__("عذرا يجب أن تحدد مادة على الأقل"));
         }
     }
 

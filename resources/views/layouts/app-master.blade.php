@@ -12,6 +12,8 @@
     <link href="{!! url('assets/bootstrap/css/bootstrap.min.css') !!}" rel="stylesheet">
 
     <style>
+
+
       a{
         text-decoration: none;
       }
@@ -26,12 +28,15 @@
         -moz-user-select: none;
         user-select: none;
       }
-    .Active{
+    /* .Active{
         border-radius: 5px;
         color: black;
         background-color:#004871;
+    } */
+    header ul li{
+      margin-left: 4px;
     }
-    body > header > div > div > ul > li:hover{
+   header ul li:hover{
         border-radius: 5px;
         color: black;
         background-color: #ffffff2b;
@@ -2295,13 +2300,137 @@ div.h4 {
   line-height: 1rem;
 }
 /* progress style */
+#nav_btn_internal{
+  display: contents;
+}
+#Tishreen_University_logo{
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  left: -95px;
+  top: -3px;
+  z-index: 99999999999999999999999999999999999;
+}
+@media (min-width: 900px) {
+  .username{
+    position: absolute;
+    top: 6px;right: 20px;
+  }
+  .faculty{
+    position: absolute;
+    top: 6px;left: 100px;
+  }  
+  #nav_row{
+    font-size:16px;
+  }
+}
+/* @media (min-width: 768px) and (max-width: 1170.99px) { 
+ *{background-color: red}
+ } */
+#nav_content_internal{
+  z-index: 9999999999;
+}
+@media (min-width: 880px) {
+  #nav_btn_external,#nav_content_external, #nav_btn_internal{
+    /* display: none; */
+  }
+  #nav{font-size:64%;}
+  .username{
+    position: absolute;
+    top: 6px;right: 20px;
+  }
+  #nav_row{
+    height: 55px;
+  }
+  #nav_content_internal{
+    position: absolute;
+    top: -2px;
+  }
+}
+.user-profile-info .px-3{
+          border-left: solid 1px;
+          border-right: solid 1px;
+          margin-left: 16px;
+          margin-right: 16px;
+        }
+        .collect-index-btns{
+          display: -webkit-inline-box;
+  }
+@media (max-width: 880px) {
+        .faculty{
+          position: absolute;
+          top: 110px;right: 5px;
+        }
+        .username{
+          position: absolute;
+          top: 86px;right: 5px;
+        }
+        .collect-index-btns{
+          display: flow-root;
+          margin-top: 10px;
+        }
+        .user-profile-info{
+          position: relative;
+          top: 69px;    margin-top: 45px;margin-bottom: 45px;
+        }
+        .btns{
+          display: grid;
+        }
+        .username{
+          display: block;
+            }
+        #nav{
+          display: list-item;
+        }
+        #addCourse{
+          margin-bottom: 2px;
+        }
+        #faculty,#logout{
+          float: right;
+        }
+}
+
+#nav_row {
+    margin-bottom: 10px;
+  }
+@media (max-width: 550px) {
+.faculty{
+    position: absolute;
+    top: 0px;right: 10px;
+  }
+  #Tishreen_University_logo{
+    text-align: center;
+    top: 2px;
+    width: 50px;
+    height:50px;
+  }
+  .username{
+    position: absolute;
+    top: 22px;right: 10px;
+  }
+  #login,#nav_row{
+      display: grid;
+      text-align: center;
+    }
+}
+      .Active{
+        border-radius: 5px;
+        color: black;
+        background-color:#6c757d;
+        border-color: #6c757d;
+    }
+    #nav > li:hover{
+        border-radius: 5px;
+        color: black;
+        background-color: #ffffff2b;
+    }
+
     </style>
-
-
+  
     <!-- Custom styles for this template -->
     <link href="{!! url('assets/css/app.css') !!}" rel="stylesheet">
 </head>
-<body style="margin-top: 77px;<?php if(URL::full()=='http://127.0.0.1:8000')echo'
+<body style="<?php if(URL::full()=='http://127.0.0.1:8000')echo'
             background-image: url(http://127.0.0.1:8000/images/Exam_Time.png);
             background-repeat: no-repeat;
             background-size: cover;'?>">
@@ -2314,11 +2443,21 @@ div.h4 {
         @yield('content')
     </main>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="{!! url('assets/bootstrap/js/bootstrap.bundle.min.js') !!}"></script>
-
     @section("scripts")
-
+    <script src="{!! url('assets/bootstrap/js/bootstrap.bundle.min.js') !!}"></script>{{-- for use js in bootstrap like collapse --}}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"> </script>{{-- for use jQuery --}}
+    <script>
+      // "global" vars, built using blade
+      var imagesUrl = '{{ URL::asset('/images/') }}';
+  </script>
+    <script src="{!! url('assets/js/users.js') !!}"></script>
+    <script src="{!! url('assets/js/courses.js') !!}"></script>
+    <script src="{!! url('assets/js/rooms.js') !!}"></script>
+    <script src="{!! url('assets/js/courses_edit.js') !!}"></script>
+    <script src="{!! url('assets/js/courses_room_edit.js') !!}"></script>
+    <script src="{!! url('assets/js/progress.js') !!}"></script>
+    <script src="{!! url('assets/js/scrollTopDown.js') !!}"></script>
     @show
   </body>
 </html>

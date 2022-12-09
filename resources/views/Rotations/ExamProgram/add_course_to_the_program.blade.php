@@ -2,26 +2,15 @@
 
 @section('content')
     <div class="container" style="margin-top: -50px;">
-        <h1>Add course to the Exam Program {{ $rotation->name }}
-            <div class="" style="float: right;">
+        <h1 class="text-center">إضافة مادة إلى برنامج {{ $rotation->name }} {{ $rotation->year }}
+            <div class="float-right">
                 <a href="{{ URL::previous() }}" class="btn btn-dark">Back</a>
             </div>
         </h1>
-        <div class="lead">
-            when you specify the following fields the system dynamically select the available rooms for the course that you have already selected it
+        <div class="mt-2">
+            @include('layouts.partials.messages')
         </div>
-            @if ($message = Session::get('retryEntering'))
-                <div class="alert alert-danger alert-block">
-                    <strong>{{ $message }}</strong>
-                </div>
-            @endif
-            @if ($message = Session::get('big_num_of_students'))
-            <div class="alert alert-danger alert-block">
-                <strong>{{ $message }}</strong>
-            </div>
-            @endif
-            <br>
-            <form method="POST" action="{{route('rotations.program.store_course_to_the_program',$rotation->id)}}" id="coursesForm">
+        <form method="POST" action="{{route('rotations.program.store_course_to_the_program',$rotation->id)}}" id="coursesForm">
                 @csrf
                 <div class="mb-3">
                     <label for="course_id" class="form-label">choose course_name :</label>
@@ -190,8 +179,7 @@
                 </div>
                 <button type="submit" class="btn btn-primary">Save course</button>
                 {{-- <a href="{{ route('courses.index') }}" class="btn btn-default">Back</a> --}}
-            </form>
-
+        </form>
     </div>
 
 @endsection

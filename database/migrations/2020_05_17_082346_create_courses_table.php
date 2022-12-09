@@ -20,6 +20,8 @@ class CreateCoursesTable extends Migration
             $table->integer('studing_year');
             $table->unsignedBigInteger('faculty_id');//->nullable(true);//for does not miss importing data
             $table->foreign('faculty_id')->references('id')->on('faculties')->onDelete('cascade')->onUpdate('cascade');
+            $table->unsignedBigInteger('user_id')->nullable(true);
+            $table->foreign('user_id')->references('id')->on('departments')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }

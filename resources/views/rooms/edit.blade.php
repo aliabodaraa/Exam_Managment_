@@ -16,7 +16,7 @@
                 @method('patch')
                 @csrf
                 <div class="mb-3">
-                    <label for="roon-name" class="form-label">Room Name</label>
+                    <label for="roon-name" class="form-label">Room Name :</label>
                     <input value="{{ $room->room_name }}"
                         type="text"
                         class="form-control"
@@ -28,7 +28,7 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="capacity" class="form-label">Room Name</label>
+                    <label for="capacity" class="form-label">Room Name :</label>
                     <input value="{{ $room->capacity }}"
                         type="number"
                         class="form-control"
@@ -40,30 +40,30 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="location" class="form-label">Room Name</label>
+                    <label for="location" class="form-label">Room location :</label>
                     <input value="{{ $room->location }}"
                         type="text"
                         class="form-control"
                         name="location"
                         placeholder="location"
-                        value="{{$room->location}}" required>
+                        value="{{$room->location}}">
                     @if ($errors->has('location'))
                         <span class="text-danger text-left">{{ $errors->first('location') }}</span>
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="notes" class="form-label">notes</label>
+                    <label for="notes" class="form-label">notes :</label>
                     <textarea cols="30" rows="10"
                         type="text"
                         class="form-control"
                         name="notes"
-                        placeholder="notes" required>{{ $room->notes }}</textarea>
+                        placeholder="notes">{{ $room->notes }}</textarea>
                     @if ($errors->has('notes'))
                         <span class="text-danger text-left">{{ $errors->first('notes') }}</span>
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="faculty_id" class="form-label">faculty_id</label>
+                    <label for="faculty_id" class="form-label">faculty_id :</label>
                     <select class="form-control" name="faculty_id" class="form-control" required>
                         @foreach (App\Models\Faculty::all() as $faculty)
                             <option value='{{ $faculty->id }}' {{ ($room->faculty->id == $faculty->id) ? 'selected': '' }}>{{ $faculty->name }}</option>

@@ -4,13 +4,13 @@
     <div class="bg-light p-4 rounded">
         <div class="container mt-4">
             <h1>
-                Update Rotation Page
+                تعديل الدورة الإمتحانية
                 <div class="float-right">
                     <a href="{{ URL::previous() }}" class="btn btn-dark">Back</a>
                 </div>
             </h1>
-            <div class="lead">
-
+            <div class="mt-2">
+                @include('layouts.partials.messages')
             </div>
             <form method="post" action="{{ route('rotations.update', $rotation->id) }}">
                 @method('patch')

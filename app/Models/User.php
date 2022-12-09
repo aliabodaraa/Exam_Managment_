@@ -34,7 +34,9 @@ class User extends Authenticatable
         'temporary_role',
         'is_active',
         'faculty_id',
-        'department_id'
+        'department_id',
+        'city',
+        'property',
     ];
 
     /**
@@ -67,12 +69,17 @@ class User extends Authenticatable
         $this->attributes['password'] = bcrypt($value);
     }
 
+    public function teaches(){
+        return $this->belongsToMany('App\Models\Course','course_teacher')->withPivot('course_id','user_id','section_type');
+    }
+
+
     //observation2
     public function rotationsObjection(){
-        return $this->belongsToMany('App\Models\Rotation','course_rotation_user')->withPivot('course_id','user_id','rotation_id');
+        return $this->belongsToMany('App\Models\Rotation','course_rotation_user')->withPivot('course_id','user_id','rotation_id')->withTimestamps();
     }
     public function coursesObjection(){
-        return $this->belongsToMany('App\Models\Course','course_rotation_user')->withPivot('course_id','user_id','rotation_id');
+        return $this->belongsToMany('App\Models\Course','course_rotation_user')->withPivot('course_id','user_id','rotation_id')->withTimestamps();
     }
     //observation2
     //assign_users_in_rooms3
@@ -113,5 +120,9 @@ class User extends Authenticatable
         dd($searchTerm);
         return empty($searchTerm) ? static::query() : static::query()->where('username','like','%' .$searchTerm. '%')
         ->orWhere('id','like','%' .$searchTerm. '%');
+    }
+
+    public function initial_members(){//many to many between Rotation & User
+        return $this->belongsToMany('App\Models\Rotation','initial_members_for_each_rotation')->withPivot('rotation_id','user_id','options')->withTimestamps();
     }
 }

@@ -3,22 +3,20 @@
 @section('content')
     <div class="bg-light p-4 rounded">
         <div class="container mt-4">
-            @if ($password_message = Session::get('password-message'))
-            <div class="alert alert-success alert-block">
-                <strong>{{ $password_message }}</strong>
-            </div>
-            @endif
-            <h1>
+            <h1 class="text-center">
                 Update User Page
                 <div class="float-right">
                     <a href="{{ URL::previous() }}" class="btn btn-dark">Back</a>
                 </div>
             </h1>
+            <div class="mt-2">
+                @include('layouts.partials.messages')
+            </div>
             <form method="post" action="{{ route('users.update', $user->id) }}">
                 @method('patch')
                 @csrf
                 <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
+                    <label for="email" class="form-label">Email :</label>
                     <input value="{{ $user->email }}"
                         type="email"
                         class="form-control"
@@ -29,7 +27,7 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="username" class="form-label">Username</label>
+                    <label for="username" class="form-label">Username :</label>
                     <input value="{{ $user->username }}"
                         type="text"
                         class="form-control"
@@ -41,7 +39,7 @@
                 </div>
                 @if(Auth::user()->id == $user->id)
                     <div class="mb-3">
-                        <label for="old_password" class="form-label">old_password</label>
+                        <label for="old_password" class="form-label">old_password :</label>
                         <input 
                             type="text"
                             class="form-control"
@@ -52,7 +50,7 @@
                         @endif
                     </div>
                     <div class="mb-3">
-                        <label for="new_password" class="form-label">new_password</label>
+                        <label for="new_password" class="form-label">new_password :</label>
                         <input
                             type="text"
                             class="form-control"
@@ -63,7 +61,7 @@
                         @endif
                     </div>
                     <div class="mb-3">
-                        <label for="new_password_verification" class="form-label">new_password_verification</label>
+                        <label for="new_password_verification" class="form-label">new_password_verification :</label>
                         <input
                             type="text"
                             class="form-control"
@@ -74,26 +72,27 @@
                         @endif
                     </div>
                 @endif
-                @if(Auth::user()->id == 1)
+                @if((Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد"))
                     <div class="mb-3">
-                        <label for="role" class="form-label">Role</label>
+                        <label for="role" class="form-label">Role :</label>
                         <select class="form-control" name="role">
-                            <option value="">Select role</option>
-                            <option value="Professor"  {{ ($user->role == 'Professor') ? 'selected': '' }}>بروفيسور</option>
-                            <option value="Doctor" {{ ($user->role == 'Doctor') ? 'selected': '' }}>دكتور</option>
-                            <option value="Master's student" {{ ($user->role == "Master's student") ? 'selected': '' }}>طالب دراسات</option>
-                            <option value="teacher" {{ ($user->role == "Engineer") ? 'selected': '' }}>مهندس</option>
-                            <option value="administrative employee" {{ ($user->role == 'administrative employee') ? 'selected': '' }}> موظف إداري</option>
+                            <option value="">لا يوجد</option>
+                            <option value="بروفيسور"  {{ ($user->role == 'بروفيسور') ? 'selected': '' }}>بروفيسور</option>
+                            <option value="دكتور" {{ ($user->role == 'دكتور') ? 'selected': '' }}>دكتور</option>
+                            <option value="طالب دراسات" {{ ($user->role == "طالب دراسات") ? 'selected': '' }}>طالب دراسات</option>
+                            <option value="مهندس" {{ ($user->role == "مهندس") ? 'selected': '' }}>مهندس</option>
+                            <option value="مدرس" {{ ($user->role == "مدرس") ? 'selected': '' }}>مدرس</option>
+                            <option value="موظف إداري" {{ ($user->role == 'موظف إداري') ? 'selected': '' }}> موظف إداري</option>
                         </select>
                         @if ($errors->has('role'))
                             <span class="text-danger text-left">{{ $errors->first('role') }}</span>
                         @endif
                     </div>
                     <div class="mb-3">
-                        <label for="temporary_role" class="form-label">temporary role</label>
+                        <label for="temporary_role" class="form-label">temporary role :</label>
                         <select class="form-control"
                             name="temporary_role">
-                            <option value="">Select temporary role</option>
+                            <option value="">لا يوجد</option>
                             <option value="عميد" {{ ($user->temporary_role == 'عميد') ? 'selected': '' }}>عميد</option>
                             <option value="نائب إداري" {{ ($user->temporary_role == 'نائب إداري') ? 'selected': '' }}>نائب إداري</option>
                             <option value="نائب علمي" {{ ($user->temporary_role == 'نائب علمي') ? 'selected': '' }}>نائب علمي</option>
@@ -108,7 +107,7 @@
                         @endif
                     </div>
                     <div class="mb-3">
-                        <label for="faculty_id" class="form-label">faculty_id</label>
+                        <label for="faculty_id" class="form-label">faculty_id :</label>
                         <select class="form-control" name="faculty_id" class="form-control" required>
                             @foreach (App\Models\Faculty::all() as $faculty)
                                 <option value='{{ $faculty->id }}' {{ ($user->faculty->id == $faculty->id) ? 'selected': '' }}>{{ $faculty->name }}</option>
@@ -119,7 +118,7 @@
                         @endif
                     </div>
                     <div class="mb-3">
-                        <label for="number_of_observation" class="form-label">number_of_observation</label>
+                        <label for="number_of_observation" class="form-label">number_of_observation :</label>
                         <select class="form-control" name="number_of_observation" class="form-control" required>
                             @for ($i = 0; $i <31; $i++)
                                 <option value='{{ $i }}' {{ ($user->number_of_observation == $i) ? 'selected': '' }}>{{ $i }}</option>
@@ -127,6 +126,28 @@
                         </select>
                         @if ($errors->has('number_of_observation'))
                             <span class="text-danger text-left">{{ $errors->first('number_of_observation') }}</span>
+                        @endif
+                    </div>
+                    <div class="mb-3">
+                        <label for="city" class="form-label">City :</label>
+                        <input value="{{ $user->city }}"
+                            type="text"
+                            class="form-control"
+                            name="city"
+                            placeholder="City" required>
+                        @if ($errors->has('city'))
+                            <span class="text-danger text-left">{{ $errors->first('city') }}</span>
+                        @endif
+                    </div>
+                    <div class="mb-3">
+                        <label for="property" class="form-label">property :</label>
+                        <select class="form-control" name="property" class="form-control" required>
+                                <option value='0' {{ ($user->property == '') ? 'selected': '' }}>لا يوجد</option>
+                                <option value='1' {{ ($user->property == 'عضو هيئة فنية') ? 'selected': '' }}>عضو هيئة فنية</option>
+                                <option value='2' {{ ($user->property == 'عضو هيئة تدريسية') ? 'selected': '' }}>عضو هيئة تدريسية</option>
+                        </select>
+                        @if ($errors->has('property'))
+                            <span class="text-danger text-left">{{ $errors->first('property') }}</span>
                         @endif
                     </div>
                 @endif

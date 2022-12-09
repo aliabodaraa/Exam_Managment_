@@ -41,24 +41,24 @@ class rotationsController extends Controller
     public function distributeStudents(Rotation $rotation){
         foreach ($rotation->coursesProgram as $course) {
             $course->distributionRoom()->wherePivot('rotation_id',$rotation->id)->detach();//clear the previous distribution
-            $curr_students_number=Course::with('rotationsProgram')->whereHas('rotationsProgram', function($query) use($course,$rotation){$query->where('course_id',$course->id)->where('rotation_id',$rotation->id);})->first()->rotationsProgram[0]->pivot->students_number;
+            $curr_students_number=$course->rotationsProgram()->wherePivot('rotation_id',$rotation->id)->first()->pivot->students_number;
             $temporory_counter=$curr_students_number;
             $rotation = Rotation::find($rotation->id);//high level we reget it because we modified it in the function isAvailableRoom line 23 24
             foreach (Room::all() as $roomBase)
                 if($this->isAvailableRoom($rotation, $course, $roomBase) && $roomBase->is_active){
                     if($curr_students_number <= Stock::getMinDistribution())//it is garantee that the curr_students_number is less than $this->getMaxDistribution() that is done in the method in controller CourseRotation_ExamProgram/store_course_to_the_program
                         if(in_array($course->studing_year, [4,5]))
-                            $temporory_counter=$this->distribute($rotation,$course,$roomBase,$temporory_counter,($roomBase->capacity+$roomBase->extra_capacity)/2);
+                            $temporory_counter=$this->distribute($rotation,$course,$roomBase,$temporory_counter,(int)(($roomBase->capacity+$roomBase->extra_capacity)/2));//problem without (int) add one student !!!!!
                         else
                             $temporory_counter=$this->distribute($rotation,$course,$roomBase,$temporory_counter,$roomBase->capacity);
                     else
                         $temporory_counter=$this->distribute($rotation,$course,$roomBase,$temporory_counter,$roomBase->capacity+$roomBase->extra_capacity);
-                        
+                        //dd($temporory_counter);
                     if(!$temporory_counter) break;
                 }
         }
         return redirect("/rotations/$rotation->id/show")
-        ->with('message','You have successfully distribute all students to the sutable rooms');
+        ->withSuccess(__('You have successfully distribute all students to the sutable rooms'));
     }
 //distribute students into rooms 
 //distributeMembersOfFaculty
@@ -88,7 +88,7 @@ public function distributeMembersOfFaculty(Rotation $rotation){
         }
     }
     return redirect("/rotations/$rotation->id/show")
-    ->with('message','You have successfully distribute all Members to the sutable rooms');
+    ->withwithSuccess(__('You have successfully distribute all Members to the sutable rooms'));
 }
 
 
@@ -232,7 +232,54 @@ public function distributeMembersOfFaculty(Rotation $rotation){
         $rotation->delete();
 
         return redirect()->back()
-            ->with('rotations-delete','rotation deleted successfully.');
+            ->withDanger(__('rotation deleted successfully.'));
     }
 
+    public function create_initial_members(Rotation $rotation)
+    {
+        $room_heads=User::where('role','دكتور')->where('temporary_role')->get()->pluck('username','id')->toarray();
+        $users= User::where('temporary_role','<>','رئيس شعبة الامتحانات')->where('role','!=','دكتور')->
+                      orWhere('temporary_role')->where('role','!=','دكتور')->get()->pluck('username','id')->
+                      toarray();
+        $users_and_roomHeads=$room_heads+$users;
+        return view('Rotations.create_initial_members',compact('rotation','users','users_and_roomHeads'));
+    }
+
+    public function store_initial_members(Request $request, Rotation $rotation)
+    {
+        if(isset($request->users)){
+            foreach ($request->users as $user_id => $options)
+                $rotation->initial_members()->attach($user_id,['options'=> json_encode($options)]);
+        }else{
+            return redirect()->back()
+            ->withWarning(__('please select at least on user'));   
+        }
+        return redirect()->route('rotations.program.show',$rotation->id)
+            ->withSuccess(__('store members successfully.'));
+    }
+    public function edit_initial_members(Rotation $rotation)
+    {
+        $room_heads=User::where('role','دكتور')->where('temporary_role')->get()->pluck('username','id')->toarray();
+        $users= User::where('temporary_role','<>','رئيس شعبة الامتحانات')->where('role','!=','دكتور')->
+                      orWhere('temporary_role')->where('role','!=','دكتور')->get()->pluck('username','id')->
+                      toarray();
+        $users_and_roomHeads=$room_heads+$users;
+        foreach ($rotation->initial_members()->get() as $user){
+            $users_with_options[$user->id]=(array)json_decode($user->pivot->options);
+        }
+        return view('Rotations.edit_initial_members',compact('rotation','users','users_and_roomHeads','users_with_options'));
+    }
+    public function update_initial_members(Request $request, Rotation $rotation)
+    {
+        if(isset($request->users)){
+            $rotation->initial_members()->detach();
+            foreach ($request->users as $user_id => $options)
+                $rotation->initial_members()->attach($user_id,['options'=> json_encode($options)]);
+        }else{
+            return redirect()->back()
+            ->withWarning(__('please select at least on user'));   
+        }
+        return redirect()->route('rotations.program.show',$rotation->id)
+            ->withSuccess(__('update members successfully.'));
+    }
 }

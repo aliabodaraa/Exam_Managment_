@@ -118,6 +118,6 @@ class roomsController extends Controller
         $room->delete();
 
         return redirect()->back()
-            ->with('room-delete','room deleted successfully.');
+        ->withSuccess(__('room deleted successfully.'));
     }
 }

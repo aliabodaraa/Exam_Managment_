@@ -28,6 +28,9 @@
                     <h5>الوقت :  <span class="badge bg-secondary">{{$course->rotationsProgram[0]->pivot->time}}</span></h5>
  
                     <h5>تفاصيل القاعات في مقرر {{$course->course_name}} : </h5>
+                    <div class="mt-2">
+                        @include('layouts.partials.messages')
+                    </div>
                 <div class="rooms">
                     @foreach ($course->rooms as $room)
                         <div class="card" style="max-height: 433px;padding-bottom:5px;

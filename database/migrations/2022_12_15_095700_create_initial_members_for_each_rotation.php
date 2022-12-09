@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCoursesRotationsUsersPivotTable extends Migration
+class CreateInitialMembersForEachRotation extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,13 @@ class CreateCoursesRotationsUsersPivotTable extends Migration
      */
     public function up()
     {
-        Schema::create('course_rotation_user', function (Blueprint $table) {//2Objection
+        Schema::create('initial_members_for_each_rotation', function (Blueprint $table) {
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->unsignedBigInteger('rotation_id');
-            $table->unsignedBigInteger('course_id');
-            $table->foreign(['rotation_id','course_id'])->references(['rotation_id','course_id'])->on('course_rotation')->onDelete('cascade')->onUpdate('cascade');
-            $table->primary(['course_id','user_id','rotation_id'],'courses_objections_ids');
+            $table->foreign('rotation_id')->references('id')->on('rotations')->onDelete('cascade')->onUpdate('cascade');
+            $table->json('options');
+            $table->primary(['user_id','rotation_id']);
             $table->timestamps();
         });
     }
@@ -31,6 +31,6 @@ class CreateCoursesRotationsUsersPivotTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('course_rotation_user');
+        Schema::dropIfExists('initial_members_for_each_rotation');
     }
 }

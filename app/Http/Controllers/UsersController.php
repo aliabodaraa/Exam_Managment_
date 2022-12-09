@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Room;
+use App\Models\Course;
 use App\Models\Rotation;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
@@ -12,6 +13,7 @@ use App\Http\Requests\UpdateUserRequest;
 use illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 use App\Http\Controllers\MaxMinRoomsCapacity\Stock;
+use App\Http\Controllers\MaxFlow\Graph;
 class UsersController extends Controller
 {
     /**
@@ -21,7 +23,9 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $users = User::first()->paginate(20);
+        // $users = User::first()->paginate(20);
+        //$users = User::paginate(8);
+        $users = User::all();
 
         return view('users.index', compact('users'));
     }
@@ -44,7 +48,7 @@ class UsersController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
-    {
+    {Graph::members();
         return view('users.create', ['roles' => Role::latest()->get()]);
     }
 
@@ -60,16 +64,15 @@ class UsersController extends Controller
     {//dd($request->secure());
         //dd($request->getRequestUri());
         //dd(1123);
+        $property='';
+        if($request->property==='1')
+            $property="عضو هيئة فنية";
+        elseif($request->property==='2')
+            $property="عضو هيئة تدريسية";
+        $custom_arr=array_merge($request->except('property'),['property'=>$property]);
         $user = User::create(
-            [// you also can be to write this User::create($request->validated()); but go to StoreUserRequest and make all fields required
-                'username'=> $request->username,
-                'email'=> $request->email,
-                'password' => $request['password'],
-                'role' => $request['role'],
-                'number_of_observation' => $request['number_of_observation'],
-                'temporary_role' => $request['temporary_role'],
-                'faculty_id' =>  $request['faculty_id'],
-            ]
+            // you also can be to write this User::create($request->validated()); but go to StoreUserRequest and make all fields required
+            $custom_arr   
         );
         //return Response::json($user);
         return redirect()->route('users.index')
@@ -150,16 +153,25 @@ class UsersController extends Controller
                 if($request['new_password'] == $request['new_password_verification']){
                     $user->update(['password' => $request['new_password']]);
                 }else{
-                return redirect()->back()->with('password-message','incorrect verification password.');
+                return redirect()->back()
+                ->withDanger(__('incorrect verification password.'));
                 }
             }else{
-                return redirect()->back()->with('password-message','incorrect old password.');
+                return redirect()->back()
+                ->withDanger(__('incorrect old password.'));
             }
         }
-        $user->update($request->all());
+        $property='';
+        if($request->property==='1')
+            $property="عضو هيئة فنية";
+        elseif($request->property==='2')
+            $property="عضو هيئة تدريسية";
+        $custom_arr=array_merge($request->except('property'),['property'=>$property]);
+        $user->update($custom_arr);
         //$user->syncRoles($request->get('role'));
 
-        return redirect()->route('users.index')->withSuccess(__('User updated successfully.'));
+        return redirect()->route('users.index')
+        ->withSuccess(__('User updated successfully.'));
     }
 
     /**
@@ -176,8 +188,72 @@ class UsersController extends Controller
         return redirect()->route('users.index')
             ->withSuccess(__('User deleted successfully.'));
     }
-}
 
+    public function create_user_courses(User $user)
+    {
+        $user_courses_teaches_ids=$user->teaches()->pluck('course_id');
+        return view('users.create_user_courses', [
+            'user' => $user,
+            'user_courses_teaches_ids' => $user_courses_teaches_ids
+        ]);
+    }
+
+    public function store_user_courses(Request $request,User $user)
+    {   //sections_types
+        //course_user_teach
+        $this->validate($request,[
+            'sections_types' => 'required'
+        ],[
+            'sections_types.unique' => 'the name of course should be unique'
+        ]);
+        if(count($request->sections_types)==2){
+            $user->teaches()->attach($request->course_user_teach,['section_type'=> 'نظري - عملي']);
+        }else{
+            if(array_keys($request->sections_types)[0]==1)
+                $user->teaches()->attach($request->course_user_teach,['section_type'=> 'نظري']);
+            elseif(array_keys($request->sections_types)[0]==2)
+                $user->teaches()->attach($request->course_user_teach,['section_type'=> 'عملي']);
+        }
+        //return Response::json($user);
+        return redirect()->route('users.edit_user_courses',$user->id)
+            ->withSuccess(__('course created successfully for user.'));
+    }
+
+    public function edit_user_courses(User $user)
+    {
+        $user_courses_teaches_ids=$user->teaches()->pluck('course_id');
+        return view('users.edit_user_courses', [
+            'user' => $user,
+            'user_courses_teaches_ids' => $user_courses_teaches_ids
+        ]);
+    }
+
+    public function update_user_courses(Request $request, User $user)
+    {
+        foreach ($request->sections_types as $course_id => $sections_types) {
+        $user->teaches()->detach($course_id);
+            if(count($sections_types)==2){
+                $user->teaches()->attach($course_id,['section_type'=> 'نظري - عملي']);
+            }else{
+                if(array_keys($sections_types)[0]==1)
+                    $user->teaches()->attach($course_id,['section_type'=> 'نظري']);
+                elseif(array_keys($sections_types)[0]==2)
+                    $user->teaches()->attach($course_id,['section_type'=> 'عملي']);
+            }
+        }
+        return redirect()->route('users.edit_user_courses',$user->id)
+        ->withSuccess(__('Course For User updated successfully.'));
+    }
+
+
+
+    public function destroy_user_courses(User $user,Course $course)
+    {
+        $user->teaches()->detach($course->id);
+        return redirect()->route('users.edit_user_courses',$user->id)
+            ->withSuccess(__('Course deleted successfully.'));
+    }
+}
 
 /*
 

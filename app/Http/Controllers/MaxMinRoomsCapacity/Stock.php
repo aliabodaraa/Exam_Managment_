@@ -32,11 +32,10 @@ class Stock extends Controller
         return $min_distribution_count;
     }
     public static function isAvailableRoom($rotation, $course, $room){
-
-        $curr_date=Course::with('rotationsProgram')->whereHas('rotationsProgram', function($query) use($course,$rotation){$query->where('course_id',$course->id)->where('rotation_id',$rotation->id);})->first()->rotationsProgram[0]->pivot->date;
-        $curr_time=Course::with('rotationsProgram')->whereHas('rotationsProgram', function($query) use($course,$rotation){$query->where('course_id',$course->id)->where('rotation_id',$rotation->id);})->first()->rotationsProgram[0]->pivot->time;
-        $curr_duration=Course::with('rotationsProgram')->whereHas('rotationsProgram', function($query) use($course,$rotation){$query->where('course_id',$course->id)->where('rotation_id',$rotation->id);})->first()->rotationsProgram[0]->pivot->duration;
-
+        $curr_date=$rotation->coursesProgram()->where('id',$course->id)->first()->pivot->date;
+        $curr_time=$rotation->coursesProgram()->where('id',$course->id)->first()->pivot->time;
+        $curr_duration=$rotation->coursesProgram()->where('id',$course->id)->first()->pivot->duration;
+    
         foreach (Course::with('distributionRoom')->whereHas('distributionRoom', function($query) use($room,$rotation){
         $query->where('room_id',$room->id)->where('rotation_id',$rotation->id);})->get() as $courseM)
                 if((count($rotation->coursesProgram()->wherePivot('date',$curr_date)->wherePivot('time','>=',$curr_time)->wherePivot('time','<=',gmdate('H:i:s',strtotime($curr_time)+strtotime($curr_duration)))->where('id',$courseM->id)->get()->toArray())
@@ -51,9 +50,9 @@ class Stock extends Controller
 
     //calculate date time duration for specific course
     public static function getDateTimeDuration_ForThisCourse($rotation, $course){
-        $date=Course::with('rotationsProgram')->whereHas('rotationsProgram', function($query) use($course,$rotation){$query->where('course_id',$course->id)->where('rotation_id',$rotation->id);})->first()->rotationsProgram[0]->pivot->date;
-        $time=Course::with('rotationsProgram')->whereHas('rotationsProgram', function($query) use($course,$rotation){$query->where('course_id',$course->id)->where('rotation_id',$rotation->id);})->first()->rotationsProgram[0]->pivot->time;
-        $duration=Course::with('rotationsProgram')->whereHas('rotationsProgram', function($query) use($course,$rotation){$query->where('course_id',$course->id)->where('rotation_id',$rotation->id);})->first()->rotationsProgram[0]->pivot->duration;
+        $date=$rotation->coursesProgram()->where('id',$course->id)->first()->pivot->date;
+        $time=$rotation->coursesProgram()->where('id',$course->id)->first()->pivot->time;
+        $duration=$rotation->coursesProgram()->where('id',$course->id)->first()->pivot->duration;
         return array($date, $time, $duration);   
     }
     //calculate date time duration for specific course
@@ -167,7 +166,7 @@ class Stock extends Controller
         $all_rotations_table=[];
         $observations_number_in_latest_rotation=0;
         //calc info for each rotation for current user
-        foreach (array_unique($user->rotations->pluck('id')->toArray()) as $rotation_id) {
+        foreach (array_unique($user->rotations->SortByDesc('end_date')->pluck('id')->toArray()) as $rotation_id) {
             $rotationInfo=Rotation::where('id',$rotation_id)->first();
             $table=[];
             $table['name']=$rotationInfo->name;

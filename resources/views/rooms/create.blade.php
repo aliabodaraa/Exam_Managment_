@@ -20,7 +20,7 @@
             <form method="POST" action="{{route('rooms.store')}}">
                 @csrf
                 <div class="mb-3">
-                    <label for="room_name" class="form-label">room name</label>
+                    <label for="room_name" class="form-label">room name :</label>
                     <input value="{{ old('room_name') }}"
                         type="text"
                         class="form-control"
@@ -31,7 +31,7 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="capacity" class="form-label">Capacity</label>
+                    <label for="capacity" class="form-label">Capacity :</label>
                     <input value="{{ old('capacity') }}"
                         type="number"
                         class="form-control"
@@ -42,29 +42,29 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="location" class="form-label">location</label>
+                    <label for="location" class="form-label">location :</label>
                     <input value="{{ old('location') }}"
                         type="text"
                         class="form-control"
                         name="location"
-                        placeholder="location" required>
+                        placeholder="location">
                     @if ($errors->has('location'))
                         <span class="text-danger text-left">{{ $errors->first('location') }}</span>
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="notes" class="form-label">notes</label>
+                    <label for="notes" class="form-label">notes :</label>
                     <textarea cols="30" rows="10" value="{{ old('notes') }}"
                         type="text"
                         class="form-control"
                         name="notes"
-                        placeholder="write note for this room" required></textarea>
+                        placeholder="write note for this room"></textarea>
                     @if ($errors->has('notes'))
                         <span class="text-danger text-left">{{ $errors->first('notes') }}</span>
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="faculty_id" class="form-label">faculty_id</label>
+                    <label for="faculty_id" class="form-label">faculty_id :</label>
                     <select class="form-control" name="faculty_id" class="form-control" required>
                         @foreach (App\Models\Faculty::all() as $faculty)
                             <option value='{{ $faculty->id }}'>{{ $faculty->name }}</option>

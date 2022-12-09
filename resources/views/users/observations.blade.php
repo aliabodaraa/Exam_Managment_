@@ -2,15 +2,20 @@
 
 @section('content')
     <div class="bg-light p-4 m-4 rounded">
-        <h3> مراقبات {{$user_name}}
-            <div style="float: right;"><a href="{{ URL::previous() }}" class="btn btn-dark">Back</a></div>
-        </h3>
-        <div class="lead"></div>
+        <h1 class="text-center">
+            <h3> مراقبات <mark>{{$user_name}}</mark>
+            <div class="float-right">
+                <a href="{{ URL::previous() }}" class="btn btn-dark">Back</a>
+            </div>
+        </h1>
+        <div class="mt-2">
+            @include('layouts.partials.messages')
+        </div>
         @if(count($all_rotations_table))
             @foreach($all_rotations_table as $rotation)
                 <div class="card text-dark bg-dark mb-2 mt-4" style="font-size: 16px;">
                     <div class="card-header" style="font-size: 26px;color:white;direction: rtl;">
-                        {{ $rotation['name']}}
+                        مراقبات {{ $rotation['name']}}
                         <span class="card-title badge bg-success me-1" style="font-size: 16px;">{{ $rotation['year'] }}</span>
                         <span class="card-title badge bg-secondary me-1" style="font-size: 16px;float: left;">start : {{ $rotation['start_date'] }}</span>
                         <span class="card-title badge bg-danger" style="font-size: 16px;float: left;">end : {{ $rotation['end_date'] }}</span>

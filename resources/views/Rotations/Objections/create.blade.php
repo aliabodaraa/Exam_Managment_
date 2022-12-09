@@ -2,32 +2,11 @@
 @section('content')
     <div class="bg-light p-2 rounded">
         <h1 class="text-center"> إعتراضات {{ $rotation->name }} - {{ $rotation->year }}
-            {{-- @if(auth()->user()->id==1)
-                <a href="{{ route('rotations.add_course_to_program',$rotation->id) }}" class="btn btn-success float-right me-2 m4-2">Add Course</a>
-            @endif --}}
         </h1>
-        {{-- <div class="lead">
-            TIME TABLE . 
-                @if(auth()->user()->id==1)
-                    <a href="{{ route('rotations.add_course_to_program',$rotation->id) }}" class="btn btn-success float-right me-2 m4-2">Add Course</a>
-                @endif
-        </div>--}}
         <div class="container-fluid p-2 rounded">
-            @if ($message = Session::get('message'))
-                <div class="alert alert-success alert-block">
-                    <strong>{{ $message }}</strong>
-                </div>
-            @endif
-            @if ($message = Session::get('user-update'))
-            <div class="alert alert-success alert-block">
-                <strong>{{ $message }}</strong>
+            <div class="mt-2">
+                @include('layouts.partials.messages')
             </div>
-            @endif
-            @if ($messageDelete = Session::get('user-delete'))
-            <div class="alert alert-success alert-block">
-                <strong>{{ $messageDelete }}</strong>
-            </div>
-            @endif
             @if(count($courses_info))
             <form method="POST" action="{{route('rotations.objections.store',$rotation->id)}}">
                 @csrf
@@ -167,9 +146,6 @@
         </div>
       @endif
       </div>
-      {{-- <div class="d-flex">
-        {!! $courses->links() !!}
-    </div> --}}
     </div>
 @endsection
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>

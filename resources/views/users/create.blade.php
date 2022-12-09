@@ -9,13 +9,13 @@
                     <a href="{{ URL::previous() }}" class="btn btn-dark">Back</a>
                 </div>
             </h1>
-            <div class="lead">
-                
+            <div class="mt-2">
+                @include('layouts.partials.messages')
             </div>
             <form method="POST" action="{{route('users.store')}}">
                 @csrf
                 <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
+                    <label for="email" class="form-label">Email :</label>
                     <input value="{{ old('email') }}"
                         type="email"
                         class="form-control"
@@ -26,7 +26,7 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="username" class="form-label">Username</label>
+                    <label for="username" class="form-label">Username :</label>
                     <input value="{{ old('username') }}"
                         type="text"
                         class="form-control"
@@ -37,32 +37,33 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
+                    <label for="password" class="form-label">Password :</label>
                     <input type="password" class="form-control" name="password" value="{{ old('password') }}" placeholder="Password" required="required">
                     @if ($errors->has('password'))
                         <span class="text-danger text-left">{{ $errors->first('password') }}</span>
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="role" class="form-label">Role</label>
+                    <label for="role" class="form-label">Role :</label>
                     <select class="form-control"
                         name="role" required>
-                        <option value="">Select role</option>
-                        <option value="Professor">بروفيسور</option>
-                        <option value="Doctor">دكتور</option>
-                        <option value="teacher">مهندس</option>
-                        <option value="Master's student">طالب دراسات</option>
-                        <option value="administrative employee">موظف إداري</option>
+                        <option value="">لا يوجد</option>
+                        <option value="بروفيسور">بروفيسور</option>
+                        <option value="دكتور">دكتور</option>
+                        <option value="مهندس">مهندس</option>
+                        <option value="مدرس">مدرس</option>
+                        <option value="طالب دراسات">طالب دراسات</option>
+                        <option value="موظف إداري">موظف إداري</option>
                     </select>
                     @if ($errors->has('role'))
                         <span class="text-danger text-left">{{ $errors->first('role') }}</span>
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="temporary_role" class="form-label">temporary role</label>
+                    <label for="temporary_role" class="form-label">temporary role :</label>
                     <select class="form-control"
                         name="temporary_role">
-                        <option value="">Select temporary role</option>
+                        <option value="">لا يوجد</option>
                         <option value="عميد">عميد</option>
                         <option value="نائب إداري">نائب إداري</option>
                         <option value="نائب علمي">نائب علمي</option>
@@ -77,7 +78,7 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="faculty_id" class="form-label">faculty_id</label>
+                    <label for="faculty_id" class="form-label">faculty_id :</label>
                     <select class="form-control" name="faculty_id" class="form-control" required>
                         @foreach (App\Models\Faculty::all() as $faculty)
                             <option value='{{ $faculty->id }}'>{{ $faculty->name }}</option>
@@ -88,7 +89,7 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="number_of_observation" class="form-label">number_of_observation</label>
+                    <label for="number_of_observation" class="form-label">number_of_observation :</label>
                     <select class="form-control" name="number_of_observation" class="form-control" required>
                         @for ($i = 0; $i <31; $i++)
                             <option value='{{ $i }}'>{{ $i }}</option>
@@ -96,6 +97,28 @@
                     </select>
                     @if ($errors->has('number_of_observation'))
                         <span class="text-danger text-left">{{ $errors->first('number_of_observation') }}</span>
+                    @endif
+                </div>
+                <div class="mb-3">
+                    <label for="city" class="form-label">City :</label>
+                    <input value="{{ old('city') }}"
+                        type="text"
+                        class="form-control"
+                        name="city"
+                        placeholder="City" required>
+                    @if ($errors->has('city'))
+                        <span class="text-danger text-left">{{ $errors->first('city') }}</span>
+                    @endif
+                </div>
+                <div class="mb-3">
+                    <label for="property" class="form-label">property : :</label>
+                    <select class="form-control" name="property" class="form-control" required>
+                            <option value='0'>لا يوجد</option>
+                            <option value='1'>عضو هيئة فنية</option>
+                            <option value='2'>عضو هيئة تدريسية</option>
+                    </select>
+                    @if ($errors->has('property'))
+                        <span class="text-danger text-left">{{ $errors->first('property') }}</span>
                     @endif
                 </div>
                 <button type="submit" class="btn btn-primary">Save user</button>

@@ -48,6 +48,11 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
                 Route::delete('/{user}/delete', 'UsersController@destroy')->name('users.destroy');
                 Route::patch('/{user}/isActive', 'UsersController@isActive')->name('users.isActive');
                 Route::get('/{user}/profile', 'UsersController@profile')->name('users.profile');
+                Route::get('/{user}/create_user_courses', 'UsersController@create_user_courses')->name('users.create_user_courses');
+                Route::post('/{user}/store_user_courses', 'UsersController@store_user_courses')->name('users.store_user_courses');
+                Route::get('/{user}/edit_user_courses', 'UsersController@edit_user_courses')->name('users.edit_user_courses');
+                Route::patch('/{user}/update_user_courses', 'UsersController@update_user_courses')->name('users.update_user_courses');
+                Route::delete('/{user}/courses_teach/{course}/destroy_user_courses', 'UsersController@destroy_user_courses')->name('users.destroy_user_courses');
             });
 
             /**
@@ -57,7 +62,11 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
                 Route::get('/', 'CoursesController@index')->name('courses.index');
                 Route::get('/create', 'CoursesController@create')->name('courses.create');
                 Route::post('/create', 'CoursesController@store')->name('courses.store');
+                Route::get('/{course}/edit', 'CoursesController@edit')->name('courses.edit');
+                Route::patch('/{course}/update', 'CoursesController@update')->name('courses.update');
                 Route::delete('/{course}/delete', 'CoursesController@destroy')->name('courses.destroy');
+                // Route::get('/{course}/add_users_to_course', 'UsersController@add_users_to_course')->name('users.add_users_to_course');
+                // Route::post('/{course}/store_users_to_course', 'CoursesController@store_users_to_course')->name('courses.store_users_to_course');
 
             });
 
@@ -102,6 +111,12 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
                 //Distribute Students && Members of Faculty
                 Route::post('/{rotation}/distributeStudents', 'RotationsController@distributeStudents')->name('rotations.distributeStudents');
                 Route::post('/{rotation}/distributeMembersOfFaculty', 'RotationsController@distributeMembersOfFaculty')->name('rotations.distributeMembersOfFaculty');
+
+                //initial_members
+                Route::get('/{rotation}/initial_members', 'RotationsController@create_initial_members')->name('rotations.create_initial_members');
+                Route::post('/{rotation}/initial_members', 'RotationsController@store_initial_members')->name('rotations.store_initial_members');
+                Route::get('/{rotation}/edit_initial_members', 'RotationsController@edit_initial_members')->name('rotations.edit_initial_members');
+                Route::patch('/{rotation}/update_initial_members', 'RotationsController@update_initial_members')->name('rotations.update_initial_members');
             });
                         
             /**
@@ -114,6 +129,13 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
                 Route::get('/{rotation}/course/{course}/edit', 'CourseRotationController@edit')->name('rotations.course.edit');
                 Route::patch('/{rotation}/course/{course}/update', 'CourseRotationController@update')->name('rotations.course.update');
             });
+            /**
+             * Course with Objection Routes
+             */
+            Route::group(['prefix' => 'objections'], function() {
+                Route::get('/objections/user/{user}/index', 'CourseRotationUser_ObjectionController@index')->name('objections.user.index');
+            });
+
         });
     });
 

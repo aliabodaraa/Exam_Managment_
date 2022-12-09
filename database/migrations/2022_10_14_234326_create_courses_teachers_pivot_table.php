@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCoursesRotationsUsersPivotTable extends Migration
+class CreateCoursesTeachersPivotTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,13 @@ class CreateCoursesRotationsUsersPivotTable extends Migration
      */
     public function up()
     {
-        Schema::create('course_rotation_user', function (Blueprint $table) {//2Objection
+        Schema::create('course_teacher', function (Blueprint $table) {
+            $table->string('section_type');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
-            $table->unsignedBigInteger('rotation_id');
             $table->unsignedBigInteger('course_id');
-            $table->foreign(['rotation_id','course_id'])->references(['rotation_id','course_id'])->on('course_rotation')->onDelete('cascade')->onUpdate('cascade');
-            $table->primary(['course_id','user_id','rotation_id'],'courses_objections_ids');
-            $table->timestamps();
+            $table->foreign('course_id')->references('id')->on('courses')->onDelete('cascade')->onUpdate('cascade');
+            $table->primary(['course_id','user_id','section_type']);//not important because i define the common table property section_type as a string variable
         });
     }
 
@@ -31,6 +30,6 @@ class CreateCoursesRotationsUsersPivotTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('course_rotation_user');
+        Schema::dropIfExists('course_teacher');
     }
 }

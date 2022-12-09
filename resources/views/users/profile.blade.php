@@ -7,7 +7,7 @@
       <div class="row d-flex justify-content-center align-items-center h-100">
         <div class="col col-lg-9 col-xl-9">
           <div class="card" style="font-size: 20px;border: 1px solid #42b19a;">
-            <div class="rounded-top text-white d-flex flex-row" style="background-color: #42b19a; height:200px;">
+            <div class="rounded-top text-white d-flex flex-row" style="background-color: #1d5a4e; height:200px;">
               <div class="ms-4 mt-5 d-flex flex-column" style="width: 150px;">
                 {{-- <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp"
                   alt="Generic placeholder image" class="img-fluid img-thumbnail mt-4 mb-2"
@@ -15,19 +15,36 @@
                   <img src="{{ asset('images/blank-profile-picture.webp') }}"
                   alt="Generic placeholder image" class="img-fluid img-thumbnail mt-4 mb-2"
                   style="width: 150px; z-index: 1">
-                @if(in_array($user->id, [1,auth()->user()->id]))
-                  <a href={{ route("users.edit",[$user->id]) }} type="button" class="btn btn-outline-dark" data-mdb-ripple-color="dark"
-                      style="z-index: 1;">
-                      Edit profile
-                  </a>
-                @endif
+                  @if($user->id == auth()->user()->id)
+                    <a href={{ route("users.edit",[$user->id]) }} type="button" class="btn btn-outline-dark mb-1" data-mdb-ripple-color="dark"
+                        style="z-index: 1;">
+                        Edit profile
+                    </a>
+                  @endif
+                  @if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
+                    @if(count($user->teaches()->get())) 
+                      <a href={{ route("users.edit_user_courses",[$user->id]) }} type="button" class="btn btn-outline-dark" data-mdb-ripple-color="dark"
+                        style="z-index: 1;">
+                        تعديل المواد
+                      </a>
+                      @else
+                      <a href={{ route("users.create_user_courses",[$user->id]) }} type="button" class="btn btn-outline-dark" data-mdb-ripple-color="dark"
+                        style="z-index: 1;">
+                        إضافة مادة
+                      </a>
+                    @endif
+                  @endif
               </div>
               <div class="ms-3" style="margin-top: 100px;">
                 <h5>{{ $user->username }}</h5>
-                <p>{{ $user->role }} <span class="badge bg-primary" style="font-size: 12px">{{ $user->temporary_role }}</span></p>
+                <p>
+                  <span class="badge bg-danger" style="font-size: 12px">{{ $user->role }}</span>
+                  &nbsp;<span class="badge bg-warning" style="font-size: 12px">{{ $user->temporary_role }}</span>
+                  &nbsp;<span class="badge bg-secondary" style="font-size: 12px">{{ $user->property }}</span>
+                </p>
               </div>
             </div>
-            <div class="p-4 text-black" style="background-color: #f8f9fa;">
+            <div class="p-4 text-black user-profile-info" style="background-color: #f8f9fa;">
               <div class="d-flex justify-content-end text-center py-1">
                 <div>
                   <p class="mb-1 h6 small">
@@ -46,18 +63,27 @@
                   <p class="small text-muted mb-0"> عدد المراقبات في اخر دورة</p>
                 </div>
                 <div>
-                  <p class="mb-1 h6 small">4</p>
+                  <p class="mb-1 h6 small">{{ count($user->teaches) }}</p>
                   <p class="small text-muted mb-0">عدد المواد التي يدرسها</p>
                 </div>
               </div>
             </div>
-            <div class="card-body p-4 text-black">
+            <div class="card-body p-4 text-black" style="background-color: #f1f1f1;margin-top:10px">
               <div class="mb-5">
                 <p class="lead fw-normal mb-1">About</p>
-                <div class="p-4" style="background-color: #f8f9fa;">
+                <div class="p-4" style="background-color: white;border-radius: 7px;">
                   <p class="font-italic mb-1">Email : {{ $user->email }}</p>
                   @if($user->department)<p class="font-italic mb-1">Department : {{ $user->department->name }}</p>@endif
+                  @if($user->property)<p class="font-italic mb-0">Property : {{ $user->property }}</p>@endif
                   <p class="font-italic mb-0">Faculty : {{ $user->faculty->name }}</p>
+                  <p class="font-italic mb-0">City : {{ $user->city }}</p>
+                  @if(count($user->teaches()->get()))
+                    <p class="font-italic mb-0">المواد التي يدرسها :
+                      @foreach ($user->teaches()->get() as $course)
+                        <span class="badge bg-secondary">{{ $course->course_name }}</span>
+                      @endforeach
+                    </p>
+                  @endif
                 </div>
               </div>
               {{-- <div class="row g-2">
