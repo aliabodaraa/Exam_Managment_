@@ -37,10 +37,12 @@
                           $num_of_my_courses_objections=App\Models\Course::with('rotationsObjection')->whereHas('rotationsObjection', function($query) use($latest_rotation_id){
                               $query->where('user_id',Auth::user()->id)->where('rotation_id',$latest_rotation_id);})->pluck('id')->toArray();
                           @endphp
-                          @if(!count($num_of_my_courses_objections))
-                              <a href="{{ route('rotations.objections.create',$latest_rotation_id) }}" class="nav-link px-2 text-white">إنشاء إعتراضات</a>
-                          @else
-                              <a href="{{ route('rotations.objections.edit',$latest_rotation_id) }}" class="nav-link px-2 text-white">تعديل إعتراضاتي</a>
+                          @if(auth()->user()->is_active && !auth()->user()->temporary_role)
+                            @if(!count($num_of_my_courses_objections))
+                                <a href="{{ route('rotations.objections.create',$latest_rotation_id) }}" class="nav-link px-2 text-white">إنشاء إعتراضات</a>
+                            @else
+                                <a href="{{ route('rotations.objections.edit',$latest_rotation_id) }}" class="nav-link px-2 text-white">تعديل إعتراضاتي</a>
+                            @endif
                           @endif
                         </li>
                       {{-- @endif --}}

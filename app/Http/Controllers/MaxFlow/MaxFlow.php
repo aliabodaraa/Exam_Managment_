@@ -8,7 +8,6 @@ use phpDocumentor\Reflection\Types\Self_;
 class MaxFlow extends Controller
 {
     public static int $V; // Number of vertices in graph
-    public array $paths=[];
 
     public function __construct(array $graph,int $length_graph){
         Self::$V = $length_graph;
@@ -30,10 +29,11 @@ class MaxFlow extends Controller
 
         // Standard BFS Loop
         while (count($queue) != 0) {
-
-            $u = array_pop($queue);
+            // Asem Very important !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            $u = array_shift($queue);
  
             for ( $v = 0; $v < Self::$V; $v++) {
+                //dump($visited);
                 if ($visited[$v] == false
                     && $rGraph[$u][$v] > 0) {
                     // If we find a connection to the sink
@@ -57,10 +57,10 @@ class MaxFlow extends Controller
 
     // Returns the maximum flow from s to t in the given
     // graph
-    public function fordFulkerson(array $graph, int $s, int $t) : int {
+    public function fordFulkerson(array & $graph, int $s, int $t) : array {
         $u=0;
         $v=0;
- 
+        $paths=[];
         // Create a residual graph and fill the residual
         // graph with given capacities in the original graph
         // as residual capacities in residual graph
@@ -105,13 +105,15 @@ class MaxFlow extends Controller
             }
             // Add path flow to overall flow
             $max_flow += $path_flow;
-
-            array_push($this->paths,$path);
+            $path=array_reverse($path);
+            array_push($paths,$path);
         }
         
+        //Ali------move changes to the out
+        $graph = $rGraph;
  
         // Return the overall flow
-        return $max_flow;
+        return $paths;
     }
 
 }

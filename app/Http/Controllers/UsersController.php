@@ -49,9 +49,7 @@ class UsersController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
-    {   
-        $graph1=new Graph(EnumPersonType::RoomHead);
-        dd($graph1);
+    {
         return view('users.create', ['roles' => Role::latest()->get()]);
     }
 

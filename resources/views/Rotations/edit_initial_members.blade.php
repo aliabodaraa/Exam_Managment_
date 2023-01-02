@@ -48,9 +48,12 @@
                 @csrf
                 <div class="users row text-center">
                     @foreach ($users_and_roomHeads as $user_id => $user)
-                        <div class="user col-lg-2 col-sm-4 col-xs-12 card text-dark bg-light  {{ (in_array($user,$users))?'border-secondary':'border-warning' }} user {{ $user_id }}">
+                        <div class="user col-lg-2 col-sm-4 col-xs-12 card text-dark bg-light {{ (in_array($user_id,$disabled_users))?'border-danger':'' }} {{ (in_array($user,$users))?'border-secondary':'border-warning' }} user {{ $user_id }}">
                             <div class="card-header fs-6">
                                 <b>{{$user}}</b>
+                                @if(in_array($user_id,$disabled_users))
+                                    <span class="badge bg-danger text-small">Not Active</span>
+                                @endif
                             </div>
                             <div class="card-body multiselect fs-6 m-auto">
                                 <p class="card-text">
@@ -59,7 +62,8 @@
                                             <input type="checkbox" id="room_head_edit"
                                             name="users[{{ $user_id }}][1]"
                                             class='toggler-wrapper style-4'
-                                            {{ (isset($users_with_options[$user_id]) && array_key_exists(1,$users_with_options[$user_id]))?'checked':'' }}
+                                            {{ (isset($users_with_options[$user_id]) && array_key_exists(1,$users_with_options[$user_id]) && !in_array($user_id,$disabled_users))?'checked':'' }}
+                                            {{ in_array($user_id,$disabled_users)?'disabled':'' }}
                                             />رئيس قاعة</label>
                                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                             <label for="two">
@@ -67,7 +71,7 @@
                                             name="users[{{ $user_id }}][2]"
                                             class='toggler-wrapper style-4'
                                             {{ (isset($users_with_options[$user_id]) && array_key_exists(2,$users_with_options[$user_id]))?'checked':'' }}
-                                            {{ (!in_array($user,$users))?'disabled':'' }}
+                                            {{ (!in_array($user,$users)||in_array($user_id,$disabled_users))?'disabled':'' }}
                                             />أمين سر</label>
                                         </div>
                                 </p>

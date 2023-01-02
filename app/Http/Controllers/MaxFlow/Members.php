@@ -19,7 +19,7 @@ class Members extends Controller
 
         $room_heads=$this->rotation->initial_members()->wherePivot('options','{"1":"on"}')->orWherePivot('options','{"1":"on","2":"on"}')->get()->pluck('id')->toarray();
         $secertaries=$this->rotation->initial_members()->wherePivot('options','{"2":"on"}')->orWherePivot('options','{"1":"on","2":"on"}')->get()->pluck('id')->toarray();
-        $observers=array_unique(array_merge(User::where('temporary_role')->whereNotIn('id',$room_heads)->get()->pluck('id')->toarray(),$secertaries));
+        $observers=array_unique(array_merge(User::where('is_active',1)->where('temporary_role')->whereNotIn('id',$room_heads)->get()->pluck('id')->toarray(),$secertaries));
         switch($this->type){
             case EnumPersonType::RoomHead:
                 $members=$room_heads;
@@ -27,7 +27,7 @@ class Members extends Controller
             case EnumPersonType::Secertary:
                 $members=$secertaries;
                 break;
-            case EnumPersonType::Observers:
+            case EnumPersonType::Observer:
                 $members=$observers;
                 break;
             default:

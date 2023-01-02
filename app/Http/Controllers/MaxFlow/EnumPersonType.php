@@ -6,5 +6,5 @@ enum EnumPersonType
 {
     case RoomHead;
     case Secertary;
-    case Observers;
+    case Observer;
 }

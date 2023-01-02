@@ -8,6 +8,8 @@ use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\MaxMinRoomsCapacity\Stock;
+use App\Http\Controllers\MaxFlow\Graph;
+use App\Http\Controllers\MaxFlow\EnumPersonType;
 class rotationsController extends Controller
 {
 
@@ -66,27 +68,54 @@ public function current_user_observations($user){
     return $user->id;
 }
 public function distributeMembersOfFaculty(Rotation $rotation){
-    $distict_arr=[];
-    foreach ($rotation->distributionRoom as $room) {
-        $room->users()->wherePivot('rotation_id',$rotation->id)->detach();//clear the previous distribution
-        $take_three=1;
-        foreach (User::all() as $user){
-            if($take_three == 4) break;
-            if($take_three==1)$cur_roleIn='Room-Head';
-            elseif($take_three==2)$cur_roleIn='Secertary';
-            else $cur_roleIn='Observer';
-            if(!in_array($user->id, $distict_arr) &&( ($user->role!='Doctor' && $take_three != 1) || $user->role=='Doctor' && $take_three == 1 ) ){
-                array_push($distict_arr,$user->id);
-                if( $user->is_active && !$user->temporary_role &&
-                $user->faculty_id == auth()->user()->faculty->id /*&&
-                $user->number_of_observation <= $this->current_user_observations($user)*/ ){
-                                $take_three++;
-                                array_push($distict_arr,$user->id);
-                                $room->users()->attach($user->id,['rotation_id'=>$rotation->id,'course_id'=>$room->pivot->course_id,'roleIn'=>$cur_roleIn]);
-                    } 
-            }
-        }
+    //old work start
+                    // $distict_arr=[];
+                    // foreach ($rotation->distributionRoom as $room) {
+                    //     $room->users()->wherePivot('rotation_id',$rotation->id)->detach();//clear the previous distribution
+                    //     $take_three=1;
+                    //     foreach (User::all() as $user){
+                    //         if($take_three == 4) break;
+                    //         if($take_three==1)$cur_roleIn='Room-Head';
+                    //         elseif($take_three==2)$cur_roleIn='Secertary';
+                    //         else $cur_roleIn='Observer';
+                    //         if(!in_array($user->id, $distict_arr) &&( ($user->role!='Doctor' && $take_three != 1) || $user->role=='Doctor' && $take_three == 1 ) ){
+                    //             array_push($distict_arr,$user->id);
+                    //             if( $user->is_active && !$user->temporary_role &&
+                    //             $user->faculty_id == auth()->user()->faculty->id /*&&
+                    //             $user->number_of_observation <= $this->current_user_observations($user)*/ ){
+                    //                             $take_three++;
+                    //                             array_push($distict_arr,$user->id);
+                    //                             $room->users()->attach($user->id,['rotation_id'=>$rotation->id,'course_id'=>$room->pivot->course_id,'roleIn'=>$cur_roleIn]);
+                    //                 } 
+                    //         }
+                    //     }
+                    // }
+    //old work end
+
+    $graph_room_heads=new Graph(EnumPersonType::RoomHead);
+    list($paths_room_heads,$paths_info_room_heads)=$graph_room_heads->applyMaxFlowAlgorithm();
+    foreach ($paths_info_room_heads['users_observations'] as $room_head_id => $room_heads_observations){
+        $s=User::where('id',$room_head_id)->first();
+        foreach ($room_heads_observations as $room_head_observation)
+            $s->courses()->attach($room_head_observation['course'],['rotation_id'=>$room_head_observation['rotation'],'room_id'=>$room_head_observation['room'],'roleIn'=>$room_head_observation['roleIn']]);
     }
+    //dump($paths_room_heads,$paths_info_room_heads);
+    $graph_secertaries=new Graph(EnumPersonType::Secertary,$paths_info_room_heads);
+    list($paths_secertaries,$paths_info_secertaries)=$graph_secertaries->applyMaxFlowAlgorithm();
+    foreach ($paths_info_secertaries['users_observations'] as $secertary_id => $secertarys_observations){
+        $s=User::where('id',$secertary_id)->first();
+        foreach ($secertarys_observations as $secertary_observation)
+            $s->courses()->attach($secertary_observation['course'],['rotation_id'=>$secertary_observation['rotation'],'room_id'=>$secertary_observation['room'],'roleIn'=>$secertary_observation['roleIn']]);
+    }
+    //dump($paths_secertaries,$paths_info_secertaries);
+    $graph_observers=new Graph(EnumPersonType::Observer,$paths_info_secertaries);
+    list($paths_observers,$paths_info_observers)=$graph_observers->applyMaxFlowAlgorithm();
+    foreach ($paths_info_observers['users_observations'] as $observer_id => $observers_observations){
+        $s=User::where('id',$observer_id)->first();
+        foreach ($observers_observations as $observer_observation)
+            $s->courses()->attach($observer_observation['course'],['rotation_id'=>$observer_observation['rotation'],'room_id'=>$observer_observation['room'],'roleIn'=>$observer_observation['roleIn']]);
+    }
+    //dd($paths_observers,$paths_info_observers);
     return redirect("/rotations/$rotation->id/show")
     ->withSuccess(__('You have successfully distribute all Members to the sutable rooms'));
 }
@@ -242,7 +271,8 @@ public function distributeMembersOfFaculty(Rotation $rotation){
                       orWhere('temporary_role')->where('role','!=','دكتور')->get()->pluck('username','id')->
                       toarray();
         $users_and_roomHeads=$room_heads+$users;
-        return view('Rotations.create_initial_members',compact('rotation','users','users_and_roomHeads'));
+        $disabled_users=User::where('is_active',0)->pluck('id')->toarray();
+        return view('Rotations.create_initial_members',compact('rotation','users','users_and_roomHeads','disabled_users'));
     }
 
     public function store_initial_members(Request $request, Rotation $rotation)
@@ -264,10 +294,11 @@ public function distributeMembersOfFaculty(Rotation $rotation){
                       orWhere('temporary_role')->where('role','!=','دكتور')->get()->pluck('username','id')->
                       toarray();
         $users_and_roomHeads=$room_heads+$users;
+        $disabled_users=User::where('is_active',0)->pluck('id')->toarray();
         foreach ($rotation->initial_members()->get() as $user){
             $users_with_options[$user->id]=(array)json_decode($user->pivot->options);
         }
-        return view('Rotations.edit_initial_members',compact('rotation','users','users_and_roomHeads','users_with_options'));
+        return view('Rotations.edit_initial_members',compact('rotation','users','users_and_roomHeads','users_with_options','disabled_users'));
     }
     public function update_initial_members(Request $request, Rotation $rotation)
     {
