@@ -88,7 +88,7 @@ public function distributeMembersOfFaculty(Rotation $rotation){
         }
     }
     return redirect("/rotations/$rotation->id/show")
-    ->withwithSuccess(__('You have successfully distribute all Members to the sutable rooms'));
+    ->withSuccess(__('You have successfully distribute all Members to the sutable rooms'));
 }
 
 

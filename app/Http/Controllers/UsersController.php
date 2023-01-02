@@ -14,6 +14,7 @@ use illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 use App\Http\Controllers\MaxMinRoomsCapacity\Stock;
 use App\Http\Controllers\MaxFlow\Graph;
+use App\Http\Controllers\MaxFlow\EnumPersonType;
 class UsersController extends Controller
 {
     /**
@@ -24,8 +25,8 @@ class UsersController extends Controller
     public function index()
     {
         // $users = User::first()->paginate(20);
-        //$users = User::paginate(8);
-        $users = User::all();
+        $users = User::paginate(80);
+        //$users = User::all();
 
         return view('users.index', compact('users'));
     }
@@ -48,7 +49,9 @@ class UsersController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
-    {Graph::members();
+    {   
+        $graph1=new Graph(EnumPersonType::RoomHead);
+        dd($graph1);
         return view('users.create', ['roles' => Role::latest()->get()]);
     }
 
