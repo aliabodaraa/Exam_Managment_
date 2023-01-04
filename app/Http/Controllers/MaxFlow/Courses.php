@@ -9,11 +9,10 @@ class Courses extends Controller
     private Rotation $rotation;
     private array $courses_ids;
     private int $length;
-    private int $num_distict_times;
 
     public function __construct($rotation){
         $this->rotation=$rotation;
-        $courses=$this->rotation->coursesProgram()->orderBy('course_rotation.date','asc')->get()->pluck('id')->toarray();
+        $courses=$this->rotation->coursesProgram()->orderBy('course_rotation.date','asc')->toBase()->pluck('id')->toarray();
         $this->courses_ids=$courses;
         $this->length=count($courses);
     }

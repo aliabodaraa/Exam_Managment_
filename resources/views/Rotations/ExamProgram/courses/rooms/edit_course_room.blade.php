@@ -98,12 +98,12 @@ $remaining_places_in_room=$total_capacity-$num_places_occupied_in_this_room;
                                         @foreach ($courses_common_with_time as $course_belongs)
                                                 @php
                                                     $number_taken_in_this_room_course=0;
-                                                    foreach ($course_belongs->distributionRoom()->where('rotation_id',$rotation->id)->get() as $oneroom)
+                                                    foreach ($course_belongs->distributionRoom()->where('rotation_id',$rotation->id)->toBase()->get() as $oneroom)
                                                         if($oneroom->id==$specific_room->id){
-                                                            $number_taken_in_this_room_course=App\Http\Controllers\MaxMinRoomsCapacity\Stock::getOccupiedNumberOfStudentsInThisCourseInSpecificRoom($rotation, $course_belongs, $oneroom);
+                                                            $number_taken_in_this_room_course=App\Http\Controllers\MaxMinRoomsCapacity\Stock::getOccupiedNumberOfStudentsInThisCourseInSpecificRoom($rotation, $course_belongs, $oneroom->id);
                                                             $num_all_courses_occupied_this_room+=$number_taken_in_this_room_course;
                                                         }
-                                                @endphp 
+                                                @endphp
                                                 @if($number_taken_in_this_room_course)
                                                 <h5>
                                                     <a style="text-decoration: none;" href="{{ route("rotations.get_room_for_course",[$rotation->id,$course_belongs->id,$specific_room->id]) }}" class="badge bg-{{($course->id == $course_belongs->id ) ? 'danger': 'secondary'}}">{{$course_belongs->course_name}}</a>
@@ -126,7 +126,11 @@ $remaining_places_in_room=$total_capacity-$num_places_occupied_in_this_room;
         </div>
             <h2 class="m-4"> تعديل القاعة <b>{{$specific_room->room_name}}</b> في مقرر <b>{{$course->course_name}}</b> 
                 <div class="" style="float: right;">
-                    <a href="{{ URL::previous() }}" class="btn btn-dark">Back</a>
+                    <a href="{{url()->previous()}}" class="btn btn-dark">رجوع
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+                        </svg>
+                    </a>
                 </div>
             </h2>
             <div class="mt-2">
@@ -177,7 +181,7 @@ $remaining_places_in_room=$total_capacity-$num_places_occupied_in_this_room;
                             <input class="form-control" 
                             type="text" 
                             id="search_user_name" 
-                            onkeyup="searchForUserName(JSON.stringify({{ App\Models\User::all() }}))" placeholder="Serarch Users">
+                            onkeyup="searchForUserName(JSON.stringify({{ App\Models\User::toBase()->get() }}))" placeholder="Serarch Users">
                         </div>
                     </div>
   
@@ -195,7 +199,7 @@ $remaining_places_in_room=$total_capacity-$num_places_occupied_in_this_room;
                             </div>
                         </div>
                         @php $counter=0; @endphp
-                    @foreach(App\Models\User::all() as $user)
+                    @foreach(App\Models\User::toBase()->get() as $user)
                             <?php if($user->id==1) continue; ?>
                                 <div id="{{$user->id}}" class="user {{$user->id}} d1 bg-white"" style="display: block;border: 1px solid #d5d5d5;cursor: disabled;
                                 border-radius: 7px;width:32.5%;position:relative;float:right;right:6px;

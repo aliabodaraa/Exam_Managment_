@@ -10,7 +10,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- Bootstrap core CSS -->
     <link href="{!! url('assets/bootstrap/css/bootstrap.min.css') !!}" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">{{-- added --}}
     <style>
 
 
@@ -211,7 +211,7 @@
   transform: translateY(-50%);
   font-size: 75%;
   text-transform: uppercase;
-  font-weight: 500;
+  font-weight: 900;
   color: white;
 }
 
@@ -2334,8 +2334,12 @@ div.h4 {
   #nav_btn_external,#nav_content_external, #nav_btn_internal{
     /* display: none; */
   }
-  #nav{font-size:64%;}
+  #nav{font-size:67%;font-weight: 900;}
   .username{
+    position: absolute;
+    top: 6px;right: 56px;
+  }
+  .profile-icon{
     position: absolute;
     top: 6px;right: 20px;
   }
@@ -2364,6 +2368,10 @@ div.h4 {
         .username{
           position: absolute;
           top: 86px;right: 5px;
+        }
+        .profile-icon{
+          position: absolute;
+          top: 10px;left: 80px;
         }
         .collect-index-btns{
           display: flow-root;
@@ -2418,6 +2426,9 @@ div.h4 {
         color: black;
         background-color:#6c757d;
         border-color: #6c757d;
+    }
+    #nav > li{
+        font-size: 14px;
     }
     #nav > li:hover{
         border-radius: 5px;

@@ -18,7 +18,7 @@ class Course extends Model
         'faculty_id'
     ];
 
-    public function TeachesBy(){
+    public function teachesBy(){
         return $this->belongsToMany('App\Models\User','course_teacher')->withPivot('course_id','user_id','section_type');
         //->where('role','Doctor')->orWhere('role','Engineer');
     }

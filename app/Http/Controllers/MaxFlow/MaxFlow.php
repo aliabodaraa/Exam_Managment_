@@ -106,6 +106,7 @@ class MaxFlow extends Controller
             // Add path flow to overall flow
             $max_flow += $path_flow;
             $path=array_reverse($path);
+            
             array_push($paths,$path);
         }
         

@@ -8,7 +8,11 @@
                 <span class="badge bg-danger">Course Full</span>
             @endif
             <div class="float-right">
-                <a href="{{ URL::previous() }}" class="btn btn-dark">Back</a>
+                <a href="{{url()->previous()}}" class="btn btn-dark">رجوع
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+                    </svg>
+                </a>
             </div>
         </h1>
         <div class="lead">
@@ -24,9 +28,9 @@
             {{-- What this --}}
                 @if ($ss = Session::get('disabled_rooms'))
                     <!-- when you submit -->
-                    @foreach (array_unique($disabled_common_rooms_send) as $itemArr)
+                    @foreach ($disabled_common_rooms_send as $itemArr)
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <strong>{{$ss}}Stop trying to submit The<b>@php $room_name=App\Models\Room::where('id',$itemArr)->first();echo $room_name->room_name; @endphp</b>reserves now in anothor course it will free after now for this reason either Un-checked the room Or make both courses in the same time</strong>
+                            <strong>{{$ss}}Stop trying to submit The<b>@php $room_name=App\Models\Room::where('id',$itemArr)->toBase()->first();echo $room_name->room_name; @endphp</b>reserves now in anothor course it will free after now for this reason either Un-checked the room Or make both courses in the same time</strong>
                             <button type="button" class="btn-close mt-1" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     @endforeach
@@ -99,13 +103,13 @@
                     <div class="mb-3">
                         <label for="duration" class="form-label">duration :</label>
                         <select class="form-control" name="duration" class="form-control" required>
-                            <option value="01:00" {{ ($course->rotationsProgram()->where('id',$rotation->id)->get()[0]->pivot->duration == "01:00") ? "selected": "" }}>01:00 hours</option>
-                            <option value="01:30" {{ ($course->rotationsProgram()->where('id',$rotation->id)->get()[0]->pivot->duration == "01:30") ? "selected": "" }}>01:30 hours</option>
-                            <option value="02:00" {{ ($course->rotationsProgram()->where('id',$rotation->id)->get()[0]->pivot->duration == "02:00") ? "selected": "" }}>2 hours</option>
-                            <option value="02:30" {{ ($course->rotationsProgram()->where('id',$rotation->id)->get()[0]->pivot->duration == "02:30") ? "selected": ""}}>02:30 hours</option>
-                            <option value="03:00" {{ ($course->rotationsProgram()->where('id',$rotation->id)->get()[0]->pivot->duration == "03:00") ? "selected": "" }}>03:00 hours</option>
-                            <option value="03:30" {{ ($course->rotationsProgram()->where('id',$rotation->id)->get()[0]->pivot->duration == "03:30") ? "selected": "" }}>03:30 hours</option>
-                            <option value="04:00" {{ ($course->rotationsProgram()->where('id',$rotation->id)->get()[0]->pivot->duration == "04:00") ? "selected": "" }}>04:00 hours</option>
+                            <option value="01:00" {{ ($duration == "01:00") ? "selected": "" }}>01:00 hours</option>
+                            <option value="01:30" {{ ($duration == "01:30") ? "selected": "" }}>01:30 hours</option>
+                            <option value="02:00" {{ ($duration == "02:00") ? "selected": "" }}>2:00 hours</option>
+                            <option value="02:30" {{ ($duration == "02:30") ? "selected": ""}}>02:30 hours</option>
+                            <option value="03:00" {{ ($duration == "03:00") ? "selected": "" }}>03:00 hours</option>
+                            <option value="03:30" {{ ($duration == "03:30") ? "selected": "" }}>03:30 hours</option>
+                            <option value="04:00" {{ ($duration == "04:00") ? "selected": "" }}>04:00 hours</option>
                         </select>
                         @if ($errors->has('duration'))
                             <span class="text-danger text-left">{{ $errors->first('duration') }}</span>
@@ -114,7 +118,7 @@
                     <div class="mb-3">
                         <label for="faculty_id" class="form-label">faculty_id</label>
                         <select class="form-control" name="faculty_id" class="form-control" required>
-                            @foreach (App\Models\Faculty::all() as $faculty)
+                            @foreach (App\Models\Faculty::toBase()->get() as $faculty)
                                 <option value='{{ $faculty->id }}' {{ ($course->faculty->id == $faculty->id) ? 'selected': '' }}>{{ $faculty->name }}</option>
                             @endforeach
                         </select>
@@ -145,7 +149,7 @@
                                     @endif --}}
                                 </thead>
                                 @php $num_all_courses_occupied_in_all_rooms=0; @endphp
-                                @foreach(App\Models\Room::all() as $room)
+                                @foreach(App\Models\Room::toBase()->get() as $room)
                                     <tr style="position: relative;top:-1px;">
                                         <td>
                                         {{-- <label class="toggler-wrapper style-4"> --}}
@@ -154,42 +158,30 @@
                                                 name="rooms[{{ $room->id }}]"
                                                 value="{{ $room->id }}"
                                                 class='rooms toggler-wrapper style-4'
-                                                {{ in_array($room->id, array_unique($rooms_this_course))
+                                                {{ in_array($room->id, $rooms_this_course)
                                                     ? 'checked'
                                                     : '' }}
-                                                {{ (in_array($room->id, array_unique($disabled_rooms)) &&
-                                                ! in_array($room->id, array_unique($common_rooms_ids)))
+                                                {{ (in_array($room->id, $disabled_rooms) &&
+                                                ! in_array($room->id, $common_rooms_ids))
                                                     ? 'disabled'
                                                     : '' }}
-                                                {{(!in_array($room->id, array_unique($rooms_this_course)) && ! in_array($room->id, array_unique($common_rooms_ids)) && $occupied_number_of_students_in_this_course === $entered_students_number)? 'disabled': '' }}
+                        {{ count($rotation->rooms()->toBase()->get())? 'disabled': '' }}{{-- added --}}
+                                                {{(!in_array($room->id, $rooms_this_course) && ! in_array($room->id, $common_rooms_ids) && $occupied_number_of_students_in_this_course === $entered_students_number)? 'disabled': '' }}
                                                 >
                                             @else
                                                 <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="danger" style="margin-left:10px; width: 25px;height: 25px;">
                                             @endif
                                         </td>
                                         <td>{{ $room->room_name }}</td>
-                                         @php 
-                                         $common_courses=[];
-                                        foreach ($rotation->coursesProgram()->get() as $courseM) {
-                                            if((count($courseM->rotationsProgram()->wherePivot('date',$date)->wherePivot('time','>=',$time)->wherePivot('time','<=',gmdate('H:i:s',strtotime($time)+strtotime($duration)))->where('id',$courseM->id)->get()->toArray())
-                                            ||  count($courseM->rotationsProgram()->wherePivot('date',$date)->wherePivot('time','<=',$time)->wherePivot('time','>=',gmdate('H:i:s',strtotime($time)-strtotime($duration)))->where('id',$courseM->id)->get()->toArray()))){
-                                                foreach ($courseM->rooms as $room) {
-                                                    if($rotation->id == $room->pivot->rotation_id)
-                                                        array_push($common_courses,$courseM);
-                                                }
-                                            }
-                                        }
-                                          @endphp
                                             <td>
-                                                {{-- list($number_taken_in_this_room_course,)=App\Http\Controllers\MaxMinRoomsCapacity\Stock::getOccupiedNumberOfStudentsInThisCourse($rotation, $course); --}}
                                                 @php $num_all_courses_occupied_this_room=0; @endphp
                                                 <div class="common-courses">
                                                         @foreach ($courses_common_with_time as $course_belongs)
                                                             @php
                                                                 $number_taken_in_this_room_course=0;
-                                                                foreach ($course_belongs->distributionRoom()->where('rotation_id',$rotation->id)->get() as $oneroom)
-                                                                    if($oneroom->id==$room->id){
-                                                                        $number_taken_in_this_room_course=App\Http\Controllers\MaxMinRoomsCapacity\Stock::getOccupiedNumberOfStudentsInThisCourseInSpecificRoom($rotation, $course_belongs, $oneroom);
+                                                                $distributed_rooms_in_this_course_this_rotation=$course_belongs->distributionRoom()->where('rotation_id',$rotation->id)->toBase()->pluck('id')->toarray();
+                                                                    if(in_array($room->id,$distributed_rooms_in_this_course_this_rotation)){
+                                                                        $number_taken_in_this_room_course=App\Http\Controllers\MaxMinRoomsCapacity\Stock::getOccupiedNumberOfStudentsInThisCourseInSpecificRoom($rotation, $course_belongs, $room->id);
                                                                         $num_all_courses_occupied_this_room+=$number_taken_in_this_room_course;
                                                                     }
                                                             @endphp 
@@ -207,28 +199,28 @@
                                             </td>
                                         <td>
                                             {{-- Capacity / Occupied --}}
-                                             @if(in_array($room->id, array_unique($rooms_this_course)) || in_array($room->id, array_unique($joining_rooms)) || in_array($room->id, array_unique($common_rooms_ids)))
+                                             @if(in_array($room->id, $rooms_this_course) || in_array($room->id, $joining_rooms) || in_array($room->id, $common_rooms_ids))
                                                 <span class="badge bg-{{(($room->capacity+$room->extra_capacity) - $num_all_courses_occupied_this_room)?'primary':'danger'}}">{{($room->capacity+$room->extra_capacity)}}/{{$num_all_courses_occupied_this_room}}</span>
                                              @endif 
                                         </td>
                                         <td>
                                             {{-- status --}}
-                                            @if(in_array($room->id, array_unique($rooms_this_course)) || in_array($room->id, array_unique($joining_rooms)) || in_array($room->id, array_unique($common_rooms_ids)))
+                                            @if(in_array($room->id, $rooms_this_course) || in_array($room->id, $joining_rooms) || in_array($room->id, $common_rooms_ids))
                                                 <span class="badge bg-{{(($room->capacity+$room->extra_capacity) - $num_all_courses_occupied_this_room)?'secondary':'danger'}}">{{(($room->capacity+$room->extra_capacity) - $num_all_courses_occupied_this_room)?($room->capacity+$room->extra_capacity) - $num_all_courses_occupied_this_room.' Free':'Full'}}</span>        
                                             @endif
                                         </td>
                                         <td>
                                             @php
-                                                $num_members_in_room=count($course->users()->wherePivot('rotation_id',$rotation->id)->wherePivot('room_id',$room->id)->get());
+                                                $num_members_in_room=count($course->users()->wherePivot('rotation_id',$rotation->id)->wherePivot('room_id',$room->id)->toBase()->get());
                                             @endphp
-                                            @if(in_array($room->id, array_unique($rooms_this_course)))
+                                            @if(in_array($room->id, $rooms_this_course))
                                             <span class="badge bg-{{($num_members_in_room)? 'success':'warning' }}">
                                                 {{ $num_members_in_room }} {{ Str::plural("person",$num_members_in_room)}}
                                             </span>
                                             @endif
                                         </td>
                                         <td>
-                                            @if(in_array($room->id, array_unique($joining_rooms))) 
+                                            @if(in_array($room->id, $joining_rooms)) 
                                             {{-- count_taken_student_in_all_rooms_in_this_course--}}
                                                     <a href="/rotations/{{ $rotation->id }}/course/{{ $course->id }}/room/{{ $room->id }}" class="btn-sm btn btn-warning" style="
                                                     {{  ($occupied_number_of_students_in_this_course === $entered_students_number) ? 'pointer-events: none;background-color: #ffc10773;border-color: #ffc10773;':''}}
@@ -236,9 +228,9 @@
                                                             Joining
                                                     </a>
                                             @endif
-                                            <a href="/rotations/{{ $rotation->id }}/course/{{ $course->id }}/room/{{ $room->id }}" class="btn-sm btn @php echo (in_array($room->id,array_unique($common_rooms_ids)))? 'btn-success':'btn-danger'; @endphp"
+                                            <a href="/rotations/{{ $rotation->id }}/course/{{ $course->id }}/room/{{ $room->id }}" class="btn-sm btn @php echo (in_array($room->id,$common_rooms_ids))? 'btn-success':'btn-danger'; @endphp"
                                                 {{-- /{{ route('courses.get_room_for_course', ['rotation'=>$rotation->id,'course'=>$course->id,'specific_room'=>$room->id]) }} --}}
-                                            style="{{ (!in_array($room->id, array_unique($common_rooms_ids))&& in_array($room->id,$disabled_common_rooms_send)) ? 'pointer-events: none;background-color:#999' : '' }} ;display:none;">{{(in_array($room->id,array_unique($common_rooms_ids))) ?'Manage':'specify members'}}
+                                            style="{{ (!in_array($room->id, $common_rooms_ids)&& in_array($room->id,$disabled_common_rooms_send)) ? 'pointer-events: none;background-color:#999' : '' }} ;display:none;">{{(in_array($room->id,$common_rooms_ids)) ?'Manage':'specify members'}}
                                             </a>
                                         </td>
                                         {{-- @if(in_array($room->id,$disabled_common_rooms_send))

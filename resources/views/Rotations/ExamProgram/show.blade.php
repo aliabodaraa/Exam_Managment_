@@ -32,23 +32,72 @@
             </h1>
         @endif --}}
         @if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
+            @php
+                list($all_rotations_table, $observations_number_in_latest_rotation)=App\Http\Controllers\MaxMinRoomsCapacity\Stock::calcInfoForEachRotationForSpecificuser(Auth::user());
+            @endphp
+
             <div class="text-center mb-4">
                 <div class="btn-group" role="group" aria-label="Basic example">
-                    @if($rotation->id == \App\Models\Rotation::latest()->first()->id)
-                        @if(!count(\App\Models\Rotation::latest()->first()->initial_members()->get()))
-                            <a href="{{ route('rotations.create_initial_members',\App\Models\Rotation::latest()->first()->id) }}" class="btn btn-danger">إنشاء تعيينات الأعضاء</a>
-                        @else
-                            <a href="{{ route('rotations.edit_initial_members',\App\Models\Rotation::latest()->first()->id) }}" class="btn btn-danger">تعديل تعيينات الأعضاء</a>
+                    @if(count($rotation->coursesProgram()->get()) )
+                        @if(!count($rotation->rooms()->get()))
+                            @if(!count($rotation->initial_members()->get()))
+                                <a href="{{ route('rotations.create_initial_members',$rotation->id) }}" class="btn btn-danger">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill-add" viewBox="0 0 16 16">
+                                        <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0Zm-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                                        <path d="M2 13c0 1 1 1 1 1h5.256A4.493 4.493 0 0 1 8 12.5a4.49 4.49 0 0 1 1.544-3.393C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4Z"/>
+                                      </svg> إنشاء تعيينات الأعضاء</a>
+                            @else
+                                <a href="{{ route('rotations.edit_initial_members',$rotation->id) }}" class="btn btn-danger"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-lines-fill" viewBox="0 0 16 16">
+                                    <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5zm.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1h-4zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2z"/>
+                                  </svg> تعديل تعيينات الأعضاء</a>
+                            @endif
                         @endif
+                        @if(!count($rotation->distributionCourse()->get()))
+                            <a href="#sortModalToggle" data-bs-toggle="modal" class='btn btn-secondary rounded-0 rounded-end'>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people" viewBox="0 0 16 16">
+                                    <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8Zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022ZM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816ZM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0Zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/>
+                                  </svg> توزيع الطلاب على القاعات</a>
+                            @include('layouts.partials.popUpSort',['route_info' => ['rotations.distributeStudents',$rotation->id],'name_button' => "توزيع الطلاب"])
+                            <a href="{{ route('rotations.program.add_course_to_the_program',$rotation->id) }}" class="btn btn-success float-right me-2 m4-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-journal-plus" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M8 5.5a.5.5 0 0 1 .5.5v1.5H10a.5.5 0 0 1 0 1H8.5V10a.5.5 0 0 1-1 0V8.5H6a.5.5 0 0 1 0-1h1.5V6a.5.5 0 0 1 .5-.5z"/>
+                                    <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2z"/>
+                                    <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1z"/>
+                                </svg> إضافة مقرر للبرنامج
+                            </a>
+                        @elseif(!count($rotation->rooms()->get()))
+                            <a href="#sortModalToggle" data-bs-toggle="modal" class='btn btn-dark rounded-0 rounded-end'>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people" viewBox="0 0 16 16">
+                                <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8Zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022ZM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816ZM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0Zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/>
+                              </svg> توزيع الأعضاء على القاعات</a>
+                            @include('layouts.partials.popUpSort',['route_info' => ['rotations.distributeMembersOfFaculty',$rotation->id]
+                            ,'name_button' => "توزيع الأعضاء"])
+                        @endif
+                        @if(count($rotation->rooms()->get()))
+                            <a href="#initializationInExamProgram" data-bs-toggle="modal" class='btn btn-danger'><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                                <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                            </svg> تهيئة البرنامج الإمتحاني</a>
+                            @include('layouts.partials.initialization.initializationInExamProgram',['route_info' => ['rotations.initExamProgram',$rotation->id],'header_text'=>'تهيئة البرنامج الإمتحاني','description'=>'!!هل أنت متاكد أنك تريد تهيئة البرنامج الإمتحاني , سيؤدي ذلك لحذف كل المقررات بالكامل'])
+                            <a href="#initializationRoomsInAllCourses" data-bs-toggle="modal" class='btn btn-secondary rounded-0 rounded-end'><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                                <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                            </svg> تهيئة القاعات</a>
+                            @include('layouts.partials.initialization.initializationRoomsInAllCourses',['route_info' => ['rotations.initRoomsInAllCourses',$rotation->id],'header_text'=>'تهيئة القاعات','description'=>'!!هل أنت متاكد أنك تريد تهيئة القاعات , سيؤدي ذلك لحذف كل القاعات من المقررات بالكامل'])
+                            <a href="#intializationInExamProgramModalToggle" data-bs-toggle="modal" class='btn btn-dark rounded-0 rounded-end'><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar-x" viewBox="0 0 16 16">
+                                <path d="M6.146 7.146a.5.5 0 0 1 .708 0L8 8.293l1.146-1.147a.5.5 0 1 1 .708.708L8.707 9l1.147 1.146a.5.5 0 0 1-.708.708L8 9.707l-1.146 1.147a.5.5 0 0 1-.708-.708L7.293 9 6.146 7.854a.5.5 0 0 1 0-.708z"/>
+                                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                            </svg> تهيئة المراقبات</a>
+                            @include('layouts.partials.initialization.initializationUsersObservationsInAllCourses',['route_info' => ['rotations.initUsersObservationsInAllCourses',$rotation->id],'header_text'=>'تهيئة المراقبات','description'=>'!!هل أنت متاكد أنك تريد تهيئة المراقبات , سيؤدي ذلك لحذف كل الأشخاص الذين تم تعيينهم في القاعات وذلك في جميع المقررات'])
+                        @endif
+
+                    @else
+                    <a href="{{ route('rotations.program.add_course_to_the_program',$rotation->id) }}" class="btn btn-success float-right me-2 m4-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-journal-plus" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8 5.5a.5.5 0 0 1 .5.5v1.5H10a.5.5 0 0 1 0 1H8.5V10a.5.5 0 0 1-1 0V8.5H6a.5.5 0 0 1 0-1h1.5V6a.5.5 0 0 1 .5-.5z"/>
+                        <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2z"/>
+                        <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1z"/>
+                        </svg> إضافة مقرر للبرنامج
+                    </a>    
                     @endif
-                    <form method="POST" action="{{route('rotations.distributeStudents',$rotation->id)}}" id="coursesForm">
-                        @csrf
-                        <button type="submit" class="btn btn-secondary rounded-0">توزيع الطلاب على القاعات </button>
-                    </form>
-                    <form method="POST" action="{{route('rotations.distributeMembersOfFaculty',$rotation->id)}}" id="coursesForm">
-                        @csrf
-                        <button type="submit" class="btn btn-dark rounded-0 rounded-end">توزيع الأعضاء على القاعات </button>
-                    </form>
                 </div>
             </div>
         @endif
@@ -60,13 +109,15 @@
             </div>
             <div class="col-lg-2 col-sm-2 col-xs-2">
                 <div class="collect-index-btns gap-1">
-                    @if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
-                    <a href="{{ route('rotations.program.add_course_to_the_program',$rotation->id) }}" class="btn btn-success float-right me-2 m4-2">Add Course</a>
-                    @endif
-                    <a href="{{url()->previous()}}" class="btn btn-dark">Back</a>
+                    <a href="{{url()->previous()}}" class="btn btn-dark">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+                        </svg> رجوع
+                    </a>
                 </div>
             </div>
         </div>
+
         @if ($createUpdateObjections = Session::get('createUpdateObjections'))
         <div class="alert alert-success alert-block">
             <strong>{{ $createUpdateObjections }}</strong>
@@ -169,18 +220,21 @@
                                                 @endphp
                                             </h5>
                                             @if(count($rotation->distributionRoom()->wherePivot('course_id',$courseQ->id)->get()->toArray()))
-                                            <div class="controll {{($year_number==4||$year_number==5) ?'d-flex':''}}">
-                                                    @if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
-                                                        <a href="{{route('rotations.course.show',['rotation'=>$rotation->id,'course'=>$courseQ->id])}}" class="btn btn-warning btn-sm btn-outline-light rounded">Show</a>
-                                                        <a href="{{route('rotations.course.edit',['rotation'=>$rotation->id,'course'=>$courseQ->id])}}" class="btn btn-info btn-sm btn-outline-light rounded">Edit</a>
-                                                        <a href="{{route('rotations.course.delete_course_from_program',['rotation'=>$rotation->id,'course'=>$id_course])}}" class="btn btn-danger btn-sm btn-outline-light rounded">Delete</a>
-                                                    @endif
-                                                    <span class="badge bg-secondary m-0">{{gmdate('H:i A',strtotime($time))}}</span>
-                                            </div>
+                                                <div class="controll {{($year_number==4||$year_number==5) ?'d-flex':''}}">
+                                                        @if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
+                                                            <a href="{{route('rotations.course.show',['rotation'=>$rotation->id,'course'=>$courseQ->id])}}" class="btn btn-warning btn-sm btn-outline-light rounded">Show</a>
+                                                            <a href="{{route('rotations.course.edit',['rotation'=>$rotation->id,'course'=>$courseQ->id])}}" class="btn btn-info btn-sm btn-outline-light rounded">Edit</a>
+                                                            @if(!count($rotation->rooms()->get()))
+                                                                <a href="#exampleModalToggle{{ $id_course }}" data-bs-toggle="modal"  href="{{route('rotations.course.delete_course_from_program',['rotation'=>$rotation->id,'course'=>$id_course])}}" class="btn btn-danger btn-sm btn-outline-light rounded">حذف</a>
+                                                            @endif
+                                                        @endif
+                                                        <span class="badge bg-secondary m-0">{{gmdate('H:i A',strtotime($time))}}</span>
+                                                </div>
                                             @else
+                                                <a href="#exampleModalToggle{{ $id_course }}" data-bs-toggle="modal" class="badge bg-danger rounded">حذف</a>                                                
                                                 <span class="badge bg-secondary m-0">{{gmdate('H:i A',strtotime($time))}}</span>
                                             @endif
-
+                                            @include('layouts.partials.popUpDelete',['route_info' => ['rotations.course.delete_course_from_program', $rotation->id, $id_course],'description' => "هل أنت متأكد أنك تريد حذف المقرر $courseQ->course_name"])
                                         </td>
                                     @endif
                                 @endforeach

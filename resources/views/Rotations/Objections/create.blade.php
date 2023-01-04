@@ -97,7 +97,7 @@
                                             @endif--}}
                                         @endif
                                         @php
-                                        $courseQ= App\Models\Course::where('id',$id_course)->first();
+                                        $courseQ= App\Models\Course::where('id',$id_course)->toBase()->first();
                                         @endphp
                                         @if($courseQ)
                                             <td id="course{{ $courseQ->id }}" class="course" align="center" height="100">
@@ -123,7 +123,8 @@
                                                     </h5>
                                                 </div>
                                                 <div class="controll">
-                                                    <span class="badge bg-secondary">{{gmdate('H:i A',strtotime($time))}}</span><span class="badge bg-dark">{{gmdate('H:i A',strtotime($time)+strtotime($rotation->coursesProgram()->where('id',$courseQ->id)->get()[0]->pivot->duration))}}</span>
+                                                    <span class="badge bg-secondary">{{gmdate('H:i A',strtotime($time))}}</span>
+                                                    {{-- <span class="badge bg-dark">{{gmdate('H:i A',strtotime($time)+strtotime($rotation->coursesProgram()->where('id',$courseQ->id)->get()[0]->pivot->duration))}}</span> --}}
                                                 </div>
                                             </td>
                                         @endif

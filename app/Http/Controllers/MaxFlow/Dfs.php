@@ -13,7 +13,7 @@ class Dfs extends Controller
     private array $parents;
     private int $curr_node;
     public function __construct(array & $adj, int $node){
-        $this->adj = & $adj;
+        $this->adj = &$adj;
         for ($i = 0; $i < count($this->adj); $i++){
             $this->status[$i]=1;
             $this->parents[$i]=-1;
@@ -30,7 +30,7 @@ class Dfs extends Controller
                     $this->parents[$j]=$node;
                     $this->dfsIterative($j);
                 }elseif($this->status[$j]==2){
-                    $this->adj[$node][$j]=0;//remove link to the common rooms that collabrate between more than course in the same time
+                    $this->adj[$node][$j]=0;//remove link to the common rooms that are common between more than course in the same time
                 }
             }
         }

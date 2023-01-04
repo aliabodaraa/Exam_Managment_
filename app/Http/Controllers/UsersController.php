@@ -25,7 +25,7 @@ class UsersController extends Controller
     public function index()
     {
         // $users = User::first()->paginate(20);
-        $users = User::paginate(80);
+        $users = User::paginate(50);
         //$users = User::all();
 
         return view('users.index', compact('users'));
@@ -50,7 +50,9 @@ class UsersController extends Controller
      */
     public function create()
     {
-        return view('users.create', ['roles' => Role::latest()->get()]);
+        return view('users.create', 
+        // ['roles' => Role::latest()->get()]
+    );
     }
 
     /**
@@ -131,10 +133,11 @@ class UsersController extends Controller
      */
     public function edit(User $user)
     {
+        //dd($user,Role::latest()->first());
         return view('users.edit', [
             'user' => $user,
-            'userRole' => $user->roles->pluck('name')->toArray(),
-            'roles' => Role::latest()->get()
+            //'userRole' => $user->roles->pluck('name')->toArray(),
+            //'roles' => Role::latest()->get()
         ]);
     }
 
@@ -202,18 +205,19 @@ class UsersController extends Controller
     public function store_user_courses(Request $request,User $user)
     {   //sections_types
         //course_user_teach
+        $course_user_teach=Course::where('course_name',$request->course_user_teach)->first();
         $this->validate($request,[
             'sections_types' => 'required'
         ],[
             'sections_types.unique' => 'the name of course should be unique'
         ]);
         if(count($request->sections_types)==2){
-            $user->teaches()->attach($request->course_user_teach,['section_type'=> 'نظري - عملي']);
+            $user->teaches()->attach($course_user_teach,['section_type'=> 'نظري - عملي']);
         }else{
             if(array_keys($request->sections_types)[0]==1)
-                $user->teaches()->attach($request->course_user_teach,['section_type'=> 'نظري']);
+                $user->teaches()->attach($course_user_teach,['section_type'=> 'نظري']);
             elseif(array_keys($request->sections_types)[0]==2)
-                $user->teaches()->attach($request->course_user_teach,['section_type'=> 'عملي']);
+                $user->teaches()->attach($course_user_teach,['section_type'=> 'عملي']);
         }
         //return Response::json($user);
         return redirect()->route('users.edit_user_courses',$user->id)
@@ -223,9 +227,15 @@ class UsersController extends Controller
     public function edit_user_courses(User $user)
     {
         $user_courses_teaches_ids=$user->teaches()->pluck('course_id');
+        $courses_common_with_users=[];
+        foreach ($user->teaches()->get() as $course)
+        if(count($course_common_with_users = $course->teachesBy()->where('id','!=',$user->id)->pluck('username')))
+            $courses_common_with_users[$course->id]=$course_common_with_users->toarray();
+
         return view('users.edit_user_courses', [
             'user' => $user,
-            'user_courses_teaches_ids' => $user_courses_teaches_ids
+            'user_courses_teaches_ids' => $user_courses_teaches_ids,
+            'courses_common_with_users'=>$courses_common_with_users
         ]);
     }
 
@@ -253,6 +263,23 @@ class UsersController extends Controller
         $user->teaches()->detach($course->id);
         return redirect()->route('users.edit_user_courses',$user->id)
             ->withSuccess(__('Course deleted successfully.'));
+    }
+
+
+
+    public function setObservations(Request $request){
+        if($request['role_user']=="all_users")
+            $query=User::all();
+        else
+            $query=User::where('role',$request['role_user'])->get();
+
+        foreach ($query as $user) {
+            $user->number_of_observation = (int)$request['reset_vlaue'];
+            $user->save();
+        }
+                  
+        return redirect()->route('users.index')
+        ->withSuccess(__('User Observations updated successfully.'));
     }
 }
 

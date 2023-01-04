@@ -15,15 +15,17 @@ class rotationsController extends Controller
 
 //distribute students into rooms
     public function isAvailableRoom($rotation, $course, $room){
+        $curr_date=$course->rotationsProgram()->where('rotation_id',$rotation->id)->first()->pivot->date;
+        $curr_time=$course->rotationsProgram()->where('rotation_id',$rotation->id)->first()->pivot->time;
+        $curr_duration=$course->rotationsProgram()->where('rotation_id',$rotation->id)->first()->pivot->duration;
 
-        $curr_date=Course::with('rotationsProgram')->whereHas('rotationsProgram', function($query) use($course,$rotation){$query->where('course_id',$course->id)->where('rotation_id',$rotation->id);})->first()->rotationsProgram[0]->pivot->date;
-        $curr_time=Course::with('rotationsProgram')->whereHas('rotationsProgram', function($query) use($course,$rotation){$query->where('course_id',$course->id)->where('rotation_id',$rotation->id);})->first()->rotationsProgram[0]->pivot->time;
-        $curr_duration=Course::with('rotationsProgram')->whereHas('rotationsProgram', function($query) use($course,$rotation){$query->where('course_id',$course->id)->where('rotation_id',$rotation->id);})->first()->rotationsProgram[0]->pivot->duration;
-        
-        foreach (Course::with('distributionRoom')->whereHas('distributionRoom', function($query) use($room,$rotation){
-        $query->where('room_id',$room->id)->where('rotation_id',$rotation->id);})->get() as $courseM)
-                if((count($rotation->coursesProgram()->wherePivot('date',$curr_date)->wherePivot('time','>=',$curr_time)->wherePivot('time','<=',gmdate('H:i:s',strtotime($curr_time)+strtotime($curr_duration)))->where('id',$courseM->id)->get()->toArray())
-                ||  count($rotation->coursesProgram()->wherePivot('date',$curr_date)->wherePivot('time','<=',$curr_time)->wherePivot('time','>=',gmdate('H:i:s',strtotime($curr_time)-strtotime($curr_duration)))->where('id',$courseM->id)->get()->toArray())))
+
+        // $all_courses_distributed=Course::with('distributionRoom')->whereHas('distributionRoom', function($query) use($room,$rotation){
+        //     $query->where('room_id',$room->id)->where('rotation_id',$rotation->id);})->get();
+        $all_courses_distributed_to_this_room_in_this_rotation_ids=$rotation->distributionCourse()->wherePivot('room_id',$room->id)->pluck('id');//dump($all_courses_distributed_to_this_room_in_this_rotation_ids);
+        // foreach ($all_courses_distributed_to_this_room_in_this_rotation_ids as $courseM)
+                if((count($rotation->coursesProgram()->whereIn('id',$all_courses_distributed_to_this_room_in_this_rotation_ids)->wherePivot('date',$curr_date)->wherePivot('time','>=',$curr_time)->wherePivot('time','<=',gmdate('H:i:s',strtotime($curr_time)+strtotime($curr_duration)))->get())
+                ||  count($rotation->coursesProgram()->whereIn('id',$all_courses_distributed_to_this_room_in_this_rotation_ids)->wherePivot('date',$curr_date)->wherePivot('time','<=',$curr_time)->wherePivot('time','>=',gmdate('H:i:s',strtotime($curr_time)-strtotime($curr_duration)))->get())))
                         return false;
 
                 return true;
@@ -91,31 +93,43 @@ public function distributeMembersOfFaculty(Rotation $rotation){
                     //     }
                     // }
     //old work end
-
-    $graph_room_heads=new Graph(EnumPersonType::RoomHead);
-    list($paths_room_heads,$paths_info_room_heads)=$graph_room_heads->applyMaxFlowAlgorithm();
-    foreach ($paths_info_room_heads['users_observations'] as $room_head_id => $room_heads_observations){
-        $s=User::where('id',$room_head_id)->first();
-        foreach ($room_heads_observations as $room_head_observation)
-            $s->courses()->attach($room_head_observation['course'],['rotation_id'=>$room_head_observation['rotation'],'room_id'=>$room_head_observation['room'],'roleIn'=>$room_head_observation['roleIn']]);
-    }
+    ini_set('max_execution_time', 180); //3 minutes
+    $graph_room_heads=new Graph(EnumPersonType::RoomHead, $rotation);
+    list($paths_room_heads,$paths_info_room_heads)=$graph_room_heads->applyMaxFlowAlgorithm();//dd($paths_room_heads,$paths_info_room_heads,$paths_info_room_heads['users_observations']);
     //dump($paths_room_heads,$paths_info_room_heads);
-    $graph_secertaries=new Graph(EnumPersonType::Secertary,$paths_info_room_heads);
-    list($paths_secertaries,$paths_info_secertaries)=$graph_secertaries->applyMaxFlowAlgorithm();
-    foreach ($paths_info_secertaries['users_observations'] as $secertary_id => $secertarys_observations){
-        $s=User::where('id',$secertary_id)->first();
-        foreach ($secertarys_observations as $secertary_observation)
-            $s->courses()->attach($secertary_observation['course'],['rotation_id'=>$secertary_observation['rotation'],'room_id'=>$secertary_observation['room'],'roleIn'=>$secertary_observation['roleIn']]);
+    if(count($paths_room_heads)){
+        $graph_secertaries=new Graph(EnumPersonType::Secertary, $rotation, $paths_info_room_heads);
+        list($paths_secertaries,$paths_info_secertaries)=$graph_secertaries->applyMaxFlowAlgorithm();
+        //dump($paths_secertaries,$paths_info_secertaries);
+        if(count($paths_secertaries)){
+            $graph_observers=new Graph(EnumPersonType::Observer, $rotation, $paths_info_secertaries);
+            list($paths_observers,$paths_info_observers)=$graph_observers->applyMaxFlowAlgorithm();
+            //dump($paths_observers,$paths_info_observers);
+            if(count($paths_observers)){
+                foreach ($paths_info_room_heads['users_observations'] as $room_head_id => $room_heads_observations){
+                    $s=User::where('id',$room_head_id)->first();
+                    foreach ($room_heads_observations as $room_head_observation)
+                        $s->courses()->attach($room_head_observation['course'],['rotation_id'=>$rotation->id,'room_id'=>$room_head_observation['room'],'roleIn'=>$room_head_observation['roleIn']]);
+                }
+                foreach ($paths_info_secertaries['users_observations'] as $secertary_id => $secertarys_observations){
+                    $s=User::where('id',$secertary_id)->first();
+                    foreach ($secertarys_observations as $secertary_observation)
+                        $s->courses()->attach($secertary_observation['course'],['rotation_id'=>$rotation->id,'room_id'=>$secertary_observation['room'],'roleIn'=>$secertary_observation['roleIn']]);
+                }
+                foreach ($paths_info_observers['users_observations'] as $observer_id => $observers_observations){
+                    $s=User::where('id',$observer_id)->first();
+                    foreach ($observers_observations as $observer_observation)
+                        $s->courses()->attach($observer_observation['course'],['rotation_id'=>$rotation->id,'room_id'=>$observer_observation['room'],'roleIn'=>$observer_observation['roleIn']]);
+                }
+            }else{
+                return redirect()->back()->withWarning(__('لا يوجد مراقبين كفايه للفرز من فضلك قم بتعديل تعيينات الأعضاء وإضافة مراقبين '));
+            }
+        }else{
+            return redirect()->back()->withWarning(__('لا يوجد امناء سر كفايه للفرز من فضلك قم بتعديل تعيينات الأعضاء وإضافة أمناء سر جدد '));
+        }
+    }else{
+        return redirect()->back()->withWarning(__('لا يوجد رؤساء قاعات كفايه للفرز من فضلك قم بتعديل تعيينات الأعضاء وإضافة رؤساء قاعات جدد '));
     }
-    //dump($paths_secertaries,$paths_info_secertaries);
-    $graph_observers=new Graph(EnumPersonType::Observer,$paths_info_secertaries);
-    list($paths_observers,$paths_info_observers)=$graph_observers->applyMaxFlowAlgorithm();
-    foreach ($paths_info_observers['users_observations'] as $observer_id => $observers_observations){
-        $s=User::where('id',$observer_id)->first();
-        foreach ($observers_observations as $observer_observation)
-            $s->courses()->attach($observer_observation['course'],['rotation_id'=>$observer_observation['rotation'],'room_id'=>$observer_observation['room'],'roleIn'=>$observer_observation['roleIn']]);
-    }
-    //dd($paths_observers,$paths_info_observers);
     return redirect("/rotations/$rotation->id/show")
     ->withSuccess(__('You have successfully distribute all Members to the sutable rooms'));
 }
@@ -312,5 +326,14 @@ public function distributeMembersOfFaculty(Rotation $rotation){
         }
         return redirect()->route('rotations.program.show',$rotation->id)
             ->withSuccess(__('update members successfully.'));
+    }
+    public function showObservationsInSpecificRotationForSpecificUser(Rotation $rotation, User $user){
+        list($all_rotations_table, $observations_number_in_latest_rotation)=Stock::calcInfoForEachRotationForSpecificuser($user);
+        if(array_key_exists($rotation->id,$all_rotations_table))
+            return view('Rotations.Observations.User.show', [
+                'user' => $user,
+                'rotation_table' => $all_rotations_table[$rotation->id],
+            ]);
+        return view('Rotations.Observations.User.show',compact('rotation','user'));
     }
 }

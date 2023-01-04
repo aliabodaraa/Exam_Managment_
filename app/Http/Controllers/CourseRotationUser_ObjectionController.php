@@ -75,9 +75,9 @@ class CourseRotationUser_ObjectionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Rotation $rotation, User $user)
     {
-        //
+        return view('Rotations.Objections.User.show',compact('user','rotation'));
     }
 
     /**

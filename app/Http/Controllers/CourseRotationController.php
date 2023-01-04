@@ -28,9 +28,9 @@ class CourseRotationController extends Controller
 
         //calc accual_common_rooms_for_specific_course
         list($accual_common_rooms_for_specific_course,$common_rooms_ids)=Stock::getAccualCommonRoomsForSpecificRotationCourse($rotation, $course);
-        list($room_heads_in_this_rotation_course_room, $secertaries_in_this_rotation_course_room, $observers_in_this_rotation_course_room)=Stock::getUsersInSpecificRotationCourseRoom($rotation,$course,$specific_room);
+        list($room_heads_in_this_rotation_course_room, $secertaries_in_this_rotation_course_room, $observers_in_this_rotation_course_room)=Stock::getUsersInSpecificRotationCourseRoom($rotation,$course,$specific_room->id);
 //dd($room_heads_in_this_rotation_course_room,$secertaries_in_this_rotation_course_room, $observers_in_this_rotation_course_room);
-        $occupied_number_of_students_in_this_course_in_this_room=Stock::getOccupiedNumberOfStudentsInThisCourseInSpecificRoom($rotation, $course, $specific_room);
+        $occupied_number_of_students_in_this_course_in_this_room=Stock::getOccupiedNumberOfStudentsInThisCourseInSpecificRoom($rotation, $course, $specific_room->id);
 
         $all_disabled_users_in_joining_room=Stock::getUsersInJoiningRoomsForDisabledThemWithRotationCourse($rotation,$course);
         //if(in_array($specific_room->id,$joining_rooms) || (in_array($specific_room->id,$rooms_this_course) && in_array($specific_room->id,$disabled_rooms))){
@@ -40,6 +40,7 @@ class CourseRotationController extends Controller
         //}
         //dd($accual_common_rooms_for_specific_course);
         //dd($joining_rooms);
+        // dd(1);
             return view('Rotations.ExamProgram.courses.rooms.edit_course_room',
             compact('rotation','course','specific_room','date','time','duration',
             'courses_common_with_time','common_rooms_ids',
@@ -61,28 +62,28 @@ class CourseRotationController extends Controller
         //calculate rooms_this_course_rotation
         
         //verify members passed
-        if($request->get('roomheads') == null && $request->get('secertaries') == null && $request->get('observers') == null)
-            return redirect()->back()->withDanger(__("عذرا يجب أن تحدد رئيس قاعة واحد وأمين سر واحد ومراقب واحد على الأقل"));
-        elseif($request->get('secertaries') == null && $request->get('observers') == null)
-            return redirect()->back()->withDanger(__("عذرا يجب أن تحدد أمين سر واحد ومراقب واحد على الأقل"));
-        elseif($request->get('roomheads') == null && $request->get('secertaries') == null)
-            return redirect()->back()->withDanger(__("عذرا يجب أن تحدد رئيس قاعة واحد وأمين سر واحد على الأقل"));
-        elseif($request->get('roomheads') == null && $request->get('observers') == null)
-            return redirect()->back()->withDanger(__("عذرا يجب أن تحدد رئيس قاعة واحد ومراقب واحد على الأقل"));
-        elseif($request->get('roomheads') == null)
-            return redirect()->back()->withWarning(__("عذرا يجب أن تحدد رئيس قاعة واحد على الأقل"));
-        elseif($request->get('secertaries') == null)
-            return redirect()->back()->withWarning(__("عذرا يجب أن تحدد أمين سر واحد على الأقل"));
-        elseif($request->get('observers') == null)
-            return redirect()->back()->withWarning(__("عذرا يجب أن تحدد مراقب واحد على الأقل"));
-
+        // if($request->get('roomheads') == null && $request->get('secertaries') == null && $request->get('observers') == null)
+        //     return redirect()->back()->withDanger(__("عذرا يجب أن تحدد رئيس قاعة واحد وأمين سر واحد ومراقب واحد على الأقل"));
+        // elseif($request->get('secertaries') == null && $request->get('observers') == null)
+        //     return redirect()->back()->withDanger(__("عذرا يجب أن تحدد أمين سر واحد ومراقب واحد على الأقل"));
+        // elseif($request->get('roomheads') == null && $request->get('secertaries') == null)
+        //     return redirect()->back()->withDanger(__("عذرا يجب أن تحدد رئيس قاعة واحد وأمين سر واحد على الأقل"));
+        // elseif($request->get('roomheads') == null && $request->get('observers') == null)
+        //     return redirect()->back()->withDanger(__("عذرا يجب أن تحدد رئيس قاعة واحد ومراقب واحد على الأقل"));
+        // elseif($request->get('roomheads') == null)
+        //     return redirect()->back()->withWarning(__("عذرا يجب أن تحدد رئيس قاعة واحد على الأقل"));
+        // elseif($request->get('secertaries') == null)
+        //     return redirect()->back()->withWarning(__("عذرا يجب أن تحدد أمين سر واحد على الأقل"));
+        // elseif($request->get('observers') == null)
+        //     return redirect()->back()->withWarning(__("عذرا يجب أن تحدد مراقب واحد على الأقل"));
 
         //verify roomheads passed - must be Doctors
-        foreach ($request->get('roomheads') as $room_head_user_id) {
-            $room_head_user=User::find($room_head_user_id);
-            if($room_head_user->role != "دكتور")
-                return redirect()->back()->withWarning(__("عذرا رئيس القاعة يجب أن يكون دكتور"));
-        }
+        // foreach ($request->get('roomheads') as $room_head_user_id) {
+        //     $room_head_user=User::find($room_head_user_id);
+        //     if($room_head_user->role != "دكتور")
+        //         return redirect()->back()->withWarning(__("عذرا رئيس القاعة يجب أن يكون دكتور"));
+        // }
+        
         if(!in_array($specific_room->id,$rooms_this_course) && !in_array($specific_room->id, $joining_rooms)){//New Room
             //Done
             $course->distributionRoom()->attach($specific_room->id, ['rotation_id'=>$rotation->id,'num_student_in_room'=> $request['num_student_in_room']]);
@@ -94,7 +95,7 @@ class CourseRotationController extends Controller
                 if($course_common_with_time->id == $course->id)
                     $course->distributionRoom()->updateExistingPivot($specific_room->id, ['rotation_id'=>$rotation->id,'num_student_in_room'=> $request['num_student_in_room']]);
                 else
-                    $course_common_with_time->distributionRoom()->updateExistingPivot($specific_room->id, ['rotation_id'=>$rotation->id,'num_student_in_room'=> Stock::getOccupiedNumberOfStudentsInThisCourseInSpecificRoom($rotation, $course_common_with_time, $specific_room) ]);
+                    $course_common_with_time->distributionRoom()->updateExistingPivot($specific_room->id, ['rotation_id'=>$rotation->id,'num_student_in_room'=> Stock::getOccupiedNumberOfStudentsInThisCourseInSpecificRoom($rotation, $course_common_with_time, $specific_room->id) ]);
 
                 $specific_room->users()->wherePivot('rotation_id',$rotation->id)->wherePivot('course_id',$course_common_with_time->id)->detach();
                 $specific_room->users()->attach($request->get('roomheads'), ['rotation_id'=>$rotation->id,'course_id'=>$course_common_with_time->id,'roleIn'=> 'RoomHead']);
@@ -108,7 +109,7 @@ class CourseRotationController extends Controller
                 if($course_common_with_time->id == $course->id){
                     $course_common_with_time->distributionRoom()->attach($specific_room->id, ['rotation_id'=>$rotation->id,'num_student_in_room'=> $request['num_student_in_room']]);
                 }else{
-                    $course_common_with_time->distributionRoom()->updateExistingPivot($specific_room->id, ['rotation_id'=>$rotation->id,'num_student_in_room'=> Stock::getOccupiedNumberOfStudentsInThisCourseInSpecificRoom($rotation, $course_common_with_time, $specific_room)]);
+                    $course_common_with_time->distributionRoom()->updateExistingPivot($specific_room->id, ['rotation_id'=>$rotation->id,'num_student_in_room'=> Stock::getOccupiedNumberOfStudentsInThisCourseInSpecificRoom($rotation, $course_common_with_time, $specific_room->id)]);
                     $specific_room->users()->wherePivot('rotation_id',$rotation->id)->wherePivot('course_id',$course_common_with_time->id)->detach();
                 }
                 $specific_room->users()->attach($request->get('roomheads'), ['rotation_id'=>$rotation->id,'course_id'=>$course_common_with_time->id,'roleIn'=> 'RoomHead']);
@@ -165,9 +166,23 @@ class CourseRotationController extends Controller
                     }
                     $disabled_rooms=array_unique($disabled_rooms_accual);
                 }
-
+                $disabled_common_rooms_send=array_unique($disabled_common_rooms_send);
         //calc number students in this course
         list($entered_students_number, $occupied_number_of_students_in_this_course)=Stock::getOccupiedNumberOfStudentsInThisCourse($rotation, $course);
+
+        //calc common courses
+        $common_courses=[];
+        $all_courses_in_this_rotation=$rotation->coursesProgram()->get();
+        foreach ($all_courses_in_this_rotation as $courseM) {
+        if((count($courseM->rotationsProgram()->wherePivot('date',$date)->wherePivot('time','>=',$time)->wherePivot('time','<=',gmdate('H:i:s',strtotime($time)+strtotime($duration)))->where('id',$courseM->id)->get()->toArray())
+        ||  count($courseM->rotationsProgram()->wherePivot('date',$date)->wherePivot('time','<=',$time)->wherePivot('time','>=',gmdate('H:i:s',strtotime($time)-strtotime($duration)))->where('id',$courseM->id)->get()->toArray()))){
+            $RoomscourseEager=$courseM->rooms;//use eager loading
+            foreach ($RoomscourseEager as $room) {
+                if($rotation->id == $room->pivot->rotation_id)
+                    array_push($common_courses,$courseM);
+            }
+        }
+        }
             //dd($joining_rooms);
         return view('Rotations.ExamProgram.courses.edit', 
         compact('rotation','course','rooms_this_course','disabled_rooms','joining_rooms','courses_common_with_time',
@@ -199,7 +214,7 @@ class CourseRotationController extends Controller
                     $disabled_rooms=array_unique($disabled_rooms_accual);
                 }
         //calc number students in this course
-        list($entered_students_number, )=Stock::getOccupiedNumberOfStudentsInThisCourse($rotation, $course);
+        list($entered_students_number, )=Stock::getOccupiedNumberOfStudentsInThisCourse($rotation->id, $course);
         //copy from edit
 
         $rooms_filtered=[];
@@ -212,8 +227,8 @@ class CourseRotationController extends Controller
         if($request->rooms){
                 $num_students_taken_in_requested_rooms=[];//register each room in request->rooms with number of student in each one before detach them
                 foreach ($request->rooms as $room) {
-                    $num_students_taken_in_requested_rooms[$room] = Stock::getOccupiedNumberOfStudentsInThisCourseInSpecificRoom($rotation, $course, Room::find($room));//register each room in request->rooms with number of student in each one before detach them
-                    $members_taken_in_requested_rooms[$room]=Stock::getUsersInSpecificRotationCourseRoom($rotation,$course,Room::find($room));//register members in each room in request->rooms before detach them
+                    $num_students_taken_in_requested_rooms[$room] = Stock::getOccupiedNumberOfStudentsInThisCourseInSpecificRoom($rotation, $course, $room->id);//register each room in request->rooms with number of student in each one before detach them
+                    $members_taken_in_requested_rooms[$room]=Stock::getUsersInSpecificRotationCourseRoom($rotation,$course,$room->id);//register members in each room in request->rooms before detach them
                 }
 
                  list($entered_students_number,)=Stock::getOccupiedNumberOfStudentsInThisCourse($rotation, $course);

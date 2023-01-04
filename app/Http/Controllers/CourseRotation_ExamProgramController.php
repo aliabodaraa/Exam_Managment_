@@ -35,16 +35,19 @@ class CourseRotation_ExamProgramController extends Controller
      */
     public function store_course_to_the_program(Request $request,Rotation $rotation)
     {
-        // if($request->course_id =='none')
+        // if($request->course_name =='none')
         //     return redirect()->back()
         //     ->with('retryEntering',"Please Detemine which course you need to add .");
         if((int)$request->students_number > Stock::getMaxDistribution())
                  return redirect()->back()->withDanger(__(Stock::getMaxDistribution()." لا يمكنك تجاوز السعة العظمى للتخزين في القاعات"));
-        $selected_course=Course::where('id',$request['course_id'])->first();
+        $selected_course=Course::where('course_name',$request['course_name'])->first();
+        if(in_array($selected_course->id,$rotation->coursesProgram()->pluck('id')->toarray()))
+            return redirect()->back()->withDanger(__(" تمت إضافة هذا المقرر مسبقا إلى هذه الدورة الإمتحانية"));
+
         $selected_course->rotationsProgram()->attach($rotation->id,['students_number'=> $request['students_number'],'duration'=> $request['duration'] ,'date'=>$request['date'],'time'=>$request['time']]);
 
         return redirect()->route("rotations.program.show",$rotation->id)
-        ->withSuccess(__('تم إضافة '.Course::find($request->course_id)->course_name.' إلى البرنامج '));
+        ->withSuccess(__('تم إضافة '.$request->course_name.' إلى البرنامج '));
     }
 
     /**
@@ -109,5 +112,23 @@ class CourseRotation_ExamProgramController extends Controller
         //$rotation->distributionCourse()->detach($course->id);//delete the row from distributionCourse
         return redirect()->route("rotations.program.show",$rotation->id)
             ->withSuccess(__('Course hided successfully.'));
+    }
+    public function initExamProgram(Rotation $rotation)
+    {
+        $rotation->coursesProgram()->detach();
+        return redirect()->route("rotations.program.show",$rotation->id)
+            ->withSuccess(__('تمت تهيئة البرنامج الامتحاني  بنجاح'));
+    }
+    public function initRoomsInAllCourses(Rotation $rotation)
+    {
+        $rotation->distributionCourse()->detach();
+        return redirect()->route("rotations.program.show",$rotation->id)
+            ->withSuccess(__('تمت تهيئة القاعات بنجاح'));
+    }
+    public function initUsersObservationsInAllCourses(Rotation $rotation)
+    {
+        $rotation->users()->detach();
+        return redirect()->route("rotations.program.show",$rotation->id)
+            ->withSuccess(__('تمت تهيئة المراقبات بنجاح'));
     }
 }

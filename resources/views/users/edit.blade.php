@@ -6,7 +6,14 @@
             <h1 class="text-center">
                 Update User Page
                 <div class="float-right">
-                    <a href="{{ URL::previous() }}" class="btn btn-dark">Back</a>
+                    @if(count($user->teaches()->get()))
+                        <a href={{ route("users.edit_user_courses",[$user->id]) }} class="btn btn-outline-dark">
+                            تعديل المواد
+                        </a>
+                    @else
+                    <a href="{{ route('users.create_user_courses',$user->id) }}" class="btn btn-outline-dark">إضافة مادة</a>
+                    @endif
+                      <a href="{{ URL::previous() }}" class="btn btn-dark">Back</a>
                 </div>
             </h1>
             <div class="mt-2">
