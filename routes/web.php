@@ -55,6 +55,11 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
                 Route::delete('/{user}/courses_teach/{course}/destroy_user_courses', 'UsersController@destroy_user_courses')->name('users.destroy_user_courses');
 
                 Route::patch('/setObservations', 'UsersController@setObservations')->name('users.setObservations');
+
+
+                //Excel
+                Route::get('/users-export', 'UsersController@export')->name('users.export');
+                Route::post('/users-import', 'UsersController@import')->name('users.import');
             });
 
             /**

@@ -15,6 +15,11 @@ use Illuminate\Support\Facades\Response;
 use App\Http\Controllers\MaxMinRoomsCapacity\Stock;
 use App\Http\Controllers\MaxFlow\Graph;
 use App\Http\Controllers\MaxFlow\EnumPersonType;
+
+
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\UsersExport;
+use App\Imports\UsersImport;
 class UsersController extends Controller
 {
     /**
@@ -280,6 +285,27 @@ class UsersController extends Controller
                   
         return redirect()->route('users.index')
         ->withSuccess(__('User Observations updated successfully.'));
+    }
+
+
+
+    //Exel
+        /**
+    * @return \Illuminate\Support\Collection
+    */
+    public function export() 
+    {
+        return Excel::download(new UsersExport, 'users.xlsx');
+    }
+       
+    /**
+    * @return \Illuminate\Support\Collection
+    */
+    public function import() 
+    {
+        Excel::import(new UsersImport,request()->file('file'));
+               
+        return back();
     }
 }
 
