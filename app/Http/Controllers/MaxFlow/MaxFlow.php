@@ -3,22 +3,39 @@
 namespace App\Http\Controllers\MaxFlow;
 
 use App\Http\Controllers\Controller;
+use App\Models\Course;
 use Illuminate\Http\Request;
 use phpDocumentor\Reflection\Types\Self_;
 class MaxFlow extends Controller
 {
     public static int $V; // Number of vertices in graph
+    //=======================  Asem  ===================
+    public static $previous_user=0;
+    public static $current_user=0;
+    public static $count=0;
+    public static $science_room_visited=false;
+    private array $members;
+    private array $courses;
+    private int $rooms;
+    private int $count_arr_same_time_courses;
 
-    public function __construct(array $graph,int $length_graph){
+    public static int $count_of_paths=0;
+    //=====================  Asem  =====================
+    public function __construct(int $length_graph,$members,$courses,$count_arr_same_time_courses){
         Self::$V = $length_graph;
+        $this->members=$members;
+        $this->courses=$courses;
+        $this->count_arr_same_time_courses=$count_arr_same_time_courses;
     }
-    
     public function bfs(array &$rGraph,int $s, int $t, array &$parent) : bool {
         // Create a visited array and mark all vertices as
         // not visited
         $visited=[];
         for ($i = 0; $i < Self::$V; ++$i)
             $visited[$i] = false;
+
+        $visited[count($this->members)+$this->count_arr_same_time_courses+count($this->courses)+1]=Self::$science_room_visited;
+        //if(Self::$current_user )
  
         // Create a queue, enqueue source vertex and mark
         // source vertex as visited
@@ -33,7 +50,7 @@ class MaxFlow extends Controller
             $u = array_shift($queue);
  
             for ( $v = 0; $v < Self::$V; $v++) {
-                //dump($visited);
+                ////dump($visited);
                 if ($visited[$v] == false
                     && $rGraph[$u][$v] > 0) {
                     // If we find a connection to the sink
@@ -42,6 +59,11 @@ class MaxFlow extends Controller
                     // and can return true
                     if ($v == $t) {
                         $parent[$v] = $u;
+                        Self::$count=(Self::$count+1)%4;
+
+                        Self::$current_user=$parent[$parent[$parent[$parent[$v]]]];
+                        //dump($parent[$parent[$parent[$parent[$v]]]]);
+                        
                         return true;
                     }
                     array_push($queue,$v);
@@ -85,6 +107,53 @@ class MaxFlow extends Controller
         // Augment the flow while there is path from source
         // to sink
         while ($this->bfs($rGraph, $s, $t, $parent)) {
+            ////dump($parent);
+            //===================Asem==============================================
+            Self::$count_of_paths=Self::$count_of_paths+1;
+            $pure_parent=array();
+            $counter_index=4;
+            $k=Self::$V-1;
+            while($parent[$k] !== -1){
+                $pure_parent[$counter_index] = $parent[$k];
+                $k=$parent[$k];
+                $counter_index--;
+            }
+            //dd($pure_parent);
+
+            if(Self::$previous_user !==0 && Self::$previous_user !== Self::$current_user){
+                //dump("new user",Self::$count_of_paths);
+                Self::$count=0;
+                Self::$science_room_visited=false;
+            }else{ //same user
+                if(Self::$count !== 0){
+                    //dump("same user",Self::$count_of_paths);
+                    $outdegree=0;
+                    if($pure_parent[2]< count($this->members)+$this->count_arr_same_time_courses){ //Check if the there is another same_time
+                        $next_course=-1;
+                        for($i=count($this->members)+$this->count_arr_same_time_courses+1;$i<=count($this->members)+$this->count_arr_same_time_courses+count($this->courses);$i++){
+                            if($rGraph[$pure_parent[2]][$i]>0 ){
+                                $next_course=$i;
+                                break;
+                            }
+                        }
+                        if($next_course !== -1){
+                            for($i =count($this->members)+$this->count_arr_same_time_courses+count($this->courses)+1;$i<Self::$V;$i++){
+                                if($rGraph[$next_course][$i]==1){
+                                    $outdegree++;
+                                }
+                            }
+                        }
+                        if($outdegree>1 && $rGraph[$next_course][count($this->members)+$this->count_arr_same_time_courses+count($this->courses)+1]==1){
+                            Self::$science_room_visited=true;
+                        }
+                    }
+                }else{
+                    Self::$science_room_visited=false;
+                }
+            }
+            Self::$previous_user = Self::$current_user;
+
+            //===================Asem==============================================
             $path=array();
             // Find minimum residual capacity of the edhes
             // along the path filled by BFS. Or we can say
@@ -96,12 +165,12 @@ class MaxFlow extends Controller
             }
             // update residual capacities of the edges and
             // reverse edges along the path
-            for ($v = $t; $v != $s; $v = $parent[$v]) {//dump($u,$v);
+            for ($v = $t; $v != $s; $v = $parent[$v]) {////dump($u,$v);
                 array_push($path,$v);
                 $u = $parent[$v];
                 $rGraph[$u][$v] -= $path_flow;
                 $rGraph[$v][$u] += $path_flow;
-                //dump($rGraph[$u][$v]);
+                ////dump($rGraph[$u][$v]);
             }
             // Add path flow to overall flow
             $max_flow += $path_flow;

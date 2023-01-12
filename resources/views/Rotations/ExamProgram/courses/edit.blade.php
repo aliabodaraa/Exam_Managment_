@@ -165,7 +165,7 @@
                                                 ! in_array($room->id, $common_rooms_ids))
                                                     ? 'disabled'
                                                     : '' }}
-                        {{ count($rotation->rooms()->toBase()->get())? 'disabled': '' }}{{-- added --}}
+                      {{--  {{ count($rotation->rooms()->toBase()->get())? 'disabled': '' }}--}}{{-- added --}}
                                                 {{(!in_array($room->id, $rooms_this_course) && ! in_array($room->id, $common_rooms_ids) && $occupied_number_of_students_in_this_course === $entered_students_number)? 'disabled': '' }}
                                                 >
                                             @else

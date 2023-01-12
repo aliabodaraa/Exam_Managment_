@@ -2307,7 +2307,7 @@ div.h4 {
   width: 50px;
   height: 50px;
   position: absolute;
-  left: -95px;
+  left: -86px;
   top: -3px;
   z-index: 99999999999999999999999999999999999;
 }
@@ -2337,11 +2337,11 @@ div.h4 {
   #nav{font-size:67%;font-weight: 900;}
   .username{
     position: absolute;
-    top: 6px;right: 56px;
+    top: 6px;right: 80px;
   }
   .profile-icon{
     position: absolute;
-    top: 6px;right: 20px;
+    top: 6px;right: 40px;
   }
   #nav_row{
     height: 55px;
@@ -2399,7 +2399,13 @@ div.h4 {
 }
 
 #nav_row {
-    margin-bottom: 10px;
+    position: fixed;
+    width: 102%;
+    z-index: 9999999999;
+    padding:0px 15px;
+  }
+  main{
+    padding: 50px;
   }
 @media (max-width: 550px) {
 .faculty{
@@ -2450,7 +2456,7 @@ div.h4 {
   </nav> --}}
     @include('layouts.partials.navbar')
 
-    <main class="container-fluid px-5">
+    <main class="container-fluid">
         @yield('content')
     </main>
 
@@ -2461,7 +2467,18 @@ div.h4 {
     <script>
       // "global" vars, built using blade
       var imagesUrl = '{{ URL::asset('/images/') }}';
-  </script>
+  </script>    <script>
+setTimeout(() => {
+  console.info("This page is not reloaded");
+  document.getElementById("navigation").style.display="none";
+if (PerformanceNavigationTiming.type === "reload") {
+  console.info("This page is reloaded");
+  document.getElementById("navigation").style.display="block";
+}
+}, 300);
+
+
+</script>
     <script src="{!! url('assets/js/users.js') !!}"></script>
     <script src="{!! url('assets/js/courses.js') !!}"></script>
     <script src="{!! url('assets/js/rooms.js') !!}"></script>

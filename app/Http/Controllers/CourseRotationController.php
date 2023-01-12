@@ -29,14 +29,14 @@ class CourseRotationController extends Controller
         //calc accual_common_rooms_for_specific_course
         list($accual_common_rooms_for_specific_course,$common_rooms_ids)=Stock::getAccualCommonRoomsForSpecificRotationCourse($rotation, $course);
         list($room_heads_in_this_rotation_course_room, $secertaries_in_this_rotation_course_room, $observers_in_this_rotation_course_room)=Stock::getUsersInSpecificRotationCourseRoom($rotation,$course,$specific_room->id);
-//dd($room_heads_in_this_rotation_course_room,$secertaries_in_this_rotation_course_room, $observers_in_this_rotation_course_room);
+        //dd($room_heads_in_this_rotation_course_room,$secertaries_in_this_rotation_course_room, $observers_in_this_rotation_course_room,$specific_room->id);
         $occupied_number_of_students_in_this_course_in_this_room=Stock::getOccupiedNumberOfStudentsInThisCourseInSpecificRoom($rotation, $course, $specific_room->id);
 
         $all_disabled_users_in_joining_room=Stock::getUsersInJoiningRoomsForDisabledThemWithRotationCourse($rotation,$course);
         //if(in_array($specific_room->id,$joining_rooms) || (in_array($specific_room->id,$rooms_this_course) && in_array($specific_room->id,$disabled_rooms))){
-            list($room_heads_in_current_joining_in_this_rotation_course_room, $secertaries_in_current_joining_in_this_rotation_course_room, $observers_in_current_joining_in_this_rotation_course_room) = Stock::getUsersInSpecificJoiningRoomForRotationCourseRoom($rotation,$course,$specific_room);
-            $pure_disabled_users_for_joining_room=array_diff(array_unique($all_disabled_users_in_joining_room),array_merge($room_heads_in_current_joining_in_this_rotation_course_room, $secertaries_in_current_joining_in_this_rotation_course_room, $observers_in_current_joining_in_this_rotation_course_room));
-                //dd($user_in_current_joining_room);
+        list($room_heads_in_current_joining_in_this_rotation_course_room, $secertaries_in_current_joining_in_this_rotation_course_room, $observers_in_current_joining_in_this_rotation_course_room) = Stock::getUsersInSpecificJoiningRoomForRotationCourseRoom($rotation,$course,$specific_room);
+        $pure_disabled_users_for_joining_room=array_diff(array_unique($all_disabled_users_in_joining_room),array_merge($room_heads_in_current_joining_in_this_rotation_course_room, $secertaries_in_current_joining_in_this_rotation_course_room, $observers_in_current_joining_in_this_rotation_course_room));
+        //dd($pure_disabled_users_for_joining_room);
         //}
         //dd($accual_common_rooms_for_specific_course);
         //dd($joining_rooms);
@@ -118,7 +118,6 @@ class CourseRotationController extends Controller
             }
         }elseif(! in_array($specific_room->id, $disabled_rooms) && in_array($specific_room->id, $rooms_this_course) ){//SingleRoom
             //Done
-            //dd($specific_room->courses()->allRelatedIds());
             $course->distributionRoom()->updateExistingPivot($specific_room->id, ['num_student_in_room'=> $request['num_student_in_room']]);
             $specific_room->users()->wherePivot('rotation_id',$rotation->id)->wherePivot('course_id',$course->id)->detach();
             $specific_room->users()->attach($request->get('roomheads'),['rotation_id'=>$rotation->id,'course_id'=>$course->id,'roleIn'=> 'RoomHead']);
@@ -214,7 +213,7 @@ class CourseRotationController extends Controller
                     $disabled_rooms=array_unique($disabled_rooms_accual);
                 }
         //calc number students in this course
-        list($entered_students_number, )=Stock::getOccupiedNumberOfStudentsInThisCourse($rotation->id, $course);
+        list($entered_students_number, )=Stock::getOccupiedNumberOfStudentsInThisCourse($rotation, $course);
         //copy from edit
 
         $rooms_filtered=[];
@@ -226,9 +225,9 @@ class CourseRotationController extends Controller
             //     return redirect()->back()->with('disabled_rooms',"!! ");  
         if($request->rooms){
                 $num_students_taken_in_requested_rooms=[];//register each room in request->rooms with number of student in each one before detach them
-                foreach ($request->rooms as $room) {
-                    $num_students_taken_in_requested_rooms[$room] = Stock::getOccupiedNumberOfStudentsInThisCourseInSpecificRoom($rotation, $course, $room->id);//register each room in request->rooms with number of student in each one before detach them
-                    $members_taken_in_requested_rooms[$room]=Stock::getUsersInSpecificRotationCourseRoom($rotation,$course,$room->id);//register members in each room in request->rooms before detach them
+                foreach ($request->rooms as $room_id) {
+                    $num_students_taken_in_requested_rooms[$room_id] = Stock::getOccupiedNumberOfStudentsInThisCourseInSpecificRoom($rotation, $course, $room_id);//register each room in request->rooms with number of student in each one before detach them
+                    $members_taken_in_requested_rooms[$room_id]=Stock::getUsersInSpecificRotationCourseRoom($rotation,$course,$room_id);//register members in each room in request->rooms before detach them
                 }
 
                  list($entered_students_number,)=Stock::getOccupiedNumberOfStudentsInThisCourse($rotation, $course);

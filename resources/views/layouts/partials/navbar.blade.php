@@ -3,8 +3,14 @@
     {{-- <h5 class="text-white h4">Collapsed content</h5> --}}
     {{-- <span class="text-muted">Toggleable via the navbar brand.</span> --}}
           @auth
+          <div class="spinner-border" id="navigation" role="status" style="display: block;z-index:99999999999999999999999999999;
+          position: absolute;
+          top: 400px;
+          right: 400px;">
+            <span class="visually-hidden">Loading...</span>
+          </div>
             <div class="col-lg-3 col-sm-3 col-xs-1" style="display:-webkit-inline-box;">
-              <nav class="navbar navbar-dark bg-dark" id="nav_content_internal">
+              <nav class="navbar navbar-inverse navbar-dark bg-dark" id="nav_content_internal">
                   <button id="nav_btn_internal" class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                   </button>

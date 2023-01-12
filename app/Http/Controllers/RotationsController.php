@@ -100,11 +100,11 @@ public function distributeMembersOfFaculty(Rotation $rotation){
     if(count($paths_room_heads)){
         $graph_secertaries=new Graph(EnumPersonType::Secertary, $rotation, $paths_info_room_heads);
         list($paths_secertaries,$paths_info_secertaries)=$graph_secertaries->applyMaxFlowAlgorithm();
-        //dump($paths_secertaries,$paths_info_secertaries);
+        //dd($paths_secertaries,$paths_info_secertaries);
         if(count($paths_secertaries)){
-            $graph_observers=new Graph(EnumPersonType::Observer, $rotation, $paths_info_secertaries);
+            $graph_observers=new Graph(EnumPersonType::Observer, $rotation, $paths_info_room_heads, $paths_info_secertaries);
             list($paths_observers,$paths_info_observers)=$graph_observers->applyMaxFlowAlgorithm();
-            //dump($paths_observers,$paths_info_observers);
+            //dd($paths_room_heads,$paths_info_room_heads,$paths_secertaries,$paths_info_secertaries,$paths_observers,$paths_info_observers);
             if(count($paths_observers)){
                 foreach ($paths_info_room_heads['users_observations'] as $room_head_id => $room_heads_observations){
                     $s=User::where('id',$room_head_id)->first();
@@ -115,7 +115,7 @@ public function distributeMembersOfFaculty(Rotation $rotation){
                     $s=User::where('id',$secertary_id)->first();
                     foreach ($secertarys_observations as $secertary_observation)
                         $s->courses()->attach($secertary_observation['course'],['rotation_id'=>$rotation->id,'room_id'=>$secertary_observation['room'],'roleIn'=>$secertary_observation['roleIn']]);
-                }
+                }//dd("Ali");
                 foreach ($paths_info_observers['users_observations'] as $observer_id => $observers_observations){
                     $s=User::where('id',$observer_id)->first();
                     foreach ($observers_observations as $observer_observation)

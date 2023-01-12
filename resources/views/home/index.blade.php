@@ -74,42 +74,30 @@
                     
                     
                     --}}
-            {{-- Warning lack of Members start --}}
-            @if((Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد"))
-                @foreach ($latest_rotation->coursesProgram()->get() as $course)
-                    @foreach ($course->rooms()->wherePivot('rotation_id',$latest_rotation->id)->get() as $room)
-                            @php
-                                $current_roles_in_exist=$room->users()->wherePivot('rotation_id',$latest_rotation->id)->wherePivot('course_id',$course->id)->pluck('roleIn')->toArray();
-                                $str_leak_of_roleIn="";//dump($current_roles_in_exist)
-                            @endphp
-                            {{-- @if(count($current_roles_in_exist)<=3) @dump("Ali")  @endif --}}
-                            @if(count($current_roles_in_exist)>=3) @continue @endif
-                            @if(!in_array("RoomHead",$current_roles_in_exist))
-                                @php $str_leak_of_roleIn.="<span class='badge bg-success'>رئيس قاعة</span>"; @endphp
-                            @endif
-                            @if(!in_array("Secertary",$current_roles_in_exist))
-                                @php $str_leak_of_roleIn.=" <span class='badge bg-success'>أمين سر</span>"; @endphp
-                            @endif
-                            @if(!in_array("Observer",$current_roles_in_exist))
-                                @php $str_leak_of_roleIn.=" <span class='badge bg-success'>مراقب</span>"; @endphp
-                            @endif
-                            @if($str_leak_of_roleIn)
-                                <div class="alert alert-warning alert-dismissible fade show" role="alert" style="direction: rtl">
-                                    <h4 class="alert-heading">تحذير !!<h4>
-                                    <hr>
-                                    <div class="row">
-                                        <div class="goTo col-sm-7">
-                                            <p>يوجد نقص @php echo $str_leak_of_roleIn; @endphp من الأعضاء في مقرر <span class="badge bg-secondary">{{ $course->course_name }}</span> في القاعة <span class="badge bg-secondary">{{ $room->room_name }}</span></p>
-                                        </div>
-                                        <div class="goTo col-sm-5" style="direction: ltr">
-                                            <a href="{{ route('rotations.get_room_for_course',[$latest_rotation->id, $course->id,$room->id]) }}" class="btn btn-warning btn-outline-light">تعديل </a>
+            {{-- Warning Section lack of Members start --}}
+        @if((Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد"))
+            @foreach ($courses_rooms_roles as $course_name => $course_rooms_roles)
+                    <div class="d-grid gap-2 mb-2">
+                            <div class="alert alert-light alert-dismissible fade show" role="alert" style="direction: rtl">
+                                <span class="badge bg-warning">{{ $course_name }}</span>
+                                    @foreach ($course_rooms_roles as $room_name => $course_room_roles)
+                                    <div class="alert alert-dark alert-dismissible fade show" role="alert" style="direction: rtl">
+                                        <h4 class="alert-heading">تحذير !!<h4>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="goTo col-sm-7">
+                                                <p>يوجد نقص @foreach ($course_room_roles as $course_room_role) @php echo $course_room_role; @endphp @endforeach  من الأعضاء في القاعة <span class="badge bg-secondary">{{ $room_name }}</span></p>
+                                            </div>
+                                            <div class="goTo col-sm-5" style="direction: ltr">
+                                                {{-- <a href="{{ route('rotations.get_room_for_course',[$latest_rotation->id, $course->id,$room->id]) }}" class="btn btn-warning btn-outline-light">تعديل </a> --}}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            @endif
-                    @endforeach
-                @endforeach
-            @endif
+                                    @endforeach
+                        </div>
+                    </div>
+            @endforeach
+        @endif
             {{-- Warning lack of Members start --}}
 
 
