@@ -13,12 +13,9 @@ class Rooms extends Controller
     
     public function __construct($rotation){
         $this->rotation=$rotation;
-        //$rooms=Room::where('is_active',1)->get()->pluck('id')->toarray();
-        $rooms=array_merge(array_unique($this->rotation->distributionRoom()->toBase()->pluck('id')->toarray()));//array_merge to keep the keys ordered
-        //dd($rooms);
+        $rooms=array_merge(array_unique($this->rotation->distributionRoom()->orderBy('id')->toBase()->pluck('id')->toarray()));//array_merge to keep the keys ordered
         $this->rooms_ids=$rooms;
         $this->length=count($rooms);
-        //dd($this);
     }
 
     public function getLength(){

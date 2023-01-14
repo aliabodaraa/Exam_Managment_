@@ -69,7 +69,7 @@
                 <div class="mb-3">
                     <label for="faculty_id" class="form-label">faculty_id :</label>
                     <select class="form-control" name="faculty_id" class="form-control" required>
-                        @foreach (App\Models\Faculty::all() as $faculty)
+                        @foreach (App\Models\Faculty::toBase()->get() as $faculty)
                             <option value='{{ $faculty->id }}' {{ ($room->faculty->id == $faculty->id) ? 'selected': '' }}>{{ $faculty->name }}</option>
                         @endforeach
                     </select>

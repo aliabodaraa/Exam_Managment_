@@ -12,20 +12,17 @@ class Members extends Controller
     private Rotation $rotation;
     private array $members_ids;
     private int $length;
-    
     public function __construct(EnumPersonType $type,Rotation $rotation){
         $this->type=$type;
         $this->rotation=$rotation;
-        $room_heads=$this->rotation->initial_members()->wherePivot('options','{"1":"on"}')->orWherePivot('options','{"1":"on","2":"on"}')->toBase()->get()->pluck('id')->toarray();
-        //dd(User::toBase()->first()); //toBase returns raw data as you use query
-        $secertaries=$this->rotation->initial_members()->wherePivot('options','{"2":"on"}')->orWherePivot('options','{"1":"on","2":"on"}')->toBase()->get()->pluck('id')->toarray();
+        $room_heads=$this->rotation->initial_members()->wherePivot('options','{"1":"on"}')->orWherePivot('options','{"1":"on","2":"on"}')->wherePivot('rotation_id',$rotation->id)->toBase()->get()->pluck('id')->toarray();
+        $secertaries=$this->rotation->initial_members()->wherePivot('options','{"2":"on"}')->orWherePivot('options','{"1":"on","2":"on"}')->wherePivot('rotation_id',$rotation->id)->toBase()->get()->pluck('id')->toarray();
         $observers=array_merge(array_unique(
                         array_merge(
                             User::where('is_active',1)->where('temporary_role')->whereNotIn('id',$room_heads)->toBase()->get()->pluck('id')->toarray()
                             ,$secertaries
                         )
                     ));
-        //dd($room_heads,$secertaries,$observers);
         switch($this->type){
             case EnumPersonType::RoomHead:
                 $members=$room_heads;

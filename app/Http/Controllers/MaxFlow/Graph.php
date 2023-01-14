@@ -31,7 +31,7 @@ class Graph extends Controller
     public function __construct(EnumPersonType $type, Rotation $rotation, array $roomheads_paths=array(), array $secertaries_paths=array()){
         $this->type = $type;
         $this->rotation=$rotation;
-
+        
         $this->members=new Members($type,$this->rotation);
         $this->arr_users_objetions_orderd=$this->getUsersWithObjectionsOnCourses();
         $this->arr_keys_users_objections_orderd=array_keys($this->arr_users_objetions_orderd);
@@ -41,45 +41,23 @@ class Graph extends Controller
         $this->arr_courses_idx_date_time=$this->coursesWithArrDateAndTime();//depend on $this->courses ordered via date and time
         [$this->arr_same_time_courses,$this->count_arr_same_time_courses]=$this->coursesInSameTimes();//depend on arr_courses_idx_date_time re-orederd to adapt with $this->arr_keys_courses_num_objections_orderd
         $this->arr_courses_with_count_of_rooms=$this->getCoursesWithCountOfRooms();//depend on sameTimes array and $this->arr_keys_courses_num_objections_orderd
-        //dd($this->arr_same_time_courses,$this->count_arr_same_time_courses);
-        // dd($this->getCourseWithNumOfObservation(),$this->getCoursesWithCountOfRooms(),$this->courses);
         $this->rooms=new Rooms($this->rotation);
         $this->buildGraph($roomheads_paths, $secertaries_paths);
-         
 
-        //  if($this->type->name == "Observer"){
-        //     dump("Graph",$this->arr_graph);
-        //     dump("users",$this->arr_keys_users_objections_orderd);
-        //  }
-
-        //  dump("Graph",$this->arr_graph);
-        //  dump("users",$this->arr_keys_users_objections_orderd);
-
-        // for($i=count($this->arr_keys_users_objections_orderd)+$this->count_arr_same_time_courses+1;$i<=count($this->arr_keys_users_objections_orderd)+count($this->arr_keys_courses_num_objections_orderd)+$this->count_arr_same_time_courses;$i++){
-        //     for($j=count($this->arr_keys_users_objections_orderd)+count($this->arr_keys_courses_num_objections_orderd)+$this->count_arr_same_time_courses+1;$j<=count($this->arr_keys_users_objections_orderd)+count($this->arr_keys_courses_num_objections_orderd)+$this->count_arr_same_time_courses+$this->rooms->getLength();$j++){
-        //         if($this->arr_graph[$i][$j]>0){
-        //             ++$counter;
-        //         }
-        //     }
-        //     dump($counter);
-        // }
-        // dd($counter);
     }
 
     public function buildGraph(array $roomheads_paths=array(), $secertaries_paths=array()){//dump(221);
         $this->length_graph=$this->members->getLength()+$this->count_arr_same_time_courses+$this->courses->getLength()+$this->rooms->getLength()+2;
-        //dd($this->members->getLength(),$this->count_arr_same_time_courses,$this->courses->getLength(),$this->rooms->getLength());
         $this->initializeGraphWithZeroValues();//initalize the graph with zero values
         $this->linkSourceWithUsers();//link source node with users via the observations of them
         $this->setUsersWithSameTimeNodes();//link users node with courses that have not objections of them in latest rotation
-
         if(
             ($this->type->name == "Observer" || $this->type->name == "Secertary") && 
             isset($roomheads_paths)){
                 //dump("1");
                 $this->subtractUsersObservations($roomheads_paths);
                 $this->cutEdgesFromUsersToSameTimeNodes($roomheads_paths);
-                
+
             }
 
         if(
@@ -88,7 +66,7 @@ class Graph extends Controller
                 //dump("2");
                 $this->subtractUsersObservations($secertaries_paths);
                 $this->cutEdgesFromUsersToSameTimeNodes($secertaries_paths);
-                
+
             }
         //for DFS
         $this->setSameTimeNodesToCourses();//link each sameTimeNode with the courses that belong to it with `1` to be able to run dfs
@@ -97,6 +75,32 @@ class Graph extends Controller
         //for DFS
         $this->setSameTimeNodesToCoursesAfterDfs();//set each course with number of belonged rooms
         $this->linkRoomsWithSink();//link rooms nodes with the sink node
+
+
+
+
+
+
+
+
+
+
+        //  $counter=0;
+        //  if($this->type->name == "Observer"){
+        //      dump("Graph",$this->arr_graph);
+        //      dump("users",$this->arr_keys_users_objections_orderd);
+        //   }
+        //   dump("Graph",$this->arr_graph);
+        //   dump("users",$this->arr_keys_users_objections_orderd);
+        //  for($i=count($this->arr_keys_users_objections_orderd)+$this->count_arr_same_time_courses+1;$i<=count($this->arr_keys_users_objections_orderd)+count($this->arr_keys_courses_num_objections_orderd)+$this->count_arr_same_time_courses;$i++)
+        //      for($j=count($this->arr_keys_users_objections_orderd)+count($this->arr_keys_courses_num_objections_orderd)+$this->count_arr_same_time_courses+1;$j<=count($this->arr_keys_users_objections_orderd)+count($this->arr_keys_courses_num_objections_orderd)+$this->count_arr_same_time_courses+$this->rooms->getLength();$j++)
+        //          if($this->arr_graph[$i][$j]>0)
+        //              ++$counter;
+        //  if($this->type->name=="RoomHead")
+        //  dump($counter);
+        //  else
+        //  dd($counter);
+
     }
     //0
     public function cutEdgesFromUsersToSameTimeNodes(array $paths_info_param){
@@ -104,20 +108,12 @@ class Graph extends Controller
                 if(in_array($user_id,$this->members->getMembers())){
                     $key_user=$this->getKeyFromArray($user_id,$this->arr_keys_users_objections_orderd);
                     foreach ($user_observations as $observation) {
-                        
                         $key_course=$this->getKeyFromArray($observation['course'],$this->arr_keys_courses_num_objections_orderd);
-                        // if($this->type->name=="Secertary" ){
-                        //     dd("insideCutEdge",$this->arr_keys_users_objections_orderd,$user_id,$key_user,$user_observations,$key_course, $this->arr_same_time_courses[$key_course],$this->members->getLength()+$this->arr_same_time_courses[$key_course]);
-                        // }
                         $this->arr_graph[$key_user+1][$this->members->getLength()+$this->arr_same_time_courses[$key_course]+1]=0;
                     }
                 }
                 
             }
-            // foreach ($paths_info_param as $key => $path) {//dd("Ali",$paths_info_param,$path);
-            //     if(in_array($path[0]-1,$this->members->getMembers()))
-            //         $this->arr_graph[$path[0]][$path[1]]=0;
-            // }
     }
     public function countPathsForSpesificUser(array $paths_info_param,$user_id){
         $count=0;
@@ -137,14 +133,6 @@ class Graph extends Controller
                     $this->arr_graph[0][$key_user+1]=$final_num_observations_for_current_user_after_abstract;
                 }
         }
-        // foreach ($paths_info_param as $key => $path) {
-        //     if(in_array($path[0]-1,$this->members->getMembers())){
-        //         $total_num_observations_for_current_user=$this->members->getNumOfObservationsForSpecificMember($path[0]-1);
-        //         $pre_num_observations_for_current_user_in_previous_graph=$this->countPathsForSpesificUser($paths_info_param,$path[0]);
-        //         $final_num_observations_for_current_user_after_abstract=$total_num_observations_for_current_user-$pre_num_observations_for_current_user_in_previous_graph;
-        //         $this->arr_graph[0][$path[0]]=$final_num_observations_for_current_user_after_abstract;
-        //     }
-        // }
     }
     //1
     public function getUsersWithObjectionsOnCourses(){//users with objections on courses in latest rotation [as edges]
@@ -175,9 +163,9 @@ class Graph extends Controller
                 if(in_array($course_id,$arr_courses_ids))
                     $num++;
             $arr_keys_courses_num_objections_orderd[$course_id]=$num;
-        }//dump($arr_keys_courses_num_objections_orderd);
+        }
         uasort($arr_keys_courses_num_objections_orderd,fn($a,$b)=>$a<$b);//sort via the course that have max objections
-        //dd($arr_keys_courses_num_objections_orderd);
+
         return $arr_keys_courses_num_objections_orderd;
     }
 
@@ -232,42 +220,16 @@ class Graph extends Controller
                     ( strtotime($pre_time) < strtotime($curr_time) && $curr_time < gmdate('H:i:s',strtotime($pre_time)+strtotime($pre_duration)) ) 
                 )
              ){
-                //dump("same_time",$pre_time ,$pre_time,"------------------------------------");
                 $same_times[$this->getKeyFromArray($this->courses->getCourses()[$i],$this->arr_keys_courses_num_objections_orderd)]=$same_times[$this->getKeyFromArray($this->courses->getCourses()[$i-1],$this->arr_keys_courses_num_objections_orderd)];
                 continue;
             }
             $same_times[$this->getKeyFromArray($this->courses->getCourses()[$i],$this->arr_keys_courses_num_objections_orderd)]=++$counter;
-            //dump("not_same_time",$pre_time ,$pre_time,"+++++++++++++++++++++++++++++++");
         }
-        $num_distict_times=$same_times[count($same_times)-1]+1;//count(array_unique($same_times));
+        $num_distict_times=count(array_unique($same_times));//$same_times[count($same_times)-1]+1;
 
         return array($same_times,$num_distict_times);
     }
-    // public function coursesInSameTimes(){//old generate ERROR
-    //     $same_times[0]=$counter=0;
-    //     for ($i=1; $i < $this->courses->getLength() ; $i++) {
-    //         $curr_date=$this->arr_courses_idx_date_time[$i]['date'];
-    //         $curr_time=$this->arr_courses_idx_date_time[$i]['time'];
-    //         $curr_duration=$this->arr_courses_idx_date_time[$i]['duration'];
 
-    //         $pre_date=$this->arr_courses_idx_date_time[$i-1]['date'];
-    //         $pre_time=$this->arr_courses_idx_date_time[$i-1]['time'];
-
-    //         if($pre_date==$curr_date &&
-    //             ( 
-    //                 ( $pre_time>=$curr_time && $pre_time <= gmdate('H:i:s',strtotime($curr_time)+strtotime($curr_duration)) ) || 
-    //                 ( $pre_time<=$curr_time && $pre_time >= gmdate('H:i:s',strtotime($curr_time)+strtotime($curr_duration)) ) 
-    //             )
-    //          ){
-    //             $same_times[$i]=$same_times[$i-1];
-    //             continue;
-    //         }
-    //         $same_times[$i]=++$counter;
-    //     }
-    //     $num_distict_times=$same_times[count($same_times)-1]+1;//count(array_unique($same_times));
-
-    //     return array($same_times,$num_distict_times);
-    // }
     public function setSameTimeNodesToCourses(){
         foreach ($this->arr_same_time_courses as $course_index => $same_time_index)
             $this->arr_graph[$this->members->getLength()+$same_time_index+1][$this->members->getLength()+$this->count_arr_same_time_courses+$course_index+1]=1;
@@ -289,6 +251,7 @@ class Graph extends Controller
         }
         return $courses_rooms;
     }
+
     public function setCoursesRooms(){//courses with distributed rooms in latest rotation [as edges]
         $courses_rooms_ids=$this->getCoursesRooms();
         foreach ($courses_rooms_ids as $course_id => $rooms_ids) {
@@ -299,6 +262,7 @@ class Graph extends Controller
             }
         }
     }
+
     public function getCoursesWithCountOfRooms(){//courses with distributed rooms in latest rotation [as edges]
         $courses_rooms_ids=$this->getCoursesRooms();
         $courses_with_count_rooms=[];
@@ -327,13 +291,8 @@ class Graph extends Controller
     public function applyMaxFlowAlgorithm(){
         $obj_max = new MaxFlow($this->length_graph,$this->members->getMembers(),$this->courses->getCourses(),$this->count_arr_same_time_courses);
         $paths=$obj_max->fordFulkerson($this->arr_graph, 0, $this->length_graph-1);
-        //dd($this->arr_graph,$paths,'sameTime',$this->arr_same_time_courses,'courses',$this->arr_keys_courses_num_objections_orderd,'users',$this->arr_users_objetions_orderd);
         $pathsInfo=$this->convertFordFulkersonPaths($paths);
-        // if($this->type->name == "Observer"){
-        //     dd("Paths",$pathsInfo,$this->arr_keys_users_objections_orderd,$this->arr_keys_courses_num_objections_orderd);
-        // }
-        //dump("Paths",$pathsInfo,$this->arr_keys_users_objections_orderd,$this->arr_keys_courses_num_objections_orderd);
-        //dd($paths);
+
         return array($paths,$pathsInfo);
     }
     
@@ -342,17 +301,14 @@ class Graph extends Controller
             $num_members=$this->members->getLength();
             $num_courses=$this->courses->getLength();
             $num_same_times=$this->count_arr_same_time_courses;
-            //$pathsInfo['num_members']=$num_members;
+        // if($this->type->name=="RoomHead")
+        //  dump($paths);
+        //  else
+        //  dd($paths);
             for ($i=1; $i <=$num_members; $i++) {
-                //$observations_num=0;
                 foreach ($paths as $path) {
-                    
                     if($i == $path[0]){
                         $pathsInfo['users_observations'][$this->arr_keys_users_objections_orderd[$i-1]][]=[
-                            //'granted_observations_num'=>++$observations_num,
-                            //'rotation' =>$this->rotation->id,
-                            //'actual_observations_num'=>User::where('id',$this->arr_keys_users_objections_orderd[$i-1])->first()->number_of_observation,
-                            
                             'course' =>$this->arr_keys_courses_num_objections_orderd[$path[2]-$num_same_times-$num_members-1],
                             'room' =>$this->rooms->getRooms()[$path[3]-$num_courses-$num_same_times-$num_members-1],
                             'date'=>Course::where('id',$this->arr_keys_courses_num_objections_orderd[$path[2]-$num_same_times-$num_members-1])->first()->rotationsProgram()->where('id',$this->rotation->id)->first()->pivot->date,

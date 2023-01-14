@@ -16,7 +16,7 @@
                 @method('patch')
                 @csrf
                 <div class="mb-3">
-                    <label for="name" class="form-label">Rotation Name</label>
+                    <label for="name" class="form-label">أسم الدورة :</label>
                     <select class="form-control" name="name" class="form-control" value="{{ $rotation->name }}" required>
                             <option value='الدورة الفصلية الأولى'>الدورة الفصلية الأولى</option>
                             <option value='الدورة الفصلية الثانية'>الدورة الفصلية الثانية</option>
@@ -62,7 +62,7 @@
                 <div class="mb-3">
                     <label for="faculty_id" class="form-label">faculty_id</label>
                     <select class="form-control" name="faculty_id" class="form-control" required>
-                        @foreach (App\Models\Faculty::all() as $faculty)
+                        @foreach (App\Models\Faculty::toBase()->get() as $faculty)
                             <option value='{{ $faculty->id }}' {{ ($rotation->faculty->id == $faculty->id) ? 'selected': '' }}>{{ $faculty->name }}</option>
                         @endforeach
                     </select>

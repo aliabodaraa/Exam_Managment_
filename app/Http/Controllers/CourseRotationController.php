@@ -36,6 +36,8 @@ class CourseRotationController extends Controller
         //if(in_array($specific_room->id,$joining_rooms) || (in_array($specific_room->id,$rooms_this_course) && in_array($specific_room->id,$disabled_rooms))){
         list($room_heads_in_current_joining_in_this_rotation_course_room, $secertaries_in_current_joining_in_this_rotation_course_room, $observers_in_current_joining_in_this_rotation_course_room) = Stock::getUsersInSpecificJoiningRoomForRotationCourseRoom($rotation,$course,$specific_room);
         $pure_disabled_users_for_joining_room=array_diff(array_unique($all_disabled_users_in_joining_room),array_merge($room_heads_in_current_joining_in_this_rotation_course_room, $secertaries_in_current_joining_in_this_rotation_course_room, $observers_in_current_joining_in_this_rotation_course_room));
+        //dd($room_heads_in_current_joining_in_this_rotation_course_room, $secertaries_in_current_joining_in_this_rotation_course_room, $observers_in_current_joining_in_this_rotation_course_room);
+
         //dd($pure_disabled_users_for_joining_room);
         //}
         //dd($accual_common_rooms_for_specific_course);
@@ -103,19 +105,28 @@ class CourseRotationController extends Controller
                 $specific_room->users()->attach($request->get('observers'), ['rotation_id'=>$rotation->id,'course_id'=>$course_common_with_time->id,'roleIn'=> 'Observer']);
             }
         }elseif(in_array($specific_room->id, $joining_rooms) ){//Joining Room
-            //Done
-            //list($room_heads_in_current_joining_in_this_rotation_course_room, $secertaries_in_current_joining_in_this_rotation_course_room, $observers_in_current_joining_in_this_rotation_course_room) = Stock::getUsersInSpecificJoiningRoomForRotationCourseRoom($rotation,$course,$specific_room);
+            $exist_users_in_request = ($request->get('roomheads')&&count($request->get('roomheads'))) || ($request->get('roomheads')&&count($request->get('secertaries'))) || ($request->get('roomheads')&&count($request->get('observers')));
             foreach ($courses_common_with_time as $course_common_with_time) {
                 if($course_common_with_time->id == $course->id){
                     $course_common_with_time->distributionRoom()->attach($specific_room->id, ['rotation_id'=>$rotation->id,'num_student_in_room'=> $request['num_student_in_room']]);
+                    if($exist_users_in_request){
+                        $specific_room->users()->attach($request->get('roomheads'), ['rotation_id'=>$rotation->id,'course_id'=>$course_common_with_time->id,'roleIn'=> 'RoomHead']);
+                        $specific_room->users()->attach($request->get('secertaries'), ['rotation_id'=>$rotation->id,'course_id'=>$course_common_with_time->id,'roleIn'=> 'Secertary']);    
+                        $specific_room->users()->attach($request->get('observers'), ['rotation_id'=>$rotation->id,'course_id'=>$course_common_with_time->id,'roleIn'=> 'Observer']);
+                    }
                 }else{
-                    $course_common_with_time->distributionRoom()->updateExistingPivot($specific_room->id, ['rotation_id'=>$rotation->id,'num_student_in_room'=> Stock::getOccupiedNumberOfStudentsInThisCourseInSpecificRoom($rotation, $course_common_with_time, $specific_room->id)]);
-                    $specific_room->users()->wherePivot('rotation_id',$rotation->id)->wherePivot('course_id',$course_common_with_time->id)->detach();
+                    if(count($course_common_with_time->distributionRoom()->where('id',$specific_room->id)->toBase()->get())){
+                        $course_common_with_time->distributionRoom()->updateExistingPivot($specific_room->id, ['rotation_id'=>$rotation->id,'num_student_in_room'=> Stock::getOccupiedNumberOfStudentsInThisCourseInSpecificRoom($rotation, $course_common_with_time, $specific_room->id)]);
+                        $specific_room->users()->wherePivot('rotation_id',$rotation->id)->wherePivot('course_id',$course_common_with_time->id)->detach();
+                        if ($exist_users_in_request) {
+                            $specific_room->users()->attach($request->get('roomheads'), ['rotation_id' => $rotation->id, 'course_id' => $course_common_with_time->id, 'roleIn' => 'RoomHead']);
+                            $specific_room->users()->attach($request->get('secertaries'), ['rotation_id' => $rotation->id, 'course_id' => $course_common_with_time->id, 'roleIn' => 'Secertary']);
+                            $specific_room->users()->attach($request->get('observers'), ['rotation_id' => $rotation->id, 'course_id' => $course_common_with_time->id, 'roleIn' => 'Observer']);
+                        }
+                    }
                 }
-                $specific_room->users()->attach($request->get('roomheads'), ['rotation_id'=>$rotation->id,'course_id'=>$course_common_with_time->id,'roleIn'=> 'RoomHead']);
-                $specific_room->users()->attach($request->get('secertaries'), ['rotation_id'=>$rotation->id,'course_id'=>$course_common_with_time->id,'roleIn'=> 'Secertary']);    
-                $specific_room->users()->attach($request->get('observers'), ['rotation_id'=>$rotation->id,'course_id'=>$course_common_with_time->id,'roleIn'=> 'Observer']);
             }
+            //dd(1);
         }elseif(! in_array($specific_room->id, $disabled_rooms) && in_array($specific_room->id, $rooms_this_course) ){//SingleRoom
             //Done
             $course->distributionRoom()->updateExistingPivot($specific_room->id, ['num_student_in_room'=> $request['num_student_in_room']]);
@@ -136,7 +147,16 @@ class CourseRotationController extends Controller
 
     public function show(Rotation $rotation, Course $course)
     {
-        return view('Rotations.ExamProgram.courses.show',compact('course','rotation'));
+        //disabled some of things when the rotation is expired
+        $today_date = date("Y-m-d");
+        $rotation_end_date = $rotation->end_date; //from database
+        $today_time = strtotime($today_date);
+        $rotation_end_time = strtotime($rotation_end_date);
+        $expire_rotation_date=false;
+        if ($rotation_end_time <= $today_time)
+            $expire_rotation_date=true;
+
+        return view('Rotations.ExamProgram.courses.show',compact('course','rotation','expire_rotation_date'));
     }
 
     public function edit(Rotation $rotation, Course $course)

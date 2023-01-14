@@ -1,12 +1,14 @@
 @extends('layouts.app-master')
 
 @section('content')
-    <div class="bg-light p-4 rounded">
+    <div class="bg-light fs-2 fw-bold p-4 rounded">
+        <div class="mt-2">
+            @include('layouts.partials.messages')
+        </div>
         @auth
         @php
             $is_find_in_names_list_in_latest_rotation=(bool)$latest_rotation->initial_members()->where('id',Auth::user()->id)->toBase()->get();
         @endphp
-            <p class="lead"></p>
             @if( ( (! auth()->user()->is_active || auth()->user()->number_of_observation == 0 ) && !auth()->user()->temporary_role))
                 <p class="mb-0 lead"> انت غير متاح في الدورة الأخيرة /{{ $latest_rotation->name }} / {{ $latest_rotation->year }}</p>
             @elseif(auth()->user()->temporary_role)
@@ -66,47 +68,97 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
               </div>
             @endif
-                    {{-- 
-    
-                    @foreach (App\Models\Course::with('rooms')->whereIn('id',$course_ids)->whereHas('rooms',fn($q) =>
-                        $q->where('rotation_id',$latest_rotation->id)
-                    )->get() as $room)
-                    
-                    
-                    --}}
-            {{-- Warning Section lack of Members start --}}
-        @if((Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد"))
-            @foreach ($courses_rooms_roles as $course_name => $course_rooms_roles)
-                    <div class="d-grid gap-2 mb-2">
-                            <div class="alert alert-light alert-dismissible fade show" role="alert" style="direction: rtl">
-                                <span class="badge bg-warning">{{ $course_name }}</span>
-                                    @foreach ($course_rooms_roles as $room_name => $course_room_roles)
-                                    <div class="alert alert-dark alert-dismissible fade show" role="alert" style="direction: rtl">
-                                        <h4 class="alert-heading">تحذير !!<h4>
-                                        <hr>
-                                        <div class="row">
-                                            <div class="goTo col-sm-7">
-                                                <p>يوجد نقص @foreach ($course_room_roles as $course_room_role) @php echo $course_room_role; @endphp @endforeach  من الأعضاء في القاعة <span class="badge bg-secondary">{{ $room_name }}</span></p>
-                                            </div>
-                                            <div class="goTo col-sm-5" style="direction: ltr">
-                                                {{-- <a href="{{ route('rotations.get_room_for_course',[$latest_rotation->id, $course->id,$room->id]) }}" class="btn btn-warning btn-outline-light">تعديل </a> --}}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @endforeach
-                        </div>
-                    </div>
-            @endforeach
-        @endif
-            {{-- Warning lack of Members start --}}
 
+        @if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
+            <div class="container">
+                <div class="row g-2">
+                        <div class="col-6 g-2">
+                            <div class="row p-3 border bg-light fs-1 blockquote text-center">
+                                <h2>عدد المقررات</h2>
+                                <div class="col-12">
+                                    <div class="p-4 border bg-light fs-3 fw-bold text-center text-muted">{{ count(App\Models\Course::toBase()->pluck('id')) }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 g-2">
+                            <div class="row p-3 border bg-light fs-1 blockquote text-center">
+                                <h2>عدد القاعات</h2>
+                                    <div class="col-6">
+                                        <div class="p-4 border bg-light fs-3 fw-bold text-center text-muted">غير مفعلة : {{ count(App\Models\Room::where('is_active',0)->toBase()->pluck('id')) }}/{{ count(App\Models\Room::toBase()->pluck('id')) }}</div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="p-4 border bg-light fs-3 fw-bold text-center text-muted">مفعلة : {{ count(App\Models\Room::where('is_active',1)->toBase()->pluck('id')) }}/{{ count(App\Models\Room::toBase()->pluck('id')) }}</div>
+                                    </div>
+                            </div>
+                        </div>
+
+                        <div class="row p-3 border bg-light fs-1 blockquote text-center">
+                            <h2>سعات القاعات بالكلية </h2>
+                            <div class="col-6">
+                                <div class="p-4 border bg-light fs-2 fw-bold text-center text-muted">سعات الدنيى للقاعات :{{ App\Http\Controllers\MaxMinRoomsCapacity\Stock::getMinDistribution() }}</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-4 border bg-light fs-2 fw-bold text-center text-muted"> سعات العظمى للقاعات: {{ App\Http\Controllers\MaxMinRoomsCapacity\Stock::getMaxDistribution() }}</div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-{{ ($total_num_observations=count($latest_rotation->users()->toBase()->get()))==0?'12':'6' }} g-2">
+                            <div class="row p-3 border bg-light fs-1 blockquote text-center">
+                                <h2>عدد المستخدمين</h2>
+                                <div class="col-6">
+                                    <div class="p-4 border bg-light fs-3 fw-bold text-center text-muted">غير مفعل : {{ count(App\Models\User::where('is_active',0)->toBase()->pluck('id')) }}/{{ count(App\Models\User::toBase()->pluck('id')) }}</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="p-4 border bg-light fs-3 fw-bold text-center text-muted"> مفعل : {{ count(App\Models\User::where('is_active',1)->toBase()->pluck('id')) }}/{{ count(App\Models\User::toBase()->pluck('id')) }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        @if($total_num_observations)
+                            <div class="col-6 g-2">
+                                <div class="row p-3 border bg-light fs-1 blockquote text-center">
+                                    <h2>عدد المراقبات</h2>
+                                    <div class="col-12">
+                                        <div class="p-4 border bg-light fs-2 fw-bold text-center text-muted">{{ $total_num_observations }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                </div>
+            </div>
+            {{-- Warning Section lack of Members start --}}
+            @if(count($latest_rotation->users()->toBase()->get()))
+                @foreach ($courses_rooms_roles as $course_name => $course_rooms_roles)
+                        <div class="d-grid gap-2 mb-2">
+                                <div class="alert alert-light alert-dismissible fade show" role="alert" style="direction: rtl">
+                                    <a href="{{route('rotations.course.edit',['rotation'=>$latest_rotation->id,'course'=>App\Models\Course::query()->where('course_name',$course_name)->toBase()->first()->id])}}" class="badge bg-warning btn btn-info btn-sm btn-outline-light rounded">{{ $course_name }}</a>
+                                        @foreach ($course_rooms_roles as $room_name => $course_room_roles)
+                                            <div class="alert alert-dark alert-dismissible fade show" role="alert" style="direction: rtl">
+                                                <h4 class="alert-heading">تحذير !!<h4>
+                                                <hr>
+                                                <div class="row">
+                                                    <div class="goTo col-sm-7">
+                                                        <p>يوجد نقص @foreach ($course_room_roles as $course_room_role) @php echo $course_room_role; @endphp @endforeach  من الأعضاء في القاعة <span class="badge bg-secondary">{{ $room_name }}</span></p>
+                                                    </div>
+                                                    <div class="goTo col-sm-5" style="direction: ltr">
+                                                        <a href="{{ route('rotations.get_room_for_course',[$latest_rotation->id, App\Models\Course::query()->where('course_name',$course_name)->toBase()->first()->id,App\Models\Room::query()->where('room_name',$room_name)->toBase()->first()->id]) }}" class="btn btn-warning btn-outline-light">تعديل </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                </div>
+                        </div>
+                @endforeach
+            @endif
+            {{-- Warning lack of Members start --}}
+        @endif
 
         @endauth
 
         @guest
-        <h1>Hello From My Application</h1>
-        <h2>{{session('success')}}</h2>
-        <p class="lead">يمكنك تسجيل الدخول و التفاعل مع الموقع بحسب دورك في كليتك</p>
+            <h1>Hello From My Application</h1>
+            <h2>{{session('success')}}</h2>
+            <p class="lead">يمكنك تسجيل الدخول و التفاعل مع الموقع بحسب دورك في كليتك</p>
         @endguest
     </div>
 @endsection

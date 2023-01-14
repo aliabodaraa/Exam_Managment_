@@ -67,7 +67,7 @@
                     <div id="checkboxes" style="text-align-last: justify;
                                                                 display: table-caption;
                                                                 width: 202px;">
-                        @foreach (App\Models\Department::all() as $department)
+                        @foreach (App\Models\Department::toBase()->get() as $department)
                             <label for="{{ $department->name }}"  style="display: flex;margin-bottom: 8px;">
                             <input type="checkbox" id="{{ $department->id }}" 
                             name="department_ids[{{ $department->id }}]"
@@ -84,7 +84,7 @@
                 <div class="mb-3">
                     <label for="faculty_id" class="form-label">faculty_id :</label>
                     <select class="form-control" name="faculty_id" class="form-control" required>
-                        @foreach (App\Models\Faculty::all() as $faculty)
+                        @foreach (App\Models\Faculty::toBase()->get() as $faculty)
                             <option value='{{ $faculty->id }}'>{{ $faculty->name }}</option>
                         @endforeach
                     </select>

@@ -17,6 +17,7 @@ class CoursesController extends Controller
 
     public function index()
     {
+        //dd(Carbon::now()->formatLocalized('l'));
         $courses = Course::orderBy('course_name')->get();
         return view('courses.index', compact('courses'));
     }

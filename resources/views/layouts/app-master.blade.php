@@ -11,6 +11,7 @@
     <!-- Bootstrap core CSS -->
     <link href="{!! url('assets/bootstrap/css/bootstrap.min.css') !!}" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">{{-- added --}}
+    <link rel="stylesheet" href="{!! url('assets/css/popUp_cubic.css') !!}">
     <style>
 
 
@@ -2220,10 +2221,10 @@ template {
 
 /* progress style */
 .progress {
-  width: 80px;
-  height: 80px;
-  background: none;
-  position: relative;
+    width: 100px;
+    height: 100px;
+    background: none;
+    position: relative;
 }
 
 .progress::after {
@@ -2401,7 +2402,7 @@ div.h4 {
 #nav_row {
     position: fixed;
     width: 102%;
-    z-index: 9999999999;
+    z-index: 9;
     padding:0px 15px;
   }
   main{
@@ -2455,6 +2456,7 @@ div.h4 {
     <a href="/search" class="py-4 px-6 hover:bg-slate-800 {{ (request()->routeIs('search')) ? 'bg-slate-800' : '' }}">search</a>
   </nav> --}}
     @include('layouts.partials.navbar')
+    @include('layouts.partials.popUp_cubic')
 
     <main class="container-fluid">
         @yield('content')
@@ -2467,17 +2469,33 @@ div.h4 {
     <script>
       // "global" vars, built using blade
       var imagesUrl = '{{ URL::asset('/images/') }}';
-  </script>    <script>
-setTimeout(() => {
-  console.info("This page is not reloaded");
-  document.getElementById("navigation").style.display="none";
-if (PerformanceNavigationTiming.type === "reload") {
-  console.info("This page is reloaded");
-  document.getElementById("navigation").style.display="block";
-}
-}, 300);
+  </script>
+  <script>
+    const navigation=document.getElementById("navigation");
+    const cubicPopUp=document.getElementById("cubicPopUp");
+    // cubicPopUp.style.display="block";
+    // cubicPopUp.classList.add("show");
+    setTimeout(() => {
+          navigation.style.display="none";
+          //to remove cubic after invoke the function `showPopUpCubic` afte invoke  with 400ms will removes
+          cubicPopUp.style.display="none";
+          cubicPopUp.classList.remove("show");
+    }, 400);
 
+      // const intializationInExamProgramModalToggle=document.getElementById("intializationInExamProgramModalToggle");
+      // const initializationRoomsInAllCourses=document.getElementById("initializationRoomsInAllCourses");
+      // const initializationInExamProgram=document.getElementById("initializationInExamProgram");
+    //cubicPopUp
+    function showPopUpCubic(){
+      //fade all initialization popUp intializationInExamProgramModalToggle initializationRoomsInAllCourses initializationInExamProgram
+      // intializationInExamProgramModalToggle.classList.reomve("show");
+      // initializationRoomsInAllCourses.classList.reomve("show");
+      // initializationInExamProgram.classList.reomve("show");
+      //fade all initialization popUp intializationInExamProgramModalToggle initializationRoomsInAllCourses initializationInExamProgram
 
+      cubicPopUp.classList.add("show");
+      cubicPopUp.style.display="block";
+    }
 </script>
     <script src="{!! url('assets/js/users.js') !!}"></script>
     <script src="{!! url('assets/js/courses.js') !!}"></script>

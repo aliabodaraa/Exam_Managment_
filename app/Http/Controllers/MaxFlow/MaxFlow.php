@@ -169,7 +169,7 @@ class MaxFlow extends Controller
                 array_push($path,$v);
                 $u = $parent[$v];
                 $rGraph[$u][$v] -= $path_flow;
-                $rGraph[$v][$u] += $path_flow;
+                //$rGraph[$v][$u] += $path_flow;-----------------------------------HERE the previous problem------------------
                 ////dump($rGraph[$u][$v]);
             }
             // Add path flow to overall flow

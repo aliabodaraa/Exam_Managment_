@@ -8,7 +8,7 @@
             </div>
         @endforeach
     @else
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <div class="alert alert-light alert-dismissible fade show border-success" role="alert">
             <strong>
                 <img src="{{ asset('images/success-icon.png') }}" alt="success" style="width: 20px;height: 20px;">
             </strong>
@@ -26,7 +26,7 @@
             </div>
         @endforeach
     @else
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <div class="alert alert-light alert-dismissible fade show border-warning" role="alert">
             <strong>
                 <img src="{{ asset('images/warning.png') }}" alt="danger" style="width: 20px;height: 20px;">
             </strong>
@@ -44,7 +44,7 @@
             </div>
         @endforeach
     @else
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <div class="alert alert-light alert-dismissible fade show border-danger" role="alert">
             <strong>
                 <img src="{{ asset('images/danger2.png') }}" alt="danger" style="width: 20px;height: 20px;">
             </strong>

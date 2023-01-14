@@ -39,11 +39,11 @@
                     @foreach($courses_info as $date => $all_years)
                         <tr>
                             <td class="date" align="center" height="100">
-                                <input type="checkbox" id="day{{++$counter}}" class="toggler-wrapper style-4"  style="float:right;display: block;
+                                <input type="checkbox" id="day{{++$counter}}" class="toggler-wrapper style-4" style="float:right;display: block;
                                 width: 200px;
                                 height: 40px;
                                 cursor: pointer;
-                                left:-16px;
+                                left:-55px;
                                 position: absolute;" onclick="select_all_courses_in_day({{ $counter }})">
                                 <b style="margin:0 0 0 35px">{{ date('l d-m-Y', strtotime($date)) }}</b>
                             </td>

@@ -10,13 +10,13 @@
         </h1>
         <?php
         $rooms = [];
-        foreach ($course->rooms as $room) {
+        foreach ($course->rooms->toBase() as $room) {
             array_push($rooms,$room->room_name);
         }
         $rooms = array_unique($rooms);
         ?>
         {{-- @dd($rooms) --}}
-@if(count($course->rooms))
+@if(count($course->rooms->toBase()))
         <div class="container mt-4" style="direction:rtl">
                     <h1>{{$course->course_name}}</h1>
                     <h5>سنة المادة : {{ $course->studing_year }}</h5>
@@ -36,9 +36,11 @@
                                     <div class="col-sm-9">
                                         <h5 class="card-title h2">{{  $room->room_name }}</h5>
                                     </div>
-                                    <div class="col-sm-3">
-                                        <a href="{{ route('rotations.get_room_for_course',[$rotation->id, $course->id,$room->id]) }}" class="btn btn-dark btn-outline-light">تعديل </a>
-                                    </div>
+                                    @if(!$expire_rotation_date)
+                                        <div class="col-sm-3">
+                                            <a href="{{ route('rotations.get_room_for_course',[$rotation->id, $course->id,$room->id]) }}" class="btn btn-dark btn-outline-light">تعديل </a>
+                                        </div>
+                                    @endif
                                 </div>
                                 <hr>
                                 <div class="course_rooms_details">

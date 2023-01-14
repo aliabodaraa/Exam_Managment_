@@ -73,7 +73,17 @@ class CourseRotation_ExamProgramController extends Controller
         //convert from array to json
         //$countries = array("Mark" => "USA", "Raymond" => "UK", "Jeff" => "JPN", "Mike" => "DE");
         //dd (json_encode($countries));
-        return view('Rotations.ExamProgram.show',compact('courses_info','rotation'));
+
+        //disabled some of things when the rotation is expired
+        $today_date = date("Y-m-d");
+        $rotation_end_date = $rotation->end_date; //from database
+        $today_time = strtotime($today_date);
+        $rotation_end_time = strtotime($rotation_end_date);
+        $expire_rotation_date=false;
+        if ($rotation_end_time <= $today_time)
+            $expire_rotation_date=true;
+
+        return view('Rotations.ExamProgram.show',compact('courses_info','rotation','expire_rotation_date'));
     }
 
     /**

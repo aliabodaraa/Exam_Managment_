@@ -32,7 +32,7 @@
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           <form method='POST' action='{{route($route_info[0],$route_info[1])}}' id='coursesForm'>
             @csrf
-              <button type='submit' class="btn btn-success">{{ $name_button }}</button>
+              <button type='submit' class="btn btn-success" onclick="showPopUpCubic()">{{ $name_button }}</button>
           </form>
         </div>
       </div>

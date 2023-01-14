@@ -22,7 +22,7 @@
                     </a>
                   @endif
                   @if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
-                    @if(count($user->teaches()->get())) 
+                    @if(count($user->teaches()->toBase()->get())) 
                       <a href={{ route("users.edit_user_courses",[$user->id]) }} type="button" class="btn btn-outline-dark" data-mdb-ripple-color="dark"
                         style="z-index: 1;">
                         تعديل المواد
@@ -77,9 +77,9 @@
                   @if($user->property)<p class="font-italic mb-0">Property : {{ $user->property }}</p>@endif
                   <p class="font-italic mb-0">Faculty : {{ $user->faculty->name }}</p>
                   <p class="font-italic mb-0">City : {{ $user->city }}</p>
-                  @if(count($user->teaches()->get()))
+                  @if(count($user->teaches()->toBase()->get()))
                     <p class="font-italic mb-0">المواد التي يدرسها :
-                      @foreach ($user->teaches()->get() as $course)
+                      @foreach ($user->teaches()->toBase()->get() as $course)
                         <span class="badge bg-secondary">{{ $course->course_name }}</span>
                       @endforeach
                     </p>

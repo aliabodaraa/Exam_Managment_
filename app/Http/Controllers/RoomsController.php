@@ -13,7 +13,7 @@ class roomsController extends Controller
      */
     public function index()
     {
-        $rooms = room::orderBy('room_name')->get();
+        $rooms = room::orderBy('id')->get();
         return view('rooms.index', compact('rooms'));
     }
 

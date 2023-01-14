@@ -44,7 +44,7 @@
                                 width: 200px;
                                 height: 40px;
                                 cursor: pointer;
-                                left:-16px;
+                                left:-55px;
                                 position: absolute;" onclick="select_all_courses_in_day({{ $counter }})">
                                 <b style="margin:0 0 0 35px">{{ date('l d-m-Y', strtotime($date)) }}</b>
                             </td>

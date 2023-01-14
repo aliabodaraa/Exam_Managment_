@@ -7,19 +7,10 @@ use App\Models\Room;
 use App\Models\Course;
 use App\Models\Rotation;
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Response;
 use App\Http\Controllers\MaxMinRoomsCapacity\Stock;
-use App\Http\Controllers\MaxFlow\Graph;
-use App\Http\Controllers\MaxFlow\EnumPersonType;
-
-
-use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\UsersExport;
-use App\Imports\UsersImport;
 class UsersController extends Controller
 {
     /**
@@ -103,10 +94,11 @@ class UsersController extends Controller
     public function profile(User $user)
     {
         list($all_rotations_table, $observations_number_in_latest_rotation)=Stock::calcInfoForEachRotationForSpecificuser($user);
-        if(array_key_exists(Rotation::latest()->get()[0]->id,$all_rotations_table))
+        //dd($all_rotations_table, $observations_number_in_latest_rotation);
+        if(array_key_exists(Rotation::latest()->toBase()->get()[0]->id,$all_rotations_table))
             return view('users.profile', [
                 'user' => $user,
-                'rotations_in_lastet_rotation_table' => $all_rotations_table[Rotation::latest()->get()[0]->id],
+                'rotations_in_lastet_rotation_table' => $all_rotations_table[Rotation::latest()->toBase()->get()[0]->id],
                 'observations_number_in_latest_rotation' => $observations_number_in_latest_rotation
             ]);
         else
@@ -125,7 +117,7 @@ class UsersController extends Controller
         return view('users.observations', [
             'user_name' => $user_name,
             'all_rotations_table' => $all_rotations_table,
-            'rotations_numbers' => array_unique($user->rotations->pluck('id')->toArray()),
+            'rotations_numbers' => array_unique($user->rotations->toBase()->pluck('id')->toArray()),
             'observations_number_in_latest_rotation' => $observations_number_in_latest_rotation
         ]);
     }                             
@@ -179,7 +171,7 @@ class UsersController extends Controller
         $user->update($custom_arr);
         //$user->syncRoles($request->get('role'));
 
-        return redirect()->route('users.index')
+        return redirect()->route('home.index')
         ->withSuccess(__('User updated successfully.'));
     }
 
@@ -287,26 +279,6 @@ class UsersController extends Controller
         ->withSuccess(__('User Observations updated successfully.'));
     }
 
-
-
-    //Exel
-        /**
-    * @return \Illuminate\Support\Collection
-    */
-    public function export() 
-    {
-        return Excel::download(new UsersExport, 'users.xlsx');
-    }
-       
-    /**
-    * @return \Illuminate\Support\Collection
-    */
-    public function import() 
-    {
-        Excel::import(new UsersImport,request()->file('file'));
-               
-        return back();
-    }
 }
 
 /*

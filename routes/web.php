@@ -37,7 +37,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
             /**
              * User Routes
              */
-            Route::group(['middleware'=>'adminAccess','prefix' => 'users'], function() {
+            Route::group(['prefix' => 'users'], function() {
                 Route::get('/', 'UsersController@index')->name('users.index');
                 Route::get('/create', 'UsersController@create')->name('users.create');
                 Route::post('/create', 'UsersController@store')->name('users.store');
@@ -58,8 +58,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
 
 
                 //Excel
-                Route::get('/users-export', 'UsersController@export')->name('users.export');
-                Route::post('/users-import', 'UsersController@import')->name('users.import');
+                Route::get('/observations-export/{rotation}', 'RotationsController@exportObservations')->name('observations.export');
+                //Route::post('/users-import', 'RotationsController@import')->name('users.import');
             });
 
             /**

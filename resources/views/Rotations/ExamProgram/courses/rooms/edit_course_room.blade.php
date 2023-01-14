@@ -21,8 +21,11 @@ foreach (App\Http\Controllers\MaxMinRoomsCapacity\Stock::getUsersInSpecificRotat
     }
 }
 $total_capacity=$specific_room->capacity+$specific_room->extra_capacity;
-$num_places_occupied_in_this_room=$occupied_number_of_students_in_this_course_in_this_room+$occupied_number_of_students_in_this_room_in_all_common_courses;
-$remaining_places_in_room=$total_capacity-$num_places_occupied_in_this_room;
+$occupied_places_in_this_room_from_all_courses=$occupied_number_of_students_in_this_course_in_this_room+$occupied_number_of_students_in_this_room_in_all_common_courses;
+$remaining_places_in_this_room_from_all_courses=$total_capacity-$occupied_places_in_this_room_from_all_courses;
+$remaining_places_in_this_course=$entered_students_number-($occupied_number_of_students_in_this_course_not_in_this_room +$occupied_number_of_students_in_this_course_in_this_room);
+
+
 @endphp
 
 @php $num_all_courses_occupied_this_room=0; @endphp
@@ -55,75 +58,77 @@ $remaining_places_in_room=$total_capacity-$num_places_occupied_in_this_room;
             </div>
             {{-- fly code to top --}}
             {{-- progress --}}
-            <div class="col-sm-4 bg-white rounded-lg mx-2" style="position: relative;
+            <div class="col-sm-6 bg-white rounded-lg mx-2" style="position: relative;
             padding: 3px;
-            display: -webkit-inline-box;
+            display: -webkit-inline-box;width: 48%;top: 10px;
             white-space: nowrap;
-            height: 100px;
+            height: 124px;
             border: 1px solid #eaeaea;">
             {{-- <h2 class="h6 font-weight-bold text-center">{{ $course->course_name }} progress</h2> --}}
             <!-- Progress bar 1 -->
-                    @if($num_places_occupied_in_this_room > 0)
-                    <div id="progress_line" class="col-sm-2 progress mx-2 mt-2" data-value='{{number_format((int)((($num_places_occupied_in_this_room)/($total_capacity))*100), 0, '.', '')}}'>
+                    @if($occupied_places_in_this_room_from_all_courses > 0)
+                    <div id="progress_line" class="col-sm-2 progress mx-2 mt-2" data-value='{{number_format((int)((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100), 0, '.', '')}}'>
                     <span class="progress-left">
-                            <span class="progress-bar border-<?php if(((($num_places_occupied_in_this_room)/($total_capacity))*100)<40) echo'danger';elseif(((($num_places_occupied_in_this_room)/($total_capacity))*100)<60) echo 'warning'; elseif(((($num_places_occupied_in_this_room)/($total_capacity))*100)<80) echo 'primary';else echo 'success';?>"></span>
+                            <span class="progress-bar border-<?php if(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<40) echo'danger';elseif(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<60) echo 'warning'; elseif(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<80) echo 'primary';else echo 'success';?>"></span>
                         </span>
                         <span class="progress-right">
-                            <span class="progress-bar border-<?php if(((($num_places_occupied_in_this_room)/($total_capacity))*100)<30) echo'danger';elseif(((($num_places_occupied_in_this_room)/($total_capacity))*100)<=60) echo 'warning'; elseif(((($num_places_occupied_in_this_room)/($total_capacity))*100)<=80) echo 'primary';else echo 'success';?>"></span>
+                            <span class="progress-bar border-<?php if(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<30) echo'danger';elseif(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<=60) echo 'warning'; elseif(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<=80) echo 'primary';else echo 'success';?>"></span>
                         </span>
                         <div class="progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
-                            <div id="progress_value" class="h3 font-weight-bold text-<?php if(((($num_places_occupied_in_this_room)/($total_capacity))*100)<30) echo'danger';elseif(((($num_places_occupied_in_this_room)/($total_capacity))*100)<=60) echo 'warning'; elseif(((($num_places_occupied_in_this_room)/($total_capacity))*100)<=80) echo 'primary';else echo 'success';?>">{{number_format((int)(((($num_places_occupied_in_this_room)/($total_capacity)))*100), 0, '.', '')}}</div><span class="h4 font-weight-bold text-<?php if(((($num_places_occupied_in_this_room)/($total_capacity))*100)<30) echo'danger';elseif(((($num_places_occupied_in_this_room)/($total_capacity))*100)<=60) echo 'warning'; elseif(((($num_places_occupied_in_this_room)/($total_capacity))*100)<=80) echo 'primary';else echo 'success';?>">%</span>
+                            <div id="progress_value" class="h3 font-weight-bold text-<?php if(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<30) echo'danger';elseif(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<=60) echo 'warning'; elseif(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<=80) echo 'primary';else echo 'success';?>">{{number_format((int)(((($occupied_places_in_this_room_from_all_courses)/($total_capacity)))*100), 0, '.', '')}}</div><span class="h4 font-weight-bold text-<?php if(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<30) echo'danger';elseif(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<=60) echo 'warning'; elseif(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<=80) echo 'primary';else echo 'success';?>">%</span>
                         </div>
                     </div>
                     @else
-                    <span class="text-warning">Room Is Empty</span>
+                    {{-- <span class="text-warning">Room Is Empty</span> --}}
 
                     @endif
                     <!-- Demo info -->
-                    <div class="col-sm-10">
-                        <div class="row text-center mt-3">
-                            <div class="col-5 px-4 border-right" style="display:none;">
-                                <div id="progress_remaining_to_full" class="h6 font-weight-bold my-0">{{100-number_format((int)(($num_places_occupied_in_this_room/$total_capacity)*100), 0, '.', '')}}</div><span class="small text-gray"> still</span>
+                        <div class="row text-center mt-3" style="justify-content: space-evenly;">
+                            <div class="col-4 px-4 border-right" style="display:none;">
+                                <div id="progress_remaining_to_full" class="h6 font-weight-bold my-0">{{100-number_format((int)(($occupied_places_in_this_room_from_all_courses/$total_capacity)*100), 0, '.', '')}}</div><span class="small text-gray"> still</span>
                             </div>
-                            <div class="col-2 px-4">
-                                <div class="h2 font-weight-bold my-0 text-">{{$num_places_occupied_in_this_room}}</div><span class="small text-gray">full places</span>
+                            <div class="col-1 py-2">
+                                <div class="h2 font-weight-bold my-0 text-">{{$occupied_places_in_this_room_from_all_courses}}</div><span class="small text-gray">full places</span>
                             </div>
-                            <div class="col-2 px-4">
-                                <div class="h2 font-weight-bold my-0">{{$total_capacity-$num_places_occupied_in_this_room}}</div><span class="small text-gray">free places</span>
+                            <div class="col-1 py-2">
+                                <div class="h2 font-weight-bold my-0">{{$remaining_places_in_this_room_from_all_courses}}</div><span class="small text-gray">free places</span>
                             </div>
-                            <div class="col-2 px-4">
+                            <div class="col-1 py-2">
                                 <div class="h2 font-weight-bold my-0">{{$total_capacity}}</div><span class="small text-gray">room capacity</span>
                             </div>
-                            <div class="col-1 mx-4 common-courses"  style="display: inline-flex;float:right">
-                                        @foreach ($courses_common_with_time as $course_belongs)
-                                                @php
-                                                    $number_taken_in_this_room_course=0;
-                                                    foreach ($course_belongs->distributionRoom()->where('rotation_id',$rotation->id)->toBase()->get() as $oneroom)
-                                                        if($oneroom->id==$specific_room->id){
-                                                            $number_taken_in_this_room_course=App\Http\Controllers\MaxMinRoomsCapacity\Stock::getOccupiedNumberOfStudentsInThisCourseInSpecificRoom($rotation, $course_belongs, $oneroom->id);
-                                                            $num_all_courses_occupied_this_room+=$number_taken_in_this_room_course;
-                                                        }
-                                                @endphp
-                                                @if($number_taken_in_this_room_course)
-                                                <h5>
-                                                    <a style="text-decoration: none;" href="{{ route("rotations.get_room_for_course",[$rotation->id,$course_belongs->id,$specific_room->id]) }}" class="badge bg-{{($course->id == $course_belongs->id ) ? 'danger': 'secondary'}}">{{$course_belongs->course_name}}</a>
-                                                    <span class="badge bg-danger" style="
-                                                    right:14px;
-                                                    border-radius: 62px;
-                                                    position: relative;
-                                                    font-size: 11px;
-                                                    top: -12px;">{{$number_taken_in_this_room_course;}}
-                                                    </span>
-                                                </h5>
-                                                @endif
-                                            @endforeach
-                                    </div>
+                            <div class="col-1 py-2">
+                                <div class="h2 font-weight-bold my-0">{{$remaining_places_in_this_course}}</div><span class="small text-gray">free course places</span>
                             </div>
-                    </div>
+                            <div class="col-3 py-2 common-courses" style="display: inline-flex;">
+                                @foreach ($courses_common_with_time as $course_belongs)
+                                    @php
+                                        $number_taken_in_this_room_course=0;
+                                        foreach ($course_belongs->distributionRoom()->where('rotation_id',$rotation->id)->toBase()->get() as $oneroom)
+                                            if($oneroom->id==$specific_room->id){
+                                                $number_taken_in_this_room_course=App\Http\Controllers\MaxMinRoomsCapacity\Stock::getOccupiedNumberOfStudentsInThisCourseInSpecificRoom($rotation, $course_belongs, $oneroom->id);
+                                                $num_all_courses_occupied_this_room+=$number_taken_in_this_room_course;
+                                            }
+                                    @endphp
+                                    @if($number_taken_in_this_room_course)
+                                        <h5>
+                                            <a style="text-decoration: none;" href="{{ route("rotations.get_room_for_course",[$rotation->id,$course_belongs->id,$specific_room->id]) }}" class="badge bg-{{($course->id == $course_belongs->id ) ? 'danger': 'secondary'}}">{{$course_belongs->course_name}}</a>
+                                            <span class="badge bg-danger" style="
+                                            right:14px;
+                                            border-radius: 62px;
+                                            position: relative;
+                                            font-size: 11px;
+                                            top: -12px;">{{$number_taken_in_this_room_course}}
+                                            </span>
+                                        </h5>
+                                    @endif
+                                @endforeach
+                            </div>
+                        </div>
                 </div>
                 {{-- progress --}}
                 {{-- fly code to top --}}
         </div>
+
             <h2 class="m-4"> تعديل القاعة <b>{{$specific_room->room_name}}</b> في مقرر <b>{{$course->course_name}}</b> 
                 <div class="" style="float: right;">
                     <a href="{{url()->previous()}}" class="btn btn-dark">رجوع
@@ -141,35 +146,15 @@ $remaining_places_in_room=$total_capacity-$num_places_occupied_in_this_room;
                     @csrf
                     <div class="row m-2">
                             <div class="col-sm-9">
-                                <label for="num_student_in_room" class="form-label">Number Students In Room <mark>{{$specific_room->room_name}}</mark>  :</label>
-                                <select class="form-control" name="num_student_in_room" class="form-control" required>
-                                    @if($entered_students_number - ($occupied_number_of_students_in_this_course_not_in_this_room +$occupied_number_of_students_in_this_course_in_this_room) <= $total_capacity)
-
-                                        @if($occupied_number_of_students_in_this_course_in_this_room)
-                                            {{-- <option>11</option> --}}
-                                            @for ($i = 1; $i <= $occupied_number_of_students_in_this_course_in_this_room; $i++)
+                                    @if($total_capacity>$occupied_places_in_this_room_from_all_courses)
+                                        <label for="num_student_in_room" class="form-label">Number Students In Room <mark>{{$specific_room->room_name}}</mark>  :</label>
+                                        <select class="form-control" name="num_student_in_room" class="form-control" required>
+                                            @for ($i = 1; $i <= $occupied_places_in_this_room_from_all_courses+$remaining_places_in_this_course; $i++)
                                                 <option value="{{$i}}" {{ $occupied_number_of_students_in_this_course_in_this_room == $i ? 'selected':'' }}>{{$i}}</option>
                                             @endfor
-                                        @else
-                                           {{-- <option>22</option> --}}
-                                            @for ($i = 1; $i <= ($entered_students_number - ($occupied_number_of_students_in_this_course_not_in_this_room +$occupied_number_of_students_in_this_course_in_this_room)); $i++)
-                                                <option value="{{$i}}">{{$i}}</option>
-                                            @endfor
-                                        @endif
-                                    @else
-                                    @if($occupied_number_of_students_in_this_course_in_this_room)
-                                        {{-- <option>111</option> --}}
-                                        @for ($i = 1; $i <= $total_capacity; $i++)
-                                            <option value="{{$i}}" {{ $occupied_number_of_students_in_this_course_in_this_room == $i ? 'selected':'' }}>{{$i}}</option>
-                                        @endfor
-                                    @else
-                                        {{-- <option>222</option> --}}
-                                        @for ($i = 1; $i <= ($total_capacity); $i++)
-                                            <option value="{{$i}}">{{$i}}</option>
-                                        @endfor
+                                        </select>
                                     @endif
-                                    @endif
-                                </select>
+
                                 @if ($errors->has('num_student_in_room'))
                                     <span class="text-danger text-left">{{ $errors->first('num_student_in_room') }}</span>
                                 @endif

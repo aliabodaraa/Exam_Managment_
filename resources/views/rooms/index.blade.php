@@ -44,7 +44,7 @@
             <input class="form-control" 
             type="text" 
             id="search_room_name" 
-            onkeyup="searchRooms(JSON.stringify({{ App\Models\Room::where('faculty_id',auth()->user()->faculty->id)->get() }}))" placeholder="Serarch Rooms">
+            onkeyup="searchRooms(JSON.stringify({{ App\Models\Room::where('faculty_id',auth()->user()->faculty->id)->toBase()->get() }}))" placeholder="Serarch Rooms">
         </div>
             <div class="table-responsive">
                 <table class="table align-items-center table-flush">

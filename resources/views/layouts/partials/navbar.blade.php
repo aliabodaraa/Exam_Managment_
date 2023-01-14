@@ -1,3 +1,5 @@
+@include('layouts.partials.popUp_cubic')
+
 <div class="collapse show" id="navbarToggleExternalContent">
   <div class="bg-dark p-2 row" id="nav_row">
     {{-- <h5 class="text-white h4">Collapsed content</h5> --}}
@@ -5,8 +7,8 @@
           @auth
           <div class="spinner-border" id="navigation" role="status" style="display: block;z-index:99999999999999999999999999999;
           position: absolute;
-          top: 400px;
-          right: 400px;">
+          top: 350px;font-size: xxx-large;
+          right: 45%;width: 75px;height: 75px; font-weight:bold">
             <span class="visually-hidden">Loading...</span>
           </div>
             <div class="col-lg-3 col-sm-3 col-xs-1" style="display:-webkit-inline-box;">
@@ -52,18 +54,20 @@
                           list($all_rotations_table, $observations_number_in_latest_rotation)=App\Http\Controllers\MaxMinRoomsCapacity\Stock::calcInfoForEachRotationForSpecificuser(Auth::user());
                       @endphp
                       {{-- <li class="{{ (!str_contains(URL::full(),"observations") && preg_match("*rotations*", URL::full()) && str_ends_with(URL::full(),"show")) ? 'Active':''}}"><a href="{{ route('rotations.program.show',[$latest_rotation->id]) }}" class="nav-link px-2 text-white">البرنامج الامتحاني</a></li> --}}
-                      @if((auth()->user()->is_active && auth()->user()->number_of_observation && $is_find_in_names_list_in_latest_rotation))  
-                        <li class="{{ (!str_contains(URL::full(),"observations") && preg_match("*rotations*", URL::full()) && (str_ends_with(URL::full(),"objections/create") || str_ends_with(URL::full(),"objections/edit"))) ? 'Active':''}}">
-                            @if(!count($num_of_my_courses_objections))
-                                <a href="{{ route('rotations.objections.create',$latest_rotation->id) }}" class="nav-link px-2 text-white">إنشاء إعتراضات</a>
-                            @else
-                                <a href="{{ route('rotations.objections.edit',$latest_rotation->id) }}" class="nav-link px-2 text-white">تعديل إعتراضاتي</a>
-                            @endif
-                        </li>
-                      @elseif(auth()->user()->is_active && auth()->user()->number_of_observation>0 && count($num_of_my_courses_objections))
-                          <li class="{{ (str_contains(URL::full(),"objections")) ? 'Active':''}}">
-                            <a href="{{ route('objections.user.show',[$latest_rotation->id,Auth::user()->id]) }}" class="nav-link px-2 text-white">إعتراضاتي</a>
-                          </li>
+                      @if((auth()->user()->is_active && auth()->user()->number_of_observation && $is_find_in_names_list_in_latest_rotation))
+                          @if(count($latest_rotation->users()->toBase()->get()))
+                            <li class="{{ (str_contains(URL::full(),"objections")) ? 'Active':''}}">
+                              <a href="{{ route('objections.user.show',[$latest_rotation->id,Auth::user()->id]) }}" class="nav-link px-2 text-white">إعتراضاتي</a>
+                            </li>
+                          @else
+                            <li class="{{ (!str_contains(URL::full(),"observations") && preg_match("*rotations*", URL::full()) && (str_ends_with(URL::full(),"objections/create") || str_ends_with(URL::full(),"objections/edit"))) ? 'Active':''}}">
+                                @if(!count($num_of_my_courses_objections))
+                                    <a href="{{ route('rotations.objections.create',$latest_rotation->id) }}" class="nav-link px-2 text-white">إنشاء إعتراضات</a>
+                                @else
+                                    <a href="{{ route('rotations.objections.edit',$latest_rotation->id) }}" class="nav-link px-2 text-white">تعديل إعتراضاتي</a>
+                                @endif
+                            </li>
+                        @endif
                       @endif
                       @if($observations_number_in_latest_rotation)
                           <li class="{{ (str_contains(URL::full(),"observations")) ? 'Active':''}}">
@@ -78,7 +82,7 @@
               @else
                 <li class="{{ str_ends_with(URL::full(),"initial_members") ? 'Active':''}}"><a href="{{ route('rotations.edit_initial_members',$latest_rotation->id) }}" class="nav-link px-2 text-white"> updateInitial</a></li>
               @endif --}}
-              @endauth
+            @endauth
             </ul>
           </div>
           <div class="col-lg-4 col-sm-4 col-xs-1">

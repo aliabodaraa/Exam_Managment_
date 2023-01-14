@@ -4,12 +4,16 @@ namespace App\Http\Controllers;
 use App\Models\Rotation;
 use App\Models\Room;
 use App\Models\User;
-use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\MaxMinRoomsCapacity\Stock;
 use App\Http\Controllers\MaxFlow\Graph;
 use App\Http\Controllers\MaxFlow\EnumPersonType;
+
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ObservationsExport;
+use App\Imports\UsersImport;
 class rotationsController extends Controller
 {
 
@@ -43,6 +47,7 @@ class rotationsController extends Controller
     }
 
     public function distributeStudents(Rotation $rotation){
+        //dd($rotation->coursesProgram->pluck('id'));
         foreach ($rotation->coursesProgram as $course) {
             $course->distributionRoom()->wherePivot('rotation_id',$rotation->id)->detach();//clear the previous distribution
             $curr_students_number=$course->rotationsProgram()->wherePivot('rotation_id',$rotation->id)->first()->pivot->students_number;
@@ -52,7 +57,7 @@ class rotationsController extends Controller
                 if($this->isAvailableRoom($rotation, $course, $roomBase) && $roomBase->is_active){
                     if($curr_students_number <= Stock::getMinDistribution())//it is garantee that the curr_students_number is less than $this->getMaxDistribution() that is done in the method in controller CourseRotation_ExamProgram/store_course_to_the_program
                         if(in_array($course->studing_year, [4,5]))
-                            $temporory_counter=$this->distribute($rotation,$course,$roomBase,$temporory_counter,(int)(($roomBase->capacity+$roomBase->extra_capacity)/2));//problem without (int) add one student !!!!!
+                            $temporory_counter=$this->distribute($rotation,$course,$roomBase,$temporory_counter,(int)((($roomBase->capacity+$roomBase->extra_capacity)/2)+1));//problem without (int) add one student !!!!!
                         else
                             $temporory_counter=$this->distribute($rotation,$course,$roomBase,$temporory_counter,$roomBase->capacity);
                     else
@@ -70,35 +75,13 @@ public function current_user_observations($user){
     return $user->id;
 }
 public function distributeMembersOfFaculty(Rotation $rotation){
-    //old work start
-                    // $distict_arr=[];
-                    // foreach ($rotation->distributionRoom as $room) {
-                    //     $room->users()->wherePivot('rotation_id',$rotation->id)->detach();//clear the previous distribution
-                    //     $take_three=1;
-                    //     foreach (User::all() as $user){
-                    //         if($take_three == 4) break;
-                    //         if($take_three==1)$cur_roleIn='Room-Head';
-                    //         elseif($take_three==2)$cur_roleIn='Secertary';
-                    //         else $cur_roleIn='Observer';
-                    //         if(!in_array($user->id, $distict_arr) &&( ($user->role!='Doctor' && $take_three != 1) || $user->role=='Doctor' && $take_three == 1 ) ){
-                    //             array_push($distict_arr,$user->id);
-                    //             if( $user->is_active && !$user->temporary_role &&
-                    //             $user->faculty_id == auth()->user()->faculty->id /*&&
-                    //             $user->number_of_observation <= $this->current_user_observations($user)*/ ){
-                    //                             $take_three++;
-                    //                             array_push($distict_arr,$user->id);
-                    //                             $room->users()->attach($user->id,['rotation_id'=>$rotation->id,'course_id'=>$room->pivot->course_id,'roleIn'=>$cur_roleIn]);
-                    //                 } 
-                    //         }
-                    //     }
-                    // }
-    //old work end
+
     ini_set('max_execution_time', 180); //3 minutes
     $graph_room_heads=new Graph(EnumPersonType::RoomHead, $rotation);
     list($paths_room_heads,$paths_info_room_heads)=$graph_room_heads->applyMaxFlowAlgorithm();//dd($paths_room_heads,$paths_info_room_heads,$paths_info_room_heads['users_observations']);
-    //dump($paths_room_heads,$paths_info_room_heads);
+    //dd($paths_room_heads,$paths_info_room_heads);
     if(count($paths_room_heads)){
-        $graph_secertaries=new Graph(EnumPersonType::Secertary, $rotation, $paths_info_room_heads);
+        $graph_secertaries=new Graph(EnumPersonType::Secertary, $rotation, $paths_info_room_heads);//dd("Alignment");
         list($paths_secertaries,$paths_info_secertaries)=$graph_secertaries->applyMaxFlowAlgorithm();
         //dd($paths_secertaries,$paths_info_secertaries);
         if(count($paths_secertaries)){
@@ -121,6 +104,42 @@ public function distributeMembersOfFaculty(Rotation $rotation){
                     foreach ($observers_observations as $observer_observation)
                         $s->courses()->attach($observer_observation['course'],['rotation_id'=>$rotation->id,'room_id'=>$observer_observation['room'],'roleIn'=>$observer_observation['roleIn']]);
                 }
+
+                //start fill common rooms between multiplue courses
+                $common_courses_rooms_taken=[];
+                foreach ($rotation->coursesProgram()->get() as $course){
+                    $rooms_taken=[];
+                    //calc Joining rooms and disabled rooms and courses_common_with_time
+                    list($disabled_rooms, $joining_rooms, $courses_common_with_time)=Stock::getDisabledAndJoiningRoomsAndCommonCoursesWithTime($rotation, $course);
+                    foreach ($course->distributionRoom()->wherePivot('rotation_id',$rotation->id)->get() as $room){
+                        //if($this->verifyTakeRoomInCourse($common_courses_rooms_taken,$course->id,$room->id)) continue;
+                        if(in_array($room->id,$rooms_taken)) continue;
+                        array_push($rooms_taken,$room->id);
+                        $rooms_this_course=Stock::getRoomsForSpecificCourse($rotation, $course);
+                        if(in_array($room->id, $disabled_rooms) && in_array($room->id, $rooms_this_course) ){//Manage Room
+                            $course_filled_with_users=$room_heads_in_this_rotation_course_room=$secertaries_in_this_rotation_course_room=$observers_in_this_rotation_course_room=null;
+                            foreach ($courses_common_with_time as $course_common_with_time) {//fill the remaining rooms that belongs to the other courses with the same members in catched course
+                                if(count($room->users()->wherePivot('course_id',$course_common_with_time->id)->toBase()->get())){
+                                    list($room_heads_in_this_rotation_course_room, $secertaries_in_this_rotation_course_room, $observers_in_this_rotation_course_room)=Stock::getUsersInSpecificRotationCourseRoom($rotation,$course_common_with_time,$room->id);
+                                    $course_filled_with_users=$course_common_with_time->id;
+                                    break;
+                                }
+                            }
+                            //dump($courses_common_with_time,$room_heads_in_this_rotation_course_room, $secertaries_in_this_rotation_course_room, $observers_in_this_rotation_course_room);
+                            foreach ($courses_common_with_time as $course_common_with_time) {//fill the remaining rooms that belongs to the other courses with the same members in catched course
+                                $arr=$common_courses_rooms_taken[$course_common_with_time->id]??[];
+                                array_push($arr,$room->id);
+                                if($course_common_with_time->id != $course_filled_with_users){
+                                    $room->users()->wherePivot('rotation_id',$rotation->id)->wherePivot('course_id',$course_common_with_time->id)->detach();
+                                    $room->users()->attach($room_heads_in_this_rotation_course_room, ['rotation_id'=>$rotation->id,'course_id'=>$course_common_with_time->id,'roleIn'=> 'RoomHead']);
+                                    $room->users()->attach($secertaries_in_this_rotation_course_room, ['rotation_id'=>$rotation->id,'course_id'=>$course_common_with_time->id,'roleIn'=> 'Secertary']);
+                                    $room->users()->attach($observers_in_this_rotation_course_room, ['rotation_id'=>$rotation->id,'course_id'=>$course_common_with_time->id,'roleIn'=> 'Observer']);
+                                }
+                            }
+                        }
+                    }
+                }
+               //end fill common rooms between multiplue courses
             }else{
                 return redirect()->back()->withWarning(__('لا يوجد مراقبين كفايه للفرز من فضلك قم بتعديل تعيينات الأعضاء وإضافة مراقبين '));
             }
@@ -130,11 +149,16 @@ public function distributeMembersOfFaculty(Rotation $rotation){
     }else{
         return redirect()->back()->withWarning(__('لا يوجد رؤساء قاعات كفايه للفرز من فضلك قم بتعديل تعيينات الأعضاء وإضافة رؤساء قاعات جدد '));
     }
+    //dd("allli");
     return redirect("/rotations/$rotation->id/show")
     ->withSuccess(__('You have successfully distribute all Members to the sutable rooms'));
 }
 
-
+// public function verifyTakeRoomInCourse(array $course_rooms,int $course_id,int $room_id){
+//     if(isset($course_rooms[$course_id][$room_id]))
+//         return true;
+//     return false;
+// }
 
 //distributeMembersOfFaculty
     /**
@@ -231,37 +255,44 @@ public function distributeMembersOfFaculty(Rotation $rotation){
      */
     public function update(Request $request, Rotation $rotation)
     {
+        // $this->validate($request,[
+        //     'name' => [
+        //         'required', 
+        //         Rule::unique("rotations")->where(function ($query) use ($rotation) {
+        //                 return $query->where(
+        //                     [
+        //                         ["year", "=", $rotation->year]
+        //                     ]
+        //                 );
+        //             })->ignore($rotation->id)//verify that the name with year don't repated (both are unique)(unique for escape comparing this routation)
+        //     ],
+        //     'year' => [
+        //         'required', 
+        //         Rule::unique("rotations")->where(function ($query) use ($rotation) {
+        //             return $query->where(
+        //                 [
+        //                     ["name", "=", $rotation->name]
+        //                 ]
+        //             );
+        //         })->ignore($rotation->id)//verify that the name with year don't repated (both are unique)(unique for escape comparing this routation)
+        //     ],
+        //     'start_date' => 'required|date',
+        //     'end_date' => 'required|date|after:start_date',
+        //     'faculty_id' => $request->faculty_id
+        // ],[
+        //     'name.unique'=>'هذه السنة موجوده تتضمن الدورة المحددة',
+        //     'year.unique'=>'هذه الدوره موجوده في السنة المحددة'
+        // ]);
         $this->validate($request,[
-            'name' => [
-                'required', 
-                Rule::unique("rotations")->where(function ($query) use ($rotation) {
-                        return $query->where(
-                            [
-                                ["year", "=", $rotation->year]
-                            ]
-                        );
-                    })->ignore($rotation->id)//verify that the name with year don't repated (both are unique)(unique for escape comparing this routation)
-            ],
-            'year' => [
-                'required', 
-                Rule::unique("rotations")->where(function ($query) use ($rotation) {
-                    return $query->where(
-                        [
-                            ["name", "=", $rotation->name]
-                        ]
-                    );
-                })->ignore($rotation->id)//verify that the name with year don't repated (both are unique)(unique for escape comparing this routation)
-            ],
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-            'faculty_id' => $request->faculty_id
-        ],[
-            'name.unique'=>'هذه السنة موجوده تتضمن الدورة المحددة',
-            'year.unique'=>'هذه الدوره موجوده في السنة المحددة'
-        ]);
-        $rotation->update($request->all());
-        return redirect()->route('rotations.index')
+            'name' => 'required']); 
+        if($rotation->update($request->all())){//???????????????????????
+            return redirect()->route('rotations.index')
             ->withSuccess(__('rotation updated successfully.'));
+        }else{
+            return redirect()->route('rotations.index')
+            ->withDanger(__('faild updated rotation.'));
+        }
+
     }
 
     /**
@@ -336,4 +367,26 @@ public function distributeMembersOfFaculty(Rotation $rotation){
             ]);
         return view('Rotations.Observations.User.show',compact('rotation','user'));
     }
+
+
+
+        //Exel
+        /**
+    * @return \Illuminate\Support\Collection
+    */
+    public function exportObservations(Rotation $rotation) 
+    {
+        return Excel::download(new ObservationsExport($rotation), 'المراقبات الإمتحانية.xlsx');
+        return redirect()->back();
+    }
+       
+    // /**
+    // * @return \Illuminate\Support\Collection
+    // */
+    // public function import() 
+    // {
+    //     Excel::import(new UsersImport,request()->file('file'));
+               
+    //     return back();
+    // }
 }
