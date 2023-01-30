@@ -270,13 +270,13 @@
                                               <div class="col-5 border-right" style="display:none;">
                                                    <div id="progress_remaining_to_full" class="h6 font-weight-bold my-0">{{100-number_format((int)(($occupied_number_of_students_in_this_course/$entered_students_number)*100), 0, '.', '')}}</div><span class="small text-gray"> still</span>
                                                </div>
-                                               <div class="col-4">
+                                               <div class="col-4 py-2">
                                                    <div class="h2 font-weight-bold my-0 text-">{{$occupied_number_of_students_in_this_course}}</div><span class="small text-gray">full places</span>
                                                </div>
-                                               <div class="col-4">
+                                               <div class="col-4 py-2">
                                                    <div class="h2 font-weight-bold my-0">{{$entered_students_number-$occupied_number_of_students_in_this_course}}</div><span class="small text-gray">free places</span>
                                                </div>
-                                               <div class="col-4">
+                                               <div class="col-4 py-2">
                                                    <div class="h2 font-weight-bold my-0">{{$entered_students_number}}</div><span class="small text-gray">students num</span>
                                                </div>
                                            </div>

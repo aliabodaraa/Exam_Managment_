@@ -52,4 +52,14 @@ class Members extends Controller
         
         return $num_observation_for_passed_member_id;
     }
+    public function geMemberWithTeachedSubjects($member_id) {//get the subjects that the member are teaching them
+        $user_subjects = [];
+        $member = User::where('id',$member_id)->first();
+        if($member->role=="دكتور")
+            foreach ($member->teaches()->pluck('course_id') as $subject_id)
+                $user_subjects[$member_id][] = $subject_id;
+
+        return $user_subjects;
+    }
+
 }

@@ -99,11 +99,13 @@ class Stock extends Controller
         $joining_rooms=[];
         $courses_common_with_time=[];
         list($date, $time, $duration)=Stock::getDateTimeDuration_ForThisCourse($rotation, $course);
-        foreach (Course::with('rotationsProgram')->whereHas('rotationsProgram', function($query) use($rotation){
-            $query->where('rotation_id',$rotation->id);})->where('id','!=',$course->id)->get() as $course_whithin_range_time) {
+        // foreach (Course::with('rotationsProgram')->whereHas('rotationsProgram', function($query) use($rotation){
+        //     $query->where('rotation_id',$rotation->id);})->where('id','!=',$course->id)->get() as $course_whithin_range_time) {
+            foreach ($rotation->coursesProgram()->where('id','!=',$course->id)->get() as $course_whithin_range_time){
                 if((count($rotation->coursesProgram()->wherePivot('date',$date)->wherePivot('time','>=',$time)->wherePivot('time','<=',gmdate('H:i:s',strtotime($time)+strtotime($duration)))->where('id',$course_whithin_range_time->id)->toBase()->get())
                 ||  count($rotation->coursesProgram()->wherePivot('date',$date)->wherePivot('time','<=',$time)->wherePivot('time','>=',gmdate('H:i:s',strtotime($time)-strtotime($duration)))->where('id',$course_whithin_range_time->id)->toBase()->get())))
                     foreach ($course_whithin_range_time->distributionRoom()->wherePivot('rotation_id',$rotation->id)->toBase()->get() as $room) {
+                        
                         array_push($disabled_rooms,$room->id);
                         array_push($courses_common_with_time,$course_whithin_range_time);
 
@@ -114,13 +116,6 @@ class Stock extends Controller
 
                     }
             }
-
-            // $disabled_rooms_accual=[];
-            // $rooms_this_course=Stock::getRoomsForSpecificCourse($rotation, $course);
-            // foreach ($disabled_rooms as $roomPure) {
-            //     if(!in_array($roomPure, $rooms_this_course))
-            //         array_push($disabled_rooms_accual,$room);
-            // $disabled_rooms=$disabled_rooms_accual;
 
             array_push($courses_common_with_time,$course);//dd(array_unique($courses_common_with_time));
         return array(array_unique($disabled_rooms), array_unique($joining_rooms), array_unique($courses_common_with_time));
@@ -252,8 +247,9 @@ class Stock extends Controller
         $disabled_roomHeadArr=[];
         $disabled_secertaryArr=[];
         $disabled_observerArr=[];
-        foreach (Course::with('rotationsProgram')->whereHas('rotationsProgram', function($query) use($date,$rotation){
-            $query->where('date',$date)->where('rotation_id',$rotation->id);})->where('id','!=',$course->id)->get() as $course_whithin_range_time) {
+        // foreach (Course::with('rotationsProgram')->whereHas('rotationsProgram', function($query) use($date,$rotation){
+        //     $query->where('date',$date)->where('rotation_id',$rotation->id);})->where('id','!=',$course->id)->get() as $course_whithin_range_time) {
+        foreach ($rotation->coursesProgram()->where('id','!=',$course->id)->get() as $course_whithin_range_time){
                 if((count($rotation->coursesProgram()->wherePivot('date',$date)->wherePivot('time','>=',$time)->wherePivot('time','<=',gmdate('H:i:s',strtotime($time)+strtotime($duration)))->where('id',$course_whithin_range_time->id)->get()->toArray())
                 ||  count($rotation->coursesProgram()->wherePivot('date',$date)->wherePivot('time','<=',$time)->wherePivot('time','>=',gmdate('H:i:s',strtotime($time)-strtotime($duration)))->where('id',$course_whithin_range_time->id)->get()->toArray())))
                     foreach ($course_whithin_range_time->users()->wherePivot('rotation_id',$rotation->id)->get() as $user) {

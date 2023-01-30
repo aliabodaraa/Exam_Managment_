@@ -2402,7 +2402,7 @@ div.h4 {
 #nav_row {
     position: fixed;
     width: 102%;
-    z-index: 9;
+    z-index: 999999;
     padding:0px 15px;
   }
   main{

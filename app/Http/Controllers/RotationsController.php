@@ -377,7 +377,7 @@ public function distributeMembersOfFaculty(Rotation $rotation){
     public function exportObservations(Rotation $rotation) 
     {
         return Excel::download(new ObservationsExport($rotation), 'المراقبات الإمتحانية.xlsx');
-        return redirect()->back();
+        //return redirect()->back()->withSuccess(__('تم تحميل ملف المراقبات بنجاح'));
     }
        
     // /**

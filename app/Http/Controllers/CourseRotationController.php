@@ -11,7 +11,7 @@ use App\Http\Controllers\MaxMinRoomsCapacity\Stock;
 class CourseRotationController extends Controller
 {
     public function get_room_for_course(Rotation $rotation, Course $course, Room $specific_room){
-        //dd(Stock::getUsersInSpecificRotationCourseRoom($rotation,$course,$specific_room));
+
         //calculate rooms_this_course_rotation
         $rooms_this_course=Stock::getRoomsForSpecificCourse($rotation, $course);
         //calculate date & time & duration _ for specific course
@@ -22,28 +22,22 @@ class CourseRotationController extends Controller
         
         //calc accual_common_rooms_for_specific_course
         $accual_common_rooms_for_specific_course=Stock::getAccualCommonRoomsForSpecificRotationCourse($rotation, $course);
-        //dd($joining_rooms);
+
         //calc number students in this course
         list($entered_students_number, $occupied_number_of_students_in_this_course)=Stock::getOccupiedNumberOfStudentsInThisCourse($rotation, $course);
 
         //calc accual_common_rooms_for_specific_course
         list($accual_common_rooms_for_specific_course,$common_rooms_ids)=Stock::getAccualCommonRoomsForSpecificRotationCourse($rotation, $course);
         list($room_heads_in_this_rotation_course_room, $secertaries_in_this_rotation_course_room, $observers_in_this_rotation_course_room)=Stock::getUsersInSpecificRotationCourseRoom($rotation,$course,$specific_room->id);
-        //dd($room_heads_in_this_rotation_course_room,$secertaries_in_this_rotation_course_room, $observers_in_this_rotation_course_room,$specific_room->id);
+
         $occupied_number_of_students_in_this_course_in_this_room=Stock::getOccupiedNumberOfStudentsInThisCourseInSpecificRoom($rotation, $course, $specific_room->id);
 
         $all_disabled_users_in_joining_room=Stock::getUsersInJoiningRoomsForDisabledThemWithRotationCourse($rotation,$course);
-        //if(in_array($specific_room->id,$joining_rooms) || (in_array($specific_room->id,$rooms_this_course) && in_array($specific_room->id,$disabled_rooms))){
+
         list($room_heads_in_current_joining_in_this_rotation_course_room, $secertaries_in_current_joining_in_this_rotation_course_room, $observers_in_current_joining_in_this_rotation_course_room) = Stock::getUsersInSpecificJoiningRoomForRotationCourseRoom($rotation,$course,$specific_room);
         $pure_disabled_users_for_joining_room=array_diff(array_unique($all_disabled_users_in_joining_room),array_merge($room_heads_in_current_joining_in_this_rotation_course_room, $secertaries_in_current_joining_in_this_rotation_course_room, $observers_in_current_joining_in_this_rotation_course_room));
-        //dd($room_heads_in_current_joining_in_this_rotation_course_room, $secertaries_in_current_joining_in_this_rotation_course_room, $observers_in_current_joining_in_this_rotation_course_room);
 
-        //dd($pure_disabled_users_for_joining_room);
-        //}
-        //dd($accual_common_rooms_for_specific_course);
-        //dd($joining_rooms);
-        // dd(1);
-            return view('Rotations.ExamProgram.courses.rooms.edit_course_room',
+        return view('Rotations.ExamProgram.courses.rooms.edit_course_room',
             compact('rotation','course','specific_room','date','time','duration',
             'courses_common_with_time','common_rooms_ids',
             'accual_common_rooms_for_specific_course','entered_students_number', 
@@ -132,11 +126,8 @@ class CourseRotationController extends Controller
             $course->distributionRoom()->updateExistingPivot($specific_room->id, ['num_student_in_room'=> $request['num_student_in_room']]);
             $specific_room->users()->wherePivot('rotation_id',$rotation->id)->wherePivot('course_id',$course->id)->detach();
             $specific_room->users()->attach($request->get('roomheads'),['rotation_id'=>$rotation->id,'course_id'=>$course->id,'roleIn'=> 'RoomHead']);
-            //$specific_room->users()->syncWithoutDetaching($request->get('roomheads'));
             $specific_room->users()->attach($request->get('secertaries'), ['rotation_id'=>$rotation->id,'course_id'=>$course->id,'roleIn'=> 'Secertary']);    
-            //$specific_room->users()->syncWithoutDetaching($request->get('secertaries')); 
             $specific_room->users()->attach($request->get('observers'), ['rotation_id'=>$rotation->id,'course_id'=>$course->id,'roleIn'=> 'Observer']);
-            //$specific_room->users()->syncWithoutDetaching($request->get('observers'));
 
         }
 

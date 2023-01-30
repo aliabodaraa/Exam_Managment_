@@ -22,8 +22,8 @@
                             <option value='{{ $course->course_name }}'>
                         @endforeach
                     </datalist>
-                    @if ($errors->has('courses_user_teach'))
-                        <span class="text-danger text-left">{{ $errors->first('courses_user_teach') }}</span>
+                    @if ($errors->has('course_user_teach'))
+                        <span class="text-danger text-left">{{ $errors->first('course_user_teach') }}</span>
                     @endif
                 </div>
                 <div class="multiselect">
@@ -36,10 +36,10 @@
                       <input type="checkbox" id="two" 
                       name="sections_types[2]"
                       class='toggler-wrapper style-4'/>عملي</label>
-                      @if ($errors->has('sections_types'))
-                      <span class="text-danger text-left">{{ $errors->first('sections_types') }}</span>
-                      @endif
                   </div>
+                  @if ($errors->has('sections_types'))
+                  <span class="text-danger text-left">{{ $errors->first('sections_types') }}</span>
+                  @endif
                 </div>
 
                 <button type="submit" class="btn btn-primary">تخصيص مادة</button>

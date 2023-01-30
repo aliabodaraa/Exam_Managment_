@@ -204,6 +204,7 @@ class UsersController extends Controller
         //course_user_teach
         $course_user_teach=Course::where('course_name',$request->course_user_teach)->first();
         $this->validate($request,[
+            'course_user_teach'=>'required',
             'sections_types' => 'required'
         ],[
             'sections_types.unique' => 'the name of course should be unique'

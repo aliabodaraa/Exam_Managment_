@@ -77,14 +77,6 @@ class Graph extends Controller
         $this->linkRoomsWithSink();//link rooms nodes with the sink node
 
 
-
-
-
-
-
-
-
-
         //  $counter=0;
         //  if($this->type->name == "Observer"){
         //      dump("Graph",$this->arr_graph);
@@ -146,6 +138,10 @@ class Graph extends Controller
                     $courses_user_objected=[];
                     foreach ($member->coursesObjection()->wherePivot('rotation_id',$this->rotation->id)->toBase()->get() as $course)
                         array_push($courses_user_objected,$course->id);
+
+                    //get the subjects that the member are teaching them and append them to own objections
+                    if(count($user_subjects_ids=$this->members->geMemberWithTeachedSubjects($member_id)))
+                        $courses_user_objected=array_merge($courses_user_objected, $user_subjects_ids);
 
                     $users_courses_objections[$member_id]=$courses_user_objected;
                 }
@@ -301,10 +297,7 @@ class Graph extends Controller
             $num_members=$this->members->getLength();
             $num_courses=$this->courses->getLength();
             $num_same_times=$this->count_arr_same_time_courses;
-        // if($this->type->name=="RoomHead")
-        //  dump($paths);
-        //  else
-        //  dd($paths);
+
             for ($i=1; $i <=$num_members; $i++) {
                 foreach ($paths as $path) {
                     if($i == $path[0]){
@@ -319,6 +312,7 @@ class Graph extends Controller
                     }
                 }
             }
+
             return $pathsInfo;
     }
 }

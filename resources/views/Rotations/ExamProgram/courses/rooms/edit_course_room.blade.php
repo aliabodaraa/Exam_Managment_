@@ -67,28 +67,27 @@ $remaining_places_in_this_course=$entered_students_number-($occupied_number_of_s
             {{-- <h2 class="h6 font-weight-bold text-center">{{ $course->course_name }} progress</h2> --}}
             <!-- Progress bar 1 -->
                     @if($occupied_places_in_this_room_from_all_courses > 0)
-                    <div id="progress_line" class="col-sm-2 progress mx-2 mt-2" data-value='{{number_format((int)((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100), 0, '.', '')}}'>
-                    <span class="progress-left">
-                            <span class="progress-bar border-<?php if(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<40) echo'danger';elseif(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<60) echo 'warning'; elseif(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<80) echo 'primary';else echo 'success';?>"></span>
-                        </span>
-                        <span class="progress-right">
-                            <span class="progress-bar border-<?php if(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<30) echo'danger';elseif(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<=60) echo 'warning'; elseif(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<=80) echo 'primary';else echo 'success';?>"></span>
-                        </span>
-                        <div class="progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
-                            <div id="progress_value" class="h3 font-weight-bold text-<?php if(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<30) echo'danger';elseif(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<=60) echo 'warning'; elseif(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<=80) echo 'primary';else echo 'success';?>">{{number_format((int)(((($occupied_places_in_this_room_from_all_courses)/($total_capacity)))*100), 0, '.', '')}}</div><span class="h4 font-weight-bold text-<?php if(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<30) echo'danger';elseif(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<=60) echo 'warning'; elseif(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<=80) echo 'primary';else echo 'success';?>">%</span>
+                        <div id="progress_line" class="col-sm-2 progress mx-2 mt-2" data-value='{{number_format((int)((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100), 0, '.', '')}}'>
+                        <span class="progress-left">
+                                <span class="progress-bar border-<?php if(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<40) echo'danger';elseif(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<60) echo 'warning'; elseif(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<80) echo 'primary';else echo 'success';?>"></span>
+                            </span>
+                            <span class="progress-right">
+                                <span class="progress-bar border-<?php if(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<30) echo'danger';elseif(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<=60) echo 'warning'; elseif(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<=80) echo 'primary';else echo 'success';?>"></span>
+                            </span>
+                            <div class="progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
+                                <div id="progress_value" class="h3 font-weight-bold text-<?php if(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<30) echo'danger';elseif(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<=60) echo 'warning'; elseif(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<=80) echo 'primary';else echo 'success';?>">{{number_format((int)(((($occupied_places_in_this_room_from_all_courses)/($total_capacity)))*100), 0, '.', '')}}</div><span class="h4 font-weight-bold text-<?php if(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<30) echo'danger';elseif(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<=60) echo 'warning'; elseif(((($occupied_places_in_this_room_from_all_courses)/($total_capacity))*100)<=80) echo 'primary';else echo 'success';?>">%</span>
+                            </div>
                         </div>
-                    </div>
                     @else
-                    {{-- <span class="text-warning">Room Is Empty</span> --}}
-
+                        <span class="text-warning">انضم الان</span>
                     @endif
                     <!-- Demo info -->
-                        <div class="row text-center mt-3" style="justify-content: space-evenly;">
+                        <div class="row text-center mt-3" style="justify-content: space-around;">
                             <div class="col-4 px-4 border-right" style="display:none;">
                                 <div id="progress_remaining_to_full" class="h6 font-weight-bold my-0">{{100-number_format((int)(($occupied_places_in_this_room_from_all_courses/$total_capacity)*100), 0, '.', '')}}</div><span class="small text-gray"> still</span>
                             </div>
                             <div class="col-1 py-2">
-                                <div class="h2 font-weight-bold my-0 text-">{{$occupied_places_in_this_room_from_all_courses}}</div><span class="small text-gray">full places</span>
+                                <div class="h2 font-weight-bold my-0">{{$occupied_places_in_this_room_from_all_courses}}</div><span class="small text-gray">full places</span>
                             </div>
                             <div class="col-1 py-2">
                                 <div class="h2 font-weight-bold my-0">{{$remaining_places_in_this_room_from_all_courses}}</div><span class="small text-gray">free places</span>
@@ -97,7 +96,7 @@ $remaining_places_in_this_course=$entered_students_number-($occupied_number_of_s
                                 <div class="h2 font-weight-bold my-0">{{$total_capacity}}</div><span class="small text-gray">room capacity</span>
                             </div>
                             <div class="col-1 py-2">
-                                <div class="h2 font-weight-bold my-0">{{$remaining_places_in_this_course}}</div><span class="small text-gray">free course places</span>
+                                <div class="h2 font-weight-bold my-0">{{$remaining_places_in_this_course}}</div><span class="small text-warning">free course places</span>
                             </div>
                             <div class="col-3 py-2 common-courses" style="display: inline-flex;">
                                 @foreach ($courses_common_with_time as $course_belongs)
