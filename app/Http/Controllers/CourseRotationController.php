@@ -244,7 +244,7 @@ class CourseRotationController extends Controller
                  list($entered_students_number,)=Stock::getOccupiedNumberOfStudentsInThisCourse($rotation, $course);
                  list(,,$duration)=Stock::getDateTimeDuration_ForThisCourse($rotation, $course);
                  if(true){
-                    $rotation->coursesProgram()->updateExistingPivot($course->id,['date'=> $request->date,'time'=>$request->time,'students_number'=> $entered_students_number,'duration'=>$request->duration]);
+                    // $rotation->coursesProgram()->updateExistingPivot($course->id,['date'=> $request->date,'time'=>$request->time,'students_number'=> $entered_students_number,'duration'=>$request->duration]);
                     $rotation->distributionCourse()->detach($course->id);//delete all rooms in this course thats causes delete all users dynamically due to exist the foregin key between both tables
                      foreach ($request->rooms as $roomD) {
                         $current_room=Room::find($roomD);

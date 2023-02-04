@@ -79,6 +79,11 @@
                         @endif
                         @if(count($rotation->rooms()->toBase()->get()))
                             @if(!$expire_rotation_date)
+                            {{-- Added --}}
+                                <a href="{{ route('rotations.edit_initial_members',$rotation->id) }}" class="btn btn-info"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-lines-fill" viewBox="0 0 16 16">
+                                    <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5zm.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1h-4zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2z"/>
+                                </svg> مشاهدة تعيينات الأعضاء</a>
+                            {{-- Added --}}
                                 <a href="#initializationInExamProgram" data-bs-toggle="modal" class='btn btn-danger'><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
                                     <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
@@ -96,7 +101,6 @@
                                     <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V9H3V2a1 1 0 0 1 1-1h5.5v2zM3 12v-2h2v2H3zm0 1h2v2H4a1 1 0 0 1-1-1v-1zm3 2v-2h3v2H6zm4 0v-2h3v1a1 1 0 0 1-1 1h-2zm3-3h-3v-2h3v2zm-7 0v-2h3v2H6z"/>
                                 </svg> تحميل المراقبات</a>
                         @endif
-
                     @else
                     <a href="{{ route('rotations.program.add_course_to_the_program',$rotation->id) }}" class="btn btn-success float-right me-2 m4-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-journal-plus" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M8 5.5a.5.5 0 0 1 .5.5v1.5H10a.5.5 0 0 1 0 1H8.5V10a.5.5 0 0 1-1 0V8.5H6a.5.5 0 0 1 0-1h1.5V6a.5.5 0 0 1 .5-.5z"/>
@@ -153,7 +157,7 @@
                     <td align="center" height="100" width="19%">
                         <b>IV<br>Fourth Year</b>
                     </td>
-                    <td align="center" height="100" width="19%">
+                    <td align="center" height="100" width="19%" style="position: absolute;padding-top: 43px;">
                         <b>IIV<br>Fifth Year</b>
                     </td>
                 </tr>
@@ -163,7 +167,12 @@
                 @foreach($courses_info as $date => $all_years)
                     <tr>
                         <td class="date" align="center" height="100">
-                            <b>{{ date('D d-m-Y', strtotime($date)) }}</b>
+                            <b>{{ date('D d-m-Y', strtotime($date)) }} 
+                                <a href="{{ route('observations.exportObservationsInSpecificDay',['rotation'=>$rotation->id,'day'=>date('D d-m-Y', strtotime($date))]) }}" class="btn btn-success" onclick="showPopUpCubic()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-spreadsheet" viewBox="0 0 16 16">
+                                        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V9H3V2a1 1 0 0 1 1-1h5.5v2zM3 12v-2h2v2H3zm0 1h2v2H4a1 1 0 0 1-1-1v-1zm3 2v-2h3v2H6zm4 0v-2h3v1a1 1 0 0 1-1 1h-2zm3-3h-3v-2h3v2zm-7 0v-2h3v2H6z"/>
+                                    </svg> تحميل المراقبات</a>
+                            </b>
                         </td>
                         @php 
                             $counter_one=0;
@@ -183,33 +192,50 @@
                                         @endif
                                         @php $counter_one++; @endphp
                                     @elseif($year_number==3 && ! $counter_three)
-                                        @if(!in_array(2,$years) && !in_array(1,$years))
-                                            <td></td><td></td>
-                                        @endif
-                                        @if(!in_array(2,$years) && in_array(1,$years))
-                                            <td></td>
+                                        @if(!in_array(2,$years))
+                                            @if(!in_array(1,$years))
+                                                <td></td><td></td>
+                                            @else
+                                                <td></td>
+                                            @endif
                                         @endif
                                         @php $counter_three++; @endphp
                                     @elseif($year_number==4 && ! $counter_four)
-                                        @if(!in_array(3,$years) && !in_array(2,$years) && !in_array(1,$years))
-                                            <td></td><td></td><td></td>
-                                        @elseif(!in_array(3,$years) && !in_array(2,$years) && in_array(1,$years))
-                                            <td></td><td></td>
-                                        @elseif(!in_array(3,$years) && in_array(2,$years))
+                                        @if(!in_array(3,$years))
+                                            @if(!in_array(2,$years))
+                                                @if(!in_array(1,$years))
+                                                    <td></td><td></td><td></td>
+                                                @else
+                                                    <td></td><td></td>
+                                                @endif
+                                            @else
+                                                <td></td>
+                                            @endif
+                                        @else
+                                            {{-- @if(in_array(5,$years))
                                             <td></td>
+                                            @endif --}}
                                         @endif
                                         @php $counter_four++; @endphp
                                     @elseif($year_number==5 && ! $counter_five)
-                                        @if(!in_array(4,$years) && !in_array(3,$years) && !in_array(2,$years) && !in_array(1,$years))
-                                            <td></td><td></td><td></td><td></td>
-                                        @elseif(!in_array(4,$years) && !in_array(3,$years) && !in_array(2,$years) && in_array(1,$years))
-                                            <td></td><td></td><td></td>
-                                        @elseif(!in_array(4,$years) && !in_array(3,$years) && in_array(2,$years))
-                                            <td></td><td></td>
-                                        @elseif(!in_array(4,$years) && in_array(3,$years))
+                                        @if(!in_array(4,$years))
+                                            @if(!in_array(3,$years))
+                                                @if(!in_array(2,$years))
+                                                    @if(!in_array(1,$years))
+                                                        <td></td><td></td><td></td><td></td>
+                                                    @else
+                                                        <td></td><td></td><td></td>
+                                                    @endif
+                                                @else
+                                                    <td></td><td></td>
+                                                @endif
+                                            @else
+                                                <td></td>
+                                            @endif
+                                        @else
+                                            {{-- @if(in_array(5,$years))
                                             <td></td>
-                                        @elseif(in_array(4,$years) && in_array(5,$years))
-                                            <td></td>
+                                            @endif --}}
                                         @endif
                                         @php $counter_five++; @endphp
                                     @endif
@@ -217,8 +243,10 @@
                                     $courseQ= App\Models\Course::where('id',$id_course)->first();
                                     @endphp
                                     @if($courseQ)
-                                        <td class="course" align="center" height="100" style="align-items: center; {{($year_number==4||$year_number==5) ?'display:flex;
-                                        flex-wrap: wrap;flex-direction: column;':'float-root';}}{{($courseQ->semester=='2')?'border-radius: 17px;background-color: #6c757d0d;':''}}">
+                                        @if($year_number===5)
+                                        <td></td>
+                                        @endif
+                                        <td class="course" style="align-items: center;{{($year_number==4||$year_number==5) ?'display: contents;':''}}">
                                             <h5 class='course-name'>
                                                 @php
                                                     if($courseQ)
@@ -226,7 +254,7 @@
                                                 @endphp
                                             </h5>
                                             @if(count($rotation->distributionRoom()->wherePivot('course_id',$courseQ->id)->toBase()->get()))
-                                                <div class="controll {{($year_number==4||$year_number==5) ?'d-flex':''}}">
+                                                <div class="controll">{{ $year_number }}
                                                         @if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
                                                             @if(!$expire_rotation_date)
                                                                 <a href="{{route('rotations.course.edit',['rotation'=>$rotation->id,'course'=>$courseQ->id])}}" class="btn btn-info btn-sm btn-outline-light rounded">Edit</a>

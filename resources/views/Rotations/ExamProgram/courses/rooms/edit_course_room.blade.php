@@ -52,7 +52,7 @@ $remaining_places_in_this_course=$entered_students_number-($occupied_number_of_s
         </button>
         <div class="row">
             <div class="col-sm-6 info-room mt-2" style="display: -webkit-inline-box;">
-                <h4><span class="badge bg-secondary">Room Name : {{$specific_room->room_name}}</span></h4>
+                {{-- <h4><span class="badge bg-secondary">Room Name : {{$specific_room->room_name}}</span></h4> --}}
                 <h4><span class="badge bg-secondary">Date : {{date('l d-m-Y', strtotime($date))}}</span></h4>
                 <h4><span class="badge bg-secondary">Time : {{gmdate('H:i A',strtotime($time))}}</span></h4>
             </div>
@@ -92,14 +92,15 @@ $remaining_places_in_this_course=$entered_students_number-($occupied_number_of_s
                             <div class="col-1 py-2">
                                 <div class="h2 font-weight-bold my-0">{{$remaining_places_in_this_room_from_all_courses}}</div><span class="small text-gray">free places</span>
                             </div>
-                            <div class="col-1 py-2">
+                            <div class="col-1 me-4 py-2">
                                 <div class="h2 font-weight-bold my-0">{{$total_capacity}}</div><span class="small text-gray">room capacity</span>
                             </div>
                             <div class="col-1 py-2">
-                                <div class="h2 font-weight-bold my-0">{{$remaining_places_in_this_course}}</div><span class="small text-warning">free course places</span>
+                                <div class="h2 font-weight-bold my-0  text-warning">{{$remaining_places_in_this_course}}</div><span class="small text-warning">free course places</span>
                             </div>
                             <div class="col-3 py-2 common-courses" style="display: inline-flex;">
                                 @foreach ($courses_common_with_time as $course_belongs)
+                                @if($course_belongs->id==$course->id) @continue @endif
                                     @php
                                         $number_taken_in_this_room_course=0;
                                         foreach ($course_belongs->distributionRoom()->where('rotation_id',$rotation->id)->toBase()->get() as $oneroom)
@@ -145,8 +146,8 @@ $remaining_places_in_this_course=$entered_students_number-($occupied_number_of_s
                     @csrf
                     <div class="row m-2">
                             <div class="col-sm-9">
-                                    @if($total_capacity>$occupied_places_in_this_room_from_all_courses)
-                                        <label for="num_student_in_room" class="form-label">Number Students In Room <mark>{{$specific_room->room_name}}</mark>  :</label>
+                                    @if($total_capacity>=$occupied_places_in_this_room_from_all_courses)
+                                        <label for="num_student_in_room" class="form-label">عدد الطلاب في  <mark>{{$specific_room->room_name}}</mark>  :</label>
                                         <select class="form-control" name="num_student_in_room" class="form-control" required>
                                             @for ($i = 1; $i <= $occupied_places_in_this_room_from_all_courses+$remaining_places_in_this_course; $i++)
                                                 <option value="{{$i}}" {{ $occupied_number_of_students_in_this_course_in_this_room == $i ? 'selected':'' }}>{{$i}}</option>
@@ -161,7 +162,7 @@ $remaining_places_in_this_course=$entered_students_number-($occupied_number_of_s
 
                         <div class="col-sm-3">
                             {{-- That is not related with controller - Only for Js --}}
-                            <label for="search_user_name" class="form-label">Search for members :</label>
+                            <label for="search_user_name" class="form-label">البحث عن أعضاء :</label>
                             <input class="form-control" 
                             type="text" 
                             id="search_user_name" 
@@ -169,7 +170,7 @@ $remaining_places_in_this_course=$entered_students_number-($occupied_number_of_s
                         </div>
                     </div>
   
-                    <label for="members" class="form-label" style="margin-left:16px;margin-top:16px">members :</label>
+                    <label for="members" class="form-label" style="margin-left:16px;margin-top:16px">الأعضاء :</label>
                     <div class="mb-3" style="margin:0 5px;">
                         <div class="row num_of_members" style="flex-flow: nowrap;color: black;padding: 6px;background-color: #eceded;border-radius: 15px;width:99%;margin:0 5px">
                             <div class="col-sm-4" style="width:33%;background-color: #f8f9fa;border-radius: 15px 0 0 15px;height: 60px;text-align: center;margin-right:5px">
@@ -272,8 +273,8 @@ $remaining_places_in_this_course=$entered_students_number-($occupied_number_of_s
                 </div>
                 <br>
                 <div class="buttons" style="margin-top: 80px;float: left;margin-bottom: 30px;">
-                    <button type="submit" class="btn btn-dark" {{ (!$occupied_number_of_students_in_this_course_in_this_room && $specific_room->capacity == $occupied_number_of_students_in_this_room_in_all_common_courses) ? 'disabled' : '' }}>Update Course</button>
-                    <a href="{{ URL::previous() }}" class="btn btn-default">Cancel</a>
+                    <button type="submit" class="btn btn-dark">تعديل</button>
+                    <a href="{{ URL::previous() }}" class="btn btn-default">إلغاء</a>
                 </div>
         </form>
         <div class="no-results" style="display:none;">No results!</div>

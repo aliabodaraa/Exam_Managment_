@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    console.log("scrollTopDown");
+    //console.log("scrollTopDown");
     $(".scroll_top_button").hide();
     //Scroll to the bottom
     $(".scroll_buttom_button").click(function() {

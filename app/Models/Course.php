@@ -4,17 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Kyslik\ColumnSortable\Sortable;
 class Course extends Model
 {
-    use HasFactory;
-
+    use HasFactory,Sortable;
+    public $sortable = [
+        'course_name',
+        'studing_year',
+        'semester',
+        'faculty_id'
+        ];
     protected $fillable=[
         'course_name',
         'studing_year',
         'semester',
-        'students_number',
-        'duration',
         'faculty_id'
     ];
 

@@ -11,13 +11,14 @@ use App\Http\Controllers\MaxFlow\MaxFlow;
 use App\Http\Controllers\MaxFlow\Dfs;
 use App\Models\Course;
 use App\Models\User;
+use Session;
 class Graph extends Controller
 {
-    private Members $members;
+    public Members $members;
     private Courses $courses;
     private Rooms $rooms;
     private Rotation $rotation;
-    private array $arr_graph=[];
+    public array $arr_graph=[];
     private int $length_graph;
     private array $arr_users_objetions_orderd;
     private array $arr_keys_users_objections_orderd;
@@ -27,7 +28,8 @@ class Graph extends Controller
     private array $arr_courses_with_count_of_rooms;
     private array $arr_courses_idx_date_time;
     private EnumPersonType $type;
-    
+    static public $num_observations=0;
+
     public function __construct(EnumPersonType $type, Rotation $rotation, array $roomheads_paths=array(), array $secertaries_paths=array()){
         $this->type = $type;
         $this->rotation=$rotation;
@@ -40,10 +42,10 @@ class Graph extends Controller
         $this->arr_keys_courses_num_objections_orderd=array_keys($this->getCourseWithNumOfObservation());//depend on $this->arr_users_objetions_orderd
         $this->arr_courses_idx_date_time=$this->coursesWithArrDateAndTime();//depend on $this->courses ordered via date and time
         [$this->arr_same_time_courses,$this->count_arr_same_time_courses]=$this->coursesInSameTimes();//depend on arr_courses_idx_date_time re-orederd to adapt with $this->arr_keys_courses_num_objections_orderd
+        //$this->arr_same_time_courses=array_reverse($this->arr_same_time_courses);
         $this->arr_courses_with_count_of_rooms=$this->getCoursesWithCountOfRooms();//depend on sameTimes array and $this->arr_keys_courses_num_objections_orderd
         $this->rooms=new Rooms($this->rotation);
         $this->buildGraph($roomheads_paths, $secertaries_paths);
-
     }
 
     public function buildGraph(array $roomheads_paths=array(), $secertaries_paths=array()){//dump(221);
@@ -75,24 +77,20 @@ class Graph extends Controller
         //for DFS
         $this->setSameTimeNodesToCoursesAfterDfs();//set each course with number of belonged rooms
         $this->linkRoomsWithSink();//link rooms nodes with the sink node
+        //$cc=0;
+        // for(int i =0 ; i<)
 
 
-        //  $counter=0;
-        //  if($this->type->name == "Observer"){
-        //      dump("Graph",$this->arr_graph);
-        //      dump("users",$this->arr_keys_users_objections_orderd);
-        //   }
-        //   dump("Graph",$this->arr_graph);
-        //   dump("users",$this->arr_keys_users_objections_orderd);
-        //  for($i=count($this->arr_keys_users_objections_orderd)+$this->count_arr_same_time_courses+1;$i<=count($this->arr_keys_users_objections_orderd)+count($this->arr_keys_courses_num_objections_orderd)+$this->count_arr_same_time_courses;$i++)
-        //      for($j=count($this->arr_keys_users_objections_orderd)+count($this->arr_keys_courses_num_objections_orderd)+$this->count_arr_same_time_courses+1;$j<=count($this->arr_keys_users_objections_orderd)+count($this->arr_keys_courses_num_objections_orderd)+$this->count_arr_same_time_courses+$this->rooms->getLength();$j++)
-        //          if($this->arr_graph[$i][$j]>0)
-        //              ++$counter;
-        //  if($this->type->name=="RoomHead")
-        //  dump($counter);
-        //  else
-        //  dd($counter);
+         for($i=count($this->arr_keys_users_objections_orderd)+$this->count_arr_same_time_courses+1;$i<=count($this->arr_keys_users_objections_orderd)+$this->count_arr_same_time_courses+count($this->arr_keys_courses_num_objections_orderd);$i++)
+             for($j=count($this->arr_keys_users_objections_orderd)+$this->count_arr_same_time_courses+count($this->arr_keys_courses_num_objections_orderd)+1;$j<=count($this->arr_keys_users_objections_orderd)+$this->count_arr_same_time_courses+count($this->arr_keys_courses_num_objections_orderd)+$this->rooms->getLength();$j++)
+                 if($this->arr_graph[$i][$j]>0)
+                     ++Self::$num_observations;
 
+        if($this->type->name == "Observer"){
+            session()->put('num_observations',Self::$num_observations);
+         }
+    
+        //dd($this->arr_keys_users_objections_orderd,$this->arr_same_time_courses, $this->arr_keys_courses_num_objections_orderd);
     }
     //0
     public function cutEdgesFromUsersToSameTimeNodes(array $paths_info_param){
@@ -285,7 +283,7 @@ class Graph extends Controller
     }
 
     public function applyMaxFlowAlgorithm(){
-        $obj_max = new MaxFlow($this->length_graph,$this->members->getMembers(),$this->courses->getCourses(),$this->count_arr_same_time_courses);
+        $obj_max = new MaxFlow($this->length_graph,$this->members->getMembers(),$this->courses->getCourses(),$this->count_arr_same_time_courses , $this->rooms->getRooms());
         $paths=$obj_max->fordFulkerson($this->arr_graph, 0, $this->length_graph-1);
         $pathsInfo=$this->convertFordFulkersonPaths($paths);
 

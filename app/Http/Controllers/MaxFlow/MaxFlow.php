@@ -16,16 +16,20 @@ class MaxFlow extends Controller
     public static $science_room_visited=false;
     private array $members;
     private array $courses;
-    private int $rooms;
+    private array $rooms;
     private int $count_arr_same_time_courses;
 
     public static int $count_of_paths=0;
     //=====================  Asem  =====================
-    public function __construct(int $length_graph,$members,$courses,$count_arr_same_time_courses){
+    public function __construct(int $length_graph,$members,$courses,$count_arr_same_time_courses , $rooms){
         Self::$V = $length_graph;
         $this->members=$members;
+    
         $this->courses=$courses;
         $this->count_arr_same_time_courses=$count_arr_same_time_courses;
+
+        ///dd($this->members ,"----",array_reverse($this->members ) );
+        $this->rooms=$rooms;
     }
     public function bfs(array &$rGraph,int $s, int $t, array &$parent) : bool {
         // Create a visited array and mark all vertices as
@@ -33,7 +37,7 @@ class MaxFlow extends Controller
         $visited=[];
         for ($i = 0; $i < Self::$V; ++$i)
             $visited[$i] = false;
-
+       
         $visited[count($this->members)+$this->count_arr_same_time_courses+count($this->courses)+1]=Self::$science_room_visited;
         //if(Self::$current_user )
  
@@ -45,14 +49,32 @@ class MaxFlow extends Controller
         $parent[$s] = -1;
 
         // Standard BFS Loop
+
+        //$gg= count($this->members)+$this->count_arr_same_time_courses+count($this->courses)+1;
+        //$ff= count($this->members)+$this->count_arr_same_time_courses+count($this->courses)+count($this->rooms);
         while (count($queue) != 0) {
+
             // Asem Very important !!!!!!!!!!!!!!!!!!!!!!!!!!!!
             $u = array_shift($queue);
+
+                        // Try to reduce the time execution
+
+                        // if($u>=$gg   && $u<= $ff){
+                        //     $parent[$t] = $u;
+                        //     Self::$count=(Self::$count+1)%4;
+
+                        //     Self::$current_user=$parent[$parent[$parent[$parent[$t]]]];
+                        //     //dump($parent[$parent[$parent[$parent[$v]]]]);
+                        
+                        //     return true;
+                        // }
+
+
+                        //
  
             for ( $v = 0; $v < Self::$V; $v++) {
                 ////dump($visited);
-                if ($visited[$v] == false
-                    && $rGraph[$u][$v] > 0) {
+                if ($visited[$v] == false && $rGraph[$u][$v] > 0) {
                     // If we find a connection to the sink
                     // node, then there is no point in BFS
                     // anymore We just have to set its parent
@@ -83,6 +105,8 @@ class MaxFlow extends Controller
         $u=0;
         $v=0;
         $paths=[];
+
+        
         // Create a residual graph and fill the residual
         // graph with given capacities in the original graph
         // as residual capacities in residual graph
@@ -110,7 +134,7 @@ class MaxFlow extends Controller
             ////dump($parent);
             //===================Asem==============================================
             Self::$count_of_paths=Self::$count_of_paths+1;
-            $pure_parent=array();
+            $pure_parent=array(); // Build pure_parent array with |path| whereas parent array with |V|
             $counter_index=4;
             $k=Self::$V-1;
             while($parent[$k] !== -1){
@@ -178,7 +202,6 @@ class MaxFlow extends Controller
             
             array_push($paths,$path);
         }
-        
         //Ali------move changes to the out
         $graph = $rGraph;
  

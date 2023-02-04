@@ -17,19 +17,17 @@
                         </svg> رجوع
                     </a>
                 </div>
-            </h1>
-            <div class="lead">
+            </h1><br>
 
-            </div>
-            @if ($message = Session::get('retryEntering'))
+            {{-- @if ($message = Session::get('retryEntering'))
                 <div class="alert alert-danger alert-block">
                     <strong>{{ $message }}</strong>
                 </div>
-            @endif
+            @endif --}}
             <form method="POST" action="{{route('courses.store')}}" id="coursesForm">
                 @csrf
                 <div class="mb-3">
-                    <label for="course_name" class="form-label">course_name :</label>
+                    <label for="course_name" class="form-label">أسم المقرر :</label>
                     <input value="{{ old('course_name') }}"
                         type="text"
                         class="form-control"
@@ -40,7 +38,7 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="department" class="form-label">Studing Year :</label>
+                    <label for="department" class="form-label">السنة :</label>
                     <select class="form-control" name="studing_year" class="form-control" required>
                             <option value='1'>سنة أولى</option>
                             <option value='2'>سنة ثانية</option>
@@ -53,7 +51,7 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="department" class="form-label">Semester :</label>
+                    <label for="department" class="form-label">الفصل :</label>
                     <select class="form-control" name="semester" class="form-control" required>
                             <option value='1'>فصل أول</option>
                             <option value='2'>فصل ثاني</option>
@@ -63,7 +61,7 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="department_ids" class="form-label">department_ids :</label>
+                    <label for="department_ids" class="form-label">الأقسام التي ينتمي لها المقرر :</label>
                     <div id="checkboxes" style="text-align-last: justify;
                                                                 display: table-caption;
                                                                 width: 202px;">
@@ -82,7 +80,7 @@
                       </div>
                 </div>
                 <div class="mb-3">
-                    <label for="faculty_id" class="form-label">faculty_id :</label>
+                    <label for="faculty_id" class="form-label">الكلية :</label>
                     <select class="form-control" name="faculty_id" class="form-control" required>
                         @foreach (App\Models\Faculty::toBase()->get() as $faculty)
                             <option value='{{ $faculty->id }}'>{{ $faculty->name }}</option>
@@ -99,42 +97,4 @@
 
     </div>
 
-@endsection
-@section('scripts')
-<script type="text/javascript">
-    let request = new XMLHttpRequest();
-    console.log(request.readyState);
-    request.onreadystatechange=()=>{
-        if(request.readyState==4)
-            if(request.status==200)
-                console.log(request.responseText);
-            else if(request.status==404)
-                console.log("Not Found");
-    }
-    $('#saveBtn').click(function (e) {
-        e.preventDefault();
-        $(this).html('Save');
-
-        $.ajax({
-          data: $('#coursesForm').serialize(),
-          url: "{{ route('courses.store') }}",
-          type: "POST",
-          dataType: 'json',
-          success: function (data) {
-
-              $('#bookForm').trigger("reset");
-              $('#ajaxModel').modal('hide');
-              table.draw();
-
-          },
-          error: function (data) {
-              console.log('Error:', data);
-              $('#saveBtn').html('Save Changes');
-          }
-      });
-    });
-request.open("GET","/resources/views/courses/edit.blade.php",true);
-request.send();
-console.log("Ali");
- </script>
 @endsection

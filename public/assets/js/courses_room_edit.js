@@ -95,7 +95,7 @@ $(document).ready(function() {
     }
 
 
-    console.log(number_of_secertaries_that_checked, number_of_secertaries_that_not_checked);
+    //console.log(number_of_secertaries_that_checked, number_of_secertaries_that_not_checked);
     $(".observers").each(function() {
         if ($(this).is(':checked'))
             number_of_observers_that_checked++;

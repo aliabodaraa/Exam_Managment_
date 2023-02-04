@@ -1,5 +1,18 @@
 @extends('layouts.app-master')
-
+@push('style')
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<style type="text/css">
+    .my-active span{
+        background-color: #5cb85c !important;
+        color: white !important;
+        border-color: #5cb85c !important;
+    }
+    ul.pager>li {
+        display: inline-flex;
+        padding: 5px;
+    }
+</style>
+@endpush
 @section('content')
     <div class="bg-light p-4 rounded">
         <div class="row">
@@ -39,7 +52,7 @@
     @if(count($courses))
         <div class="col-sm-3 mb-1">
             {{-- That is not related with controller - Only for Js --}}
-            <label for="search_course_name" class="form-label">Search :</label>
+            <label for="search_course_name" class="form-label">البحث عن مقرر :</label>
             <input class="form-control" 
             type="text" 
             id="search_course_name" 
@@ -49,13 +62,13 @@
             <table class="table table-light">
                 <thead>
                 <tr>
-                    <th scope="col" width="10%">course_name</th>
-                    <th scope="col" width="10%">studing_year</th>
-                    <th scope="col" width="10%">semester</th>
-                    <th scope="col" width="20%">department</th>
-                    <th scope="col" width="10%">faculty</th>
+                    <th scope="col" width="10%">@sortablelink('course_name','أسم المقرر')</th>
+                    <th scope="col" width="10%">@sortablelink('studing_year','سنة المقرر')</th>
+                    <th scope="col" width="10%">@sortablelink('semester','الفصل')</th>
+                    <th scope="col" width="20%">الأقسام</th>
+                    <th scope="col" width="10%">@sortablelink('faculty_id','الكلية')</th>
                     @if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
-                        <th scope="col" width="10%">Actions</th>
+                        <th scope="col" width="10%">خيارات</th>
                     @endif
                 </tr>
                 </thead>
@@ -67,10 +80,10 @@
                                 <td>{{ $course->semester }}</td>
                                 <td>
                                     @foreach ($course->departments()->get() as $department)
-                                        <span class="badge bg-secondary">{{ $department->name }}</span>
+                                        <span class="badge bg-{{ ($department->id==1)?'secondary':'' }}{{ ($department->id==2)?'primary':'' }}{{ ($department->id==3)?'info':'' }}">{{ $department->name }}</span>
                                     @endforeach
                                 </td>
-                                <td>{{ $course->faculty->name }}</td>
+                                <td><span class="badge bg-success">{{ $course->faculty->name }}</span></td>
                                 @if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
                                 <td style="display:flex;align-items:baseline;">
                                     <a href="{{ route('courses.edit', $course->id) }}" class="btn btn-info btn-sm me-2 btn-close-white"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
@@ -89,6 +102,9 @@
                         @endforeach
                 </tbody>
             </table>
+            <center class="mt-5">
+                {{  $courses->withQueryString()->links() }}
+            </center>
         </div>
         @else
         <div class="alert text-black alert-success" role="alert" style="margin-top: 20px;">

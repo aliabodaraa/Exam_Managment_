@@ -105,7 +105,6 @@ class Stock extends Controller
                 if((count($rotation->coursesProgram()->wherePivot('date',$date)->wherePivot('time','>=',$time)->wherePivot('time','<=',gmdate('H:i:s',strtotime($time)+strtotime($duration)))->where('id',$course_whithin_range_time->id)->toBase()->get())
                 ||  count($rotation->coursesProgram()->wherePivot('date',$date)->wherePivot('time','<=',$time)->wherePivot('time','>=',gmdate('H:i:s',strtotime($time)-strtotime($duration)))->where('id',$course_whithin_range_time->id)->toBase()->get())))
                     foreach ($course_whithin_range_time->distributionRoom()->wherePivot('rotation_id',$rotation->id)->toBase()->get() as $room) {
-                        
                         array_push($disabled_rooms,$room->id);
                         array_push($courses_common_with_time,$course_whithin_range_time);
 
@@ -182,6 +181,7 @@ class Stock extends Controller
         foreach (array_unique($user->rotations->SortByDesc('end_date')->toBase()->pluck('id')->toArray()) as $rotation_id) {
             $rotationInfo=Rotation::where('id',$rotation_id)->first();
             $table=[];
+            $table['id']=$rotationInfo->id;
             $table['name']=$rotationInfo->name;
             $table['year']=$rotationInfo->year;
             $table['start_date']=$rotationInfo->start_date;

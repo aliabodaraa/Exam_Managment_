@@ -2344,6 +2344,16 @@ div.h4 {
     position: absolute;
     top: 6px;right: 40px;
   }
+  #nav_row > div.col-lg-4.col-sm-4.col-xs-1 > div.text-end > div.profile-icon > a > svg{
+    color: white;
+  }
+  #nav_row > div.col-lg-4.col-sm-4.col-xs-1 > div.text-end > div.profile-icon > a > svg:hover{
+    color: #888;
+  }
+  label{
+    direction: rtl;
+    float: right;
+  }
   #nav_row{
     height: 55px;
   }
@@ -2442,7 +2452,12 @@ div.h4 {
         color: black;
         background-color: #ffffff2b;
     }
-
+  table tr{
+    text-align: center;
+  }
+  input{
+    direction: rtl;
+  }
     </style>
   
     <!-- Custom styles for this template -->
@@ -2504,6 +2519,7 @@ div.h4 {
     <script src="{!! url('assets/js/courses_room_edit.js') !!}"></script>
     <script src="{!! url('assets/js/progress.js') !!}"></script>
     <script src="{!! url('assets/js/scrollTopDown.js') !!}"></script>
+    <script src="{!! url('assets/js/rotation_date_starting_ending.js') !!}"></script>
     @show
   </body>
 </html>

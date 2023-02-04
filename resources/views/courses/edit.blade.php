@@ -21,7 +21,7 @@
                 @method('patch')
                 @csrf
                 <div class="mb-3">
-                    <label for="course_name" class="form-label">course_name :</label>
+                    <label for="course_name" class="form-label">أسم المقرر :</label>
                     <input value="{{ $course->course_name }}"
                         type="text"
                         class="form-control"
@@ -33,7 +33,7 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="department" class="form-label">Studing Year :</label>
+                    <label for="studing_year" class="form-label">سنة المقرر :</label>
                     <select class="form-control" name="studing_year" class="form-control" required>
                             <option value='1' {{ $course->studing_year=='1'?'selected':'' }}>سنة أولى</option>
                             <option value='2' {{ $course->studing_year=='2'?'selected':'' }}>سنة ثانية</option>
@@ -46,7 +46,7 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="department" class="form-label">Semester :</label>
+                    <label for="semester" class="form-label">فصل المقرر :</label>
                     <select class="form-control" name="semester" class="form-control" required>
                             <option value='1' {{ $course->semester=='1'?'selected':'' }}>فصل أول</option>
                             <option value='2' {{ $course->semester=='2'?'selected':'' }}>فصل ثاني</option>
@@ -56,8 +56,8 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="department_ids" class="form-label">department_ids :</label>
-                    <div id="checkboxes" style="text-align-last: justify;
+                    <label for="department_ids" class="form-label">القسم الذي ينتمي له المقرر (أختياري) :</label>
+                    <div id="checkboxes" style="text-align-last: justify;margin-top: 24px;
                                                 display: table-caption;
                                                 width: 202px;">
                         @foreach (App\Models\Department::all() as $department)
@@ -65,7 +65,7 @@
                             <input type="checkbox"
                             id="{{ $department->id }}"
                             name="department_ids[{{ $department->id }}]"
-                            class='rooms toggler-wrapper style-4'
+                            class='toggler-wrapper style-4'
                             {{ in_array($department->id,$current_departments_ids)?'checked':'' }}/>
                             {{ $department->name }}
                             </label>
@@ -76,7 +76,7 @@
                       </div>
                 </div>
                 <div class="mb-3">
-                    <label for="faculty_id" class="form-label">faculty_id :</label>
+                    <label for="faculty_id" class="form-label">الكلية التي ينتمي لها المقرر :</label>
                     <select class="form-control" name="faculty_id" class="form-control" required>
                             <option value='{{ $course->faculty->id }}'>{{ $course->faculty->name }}</option>
                     </select>
@@ -84,7 +84,7 @@
                         <span class="text-danger text-left">{{ $errors->first('faculty_id') }}</span>
                     @endif
                 </div>
-                <button type="submit" class="btn btn-primary">Update course</button>
+                <button type="submit" class="btn btn-primary">تعديل</button>
             </form>
         </div>
 

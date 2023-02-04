@@ -35,6 +35,9 @@ class CourseRotation_ExamProgramController extends Controller
      */
     public function store_course_to_the_program(Request $request,Rotation $rotation)
     {
+        if(!in_array($request->course_name,Course::get()->pluck('course_name')->toarray()))
+            return redirect()->back()->withDanger(__("!! أسم المقرر الذي أدخلته غير معروف"));
+
         // if($request->course_name =='none')
         //     return redirect()->back()
         //     ->with('retryEntering',"Please Detemine which course you need to add .");

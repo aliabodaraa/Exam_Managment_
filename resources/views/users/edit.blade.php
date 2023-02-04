@@ -4,16 +4,18 @@
     <div class="bg-light p-4 rounded">
         <div class="container mt-4">
             <h1 class="text-center">
-                Update User Page
+                تعديل بيانات {{ $user->username }}
                 <div class="float-right">
-                    @if(count($user->teaches()->get()))
-                        <a href={{ route("users.edit_user_courses",[$user->id]) }} class="btn btn-outline-dark">
-                            تعديل المواد
-                        </a>
-                    @else
-                    <a href="{{ route('users.create_user_courses',$user->id) }}" class="btn btn-outline-dark">إضافة مادة</a>
+                    @if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
+                        @if(count($user->teaches()->toBase()->get()))
+                            <a href={{ route("users.edit_user_courses",[$user->id]) }} class="btn btn-outline-dark">
+                                تعديل المواد
+                            </a>
+                        @else
+                            <a href="{{ route('users.create_user_courses',$user->id) }}" class="btn btn-outline-dark">إضافة مادة</a>
+                        @endif
                     @endif
-                      <a href="{{ URL::previous() }}" class="btn btn-dark">Back</a>
+                      <a href="{{ URL::previous() }}" class="btn btn-dark">رجوع</a>
                 </div>
             </h1>
             <div class="mt-2">
@@ -23,7 +25,7 @@
                 @method('patch')
                 @csrf
                 <div class="mb-3">
-                    <label for="email" class="form-label">Email :</label>
+                    <label for="email" class="form-label">الإيميل :</label>
                     <input value="{{ $user->email }}"
                         type="email"
                         class="form-control"
@@ -34,7 +36,7 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="username" class="form-label">Username :</label>
+                    <label for="username" class="form-label">الأسم :</label>
                     <input value="{{ $user->username }}"
                         type="text"
                         class="form-control"
@@ -46,7 +48,7 @@
                 </div>
                 @if(Auth::user()->id == $user->id)
                     <div class="mb-3">
-                        <label for="old_password" class="form-label">old_password :</label>
+                        <label for="old_password" class="form-label">كلمة المرور القديمة :</label>
                         <input 
                             type="text"
                             class="form-control"
@@ -57,7 +59,7 @@
                         @endif
                     </div>
                     <div class="mb-3">
-                        <label for="new_password" class="form-label">new_password :</label>
+                        <label for="new_password" class="form-label">كلمة المرور الجديدة :</label>
                         <input
                             type="text"
                             class="form-control"
@@ -68,7 +70,7 @@
                         @endif
                     </div>
                     <div class="mb-3">
-                        <label for="new_password_verification" class="form-label">new_password_verification :</label>
+                        <label for="new_password_verification" class="form-label">تأكيد كلمة المرور الجديدة :</label>
                         <input
                             type="text"
                             class="form-control"
@@ -96,7 +98,7 @@
                         @endif
                     </div>
                     <div class="mb-3">
-                        <label for="temporary_role" class="form-label">temporary role :</label>
+                        <label for="temporary_role" class="form-label">الدور المؤقت :</label>
                         <select class="form-control"
                             name="temporary_role">
                             <option value="">لا يوجد</option>
@@ -114,7 +116,7 @@
                         @endif
                     </div>
                     <div class="mb-3">
-                        <label for="faculty_id" class="form-label">faculty_id :</label>
+                        <label for="faculty_id" class="form-label">الكلية :</label>
                         <select class="form-control" name="faculty_id" class="form-control" required>
                             @foreach (App\Models\Faculty::all() as $faculty)
                                 <option value='{{ $faculty->id }}' {{ ($user->faculty->id == $faculty->id) ? 'selected': '' }}>{{ $faculty->name }}</option>
@@ -125,7 +127,30 @@
                         @endif
                     </div>
                     <div class="mb-3">
-                        <label for="number_of_observation" class="form-label">number_of_observation :</label>
+                        <label for="department_id" class="form-label">القسم :</label><br><br>
+                        <div class="d-flex" style="justify-content: space-evenly;">
+                          <label for="programming">
+                            <input type="radio" id="programming"
+                            name="department_id" value="1"
+                            class='toggler-wrapper style-4' {{ ($user->department_id == '1') ? 'checked': '' }}/>برمجيات
+                          </label>
+                          <label for="two">
+                            <input type="radio" id="network" 
+                            name="department_id" value="2"
+                            class='toggler-wrapper style-4' {{ ($user->department_id == '2') ? 'checked': '' }}/>شبكات
+                          </label>
+                          <label for="two">
+                            <input type="radio" id="artifialIntellegence" 
+                            name="department_id" value="3"
+                            class='toggler-wrapper style-4' {{ ($user->department_id == '3') ? 'checked': '' }}/>ذكاء صنعي
+                          </label>
+                        </div>
+                        @if ($errors->has('department_id'))
+                        <span class="text-danger text-left">{{ $errors->first('department_id') }}</span>
+                        @endif
+                    </div>
+                    <div class="mb-3">
+                        <label for="number_of_observation" class="form-label">عدد المراقبات :</label>
                         <select class="form-control" name="number_of_observation" class="form-control" required>
                             @for ($i = 0; $i <31; $i++)
                                 <option value='{{ $i }}' {{ ($user->number_of_observation == $i) ? 'selected': '' }}>{{ $i }}</option>
@@ -136,7 +161,7 @@
                         @endif
                     </div>
                     <div class="mb-3">
-                        <label for="city" class="form-label">City :</label>
+                        <label for="city" class="form-label">المدينة :</label>
                         <input value="{{ $user->city }}"
                             type="text"
                             class="form-control"
@@ -147,7 +172,7 @@
                         @endif
                     </div>
                     <div class="mb-3">
-                        <label for="property" class="form-label">property :</label>
+                        <label for="property" class="form-label">العضوية :</label>
                         <select class="form-control" name="property" class="form-control" required>
                                 <option value='0' {{ ($user->property == '') ? 'selected': '' }}>لا يوجد</option>
                                 <option value='1' {{ ($user->property == 'عضو هيئة فنية') ? 'selected': '' }}>عضو هيئة فنية</option>
@@ -158,8 +183,8 @@
                         @endif
                     </div>
                 @endif
-                <button type="submit" class="btn btn-primary">Update user</button>
-                <a href="{{ route('users.index') }}" class="btn btn-default">Cancel</button>
+                <button type="submit" class="btn btn-primary">تعديل</button>
+                <a href="{{ route('users.index') }}" class="btn btn-default">إلغاء</button>
             </form>
         </div>
     </div>

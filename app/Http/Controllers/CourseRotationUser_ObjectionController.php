@@ -31,7 +31,7 @@ class CourseRotationUser_ObjectionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Rotation $rotation){
+    public function create(Rotation $rotation,User $user){
         // $courses=DB::select('select * from courses');
         // dd($courses);
         $courses_info=[];
@@ -40,7 +40,7 @@ class CourseRotationUser_ObjectionController extends Controller
               ksort($courses_info[$course->pivot->date]);
         }
         ksort($courses_info);
-        return view('Rotations.Objections.create',compact('courses_info','rotation'));
+        return view('Rotations.Objections.create',compact('courses_info','rotation','user'));
     }
 
     /**
@@ -49,7 +49,7 @@ class CourseRotationUser_ObjectionController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, Rotation $rotation){
+    public function store(Request $request, Rotation $rotation,User $user){
         $get_all_course_in_same_time=[];
         if(isset($request->courses_objections_ids)){
             foreach ((array)$request->courses_objections_ids as $key => $course_id) {
@@ -59,9 +59,9 @@ class CourseRotationUser_ObjectionController extends Controller
                     array_push($get_all_course_in_same_time,$id);
                 }
             }
-            $rotation->coursesObjection()->attach(array_unique($get_all_course_in_same_time),['user_id'=>Auth::user()->id,'rotation_id'=>$rotation->id]);
+            $rotation->coursesObjection()->attach(array_unique($get_all_course_in_same_time),['user_id'=>$user->id,'rotation_id'=>$rotation->id]);
 
-            return redirect()->route('rotations.program.show',$rotation->id)
+            return redirect()->back()
             ->withSuccess(__('your objections created successfully.'));
         }else{
             return redirect()->back()
@@ -86,7 +86,7 @@ class CourseRotationUser_ObjectionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Rotation $rotation){        
+    public function edit(Rotation $rotation,User $user){        
         //dd($rotation->coursesObjection()->get());
         $courses_info=[];
         foreach($rotation->coursesProgram as $course){
@@ -95,10 +95,10 @@ class CourseRotationUser_ObjectionController extends Controller
         }
         ksort($courses_info);
 
-        $courses_objections_ids=Course::with('rotationsObjection')->whereHas('rotationsObjection', function($query) use($rotation){
-            $query->where('user_id',Auth::user()->id)->where('rotation_id',$rotation->id);})->pluck('id')->toArray();
+        $courses_objections_ids=Course::with('rotationsObjection')->whereHas('rotationsObjection', function($query) use($rotation,$user){
+            $query->where('user_id',$user->id)->where('rotation_id',$rotation->id);})->pluck('id')->toArray();
         //dd($courses_objections_ids);
-        return view('Rotations.Objections.edit',compact('courses_info','rotation','courses_objections_ids'));
+        return view('Rotations.Objections.edit',compact('courses_info','rotation','courses_objections_ids','user'));
     }
 
     /**
@@ -108,9 +108,9 @@ class CourseRotationUser_ObjectionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Rotation $rotation){
+    public function update(Request $request, Rotation $rotation,User $user){
 
-        Auth::user()->rotationsObjection()->detach($rotation->id);
+        $user->rotationsObjection()->detach($rotation->id);
 
         $get_all_course_in_same_time=[];
         if(isset($request->courses_objections_ids)){
@@ -121,12 +121,12 @@ class CourseRotationUser_ObjectionController extends Controller
                     array_push($get_all_course_in_same_time,$id);
                 }
             }
-            $rotation->coursesObjection()->attach(array_unique($get_all_course_in_same_time),['user_id'=>Auth::user()->id,'rotation_id'=>$rotation->id]);
+            $rotation->coursesObjection()->attach(array_unique($get_all_course_in_same_time),['user_id'=>$user->id,'rotation_id'=>$rotation->id]);
 
-            return redirect()->route('rotations.program.show',$rotation->id)
+            return redirect()->back()
             ->withSuccess(__('your objections updated successfully.'));
         }else{
-            return redirect()->route('rotations.program.show',$rotation->id)
+            return redirect()->back()
             ->withWarning(__('You Discard All your Objections.'));
         }
     }

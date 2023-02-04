@@ -35,12 +35,12 @@
             <table class="table table-light">
                 <thead>
                 <tr>
-                    <th scope="col" width="15%">rotation name</th>
-                    <th scope="col" width="15%">year</th>
-                    <th scope="col" width="15%">start_date</th>
-                    <th scope="col" width="15%">end_date</th>
-                    <th scope="col" width="15%">faculty</th>
-                    <th scope="col" width="25%">Actions</th>
+                    <th scope="col" width="15%">أسم الدورة</th>
+                    <th scope="col" width="15%">السنة</th>
+                    <th scope="col" width="15%">تاريخ البداية</th>
+                    <th scope="col" width="15%">تاريخ النهاية</th>
+                    <th scope="col" width="15%">الكلية</th>
+                    <th scope="col" width="25%">خيارات</th>
                 </tr>
                 </thead>
                 <tbody>

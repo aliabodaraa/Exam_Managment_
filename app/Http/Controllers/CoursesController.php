@@ -14,14 +14,12 @@ use Ramsey\Uuid\Type\Integer;
 use Illuminate\Support\Facades\DB;
 class CoursesController extends Controller
 {
-
     public function index()
     {
         //dd(Carbon::now()->formatLocalized('l'));
-        $courses = Course::orderBy('course_name')->get();
+        $courses = Course::sortable()->orderBy('course_name')->paginate(100);
         return view('courses.index', compact('courses'));
     }
-
     public function create()
     {
         return view('courses.create');
@@ -40,6 +38,7 @@ class CoursesController extends Controller
             $course->departments()->detach();
             $course->departments()->attach($request->department_ids);
         }
+
         return redirect()->route("courses.index")
         ->withSuccess(__('course '.$request->course_name.' created successfully'));
     }
@@ -67,7 +66,7 @@ class CoursesController extends Controller
         $course->delete();
 
         return redirect()->route('courses.index')
-            ->with('user-delete','Course deleted successfully.');
+        ->withSuccess(__('course deleted successfully'));
     }
 
     // public function add_users_to_course(Course $course)

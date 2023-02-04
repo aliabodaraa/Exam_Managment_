@@ -9,26 +9,29 @@ use App\Models\Room;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Style;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Maatwebsite\Excel\Concerns\WithBackgroundColor;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use PhpOffice\PhpSpreadsheet\Style\Color;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class ObservationsExport implements FromCollection,WithHeadings,WithBackgroundColor,WithStyles,ShouldAutoSize
+class exportObservationsInSpecificDay implements FromCollection,WithHeadings, WithMapping,WithBackgroundColor,WithStyles,WithColumnWidths
 {
     private Rotation $rotation;
-    public function __construct(Rotation $rotation)
+    private $day;
+    public function __construct(Rotation $rotation,$day)
     {
         $this->rotation=$rotation;
+        $this->day=$day;
+        // dd($this->rotation,$this->day);
     }
     /**
     * @return \Illuminate\Support\Collection
     */
     public function collection()
-    {//$this->rotation->select like Rotation::select
+    {
         $all_observations_ids = $this->rotation->where('id','=',$this->rotation->id)
         ->select("user_id","roleIn","date","time","students_number","duration","course_rotation.rotation_id","course_rotation.course_id","num_student_in_room","course_room_rotation.room_id")
         ->join('course_rotation','rotations.id','=','course_rotation.rotation_id')
@@ -66,35 +69,13 @@ class ObservationsExport implements FromCollection,WithHeadings,WithBackgroundCo
         }
         return collect($observations_names);
     }
-    public function backgroundColor()
+    public function columnWidths(): array
     {
-        // Return RGB color code.
-        return '999999';
-    
-        // Return a Color instance. The fill type will automatically be set to "solid"
-        //return new Color(Color::COLOR_BLUE);
-    
-        // Or return the styles array
         return [
-             'fillType'   => Fill::FILL_GRADIENT_LINEAR,
-             //'startColor' => ['argb' => Color::COLOR_BLUE],
+            'A' => 55,
+            'B' => 45,            
         ];
     }
-    // public function columnWidths(): array
-    // {
-    //     return [
-    //         'A' => 55,
-    //         'B' => 45,          
-    //         'C' => 55,
-    //         'D' => 45,  
-    //         'E' => 55,
-    //         'F' => 45,
-    //         'G' => 55,
-    //         'H' => 45,  
-    //         'I' => 55,
-    //         'J' => 45,   
-    //     ];
-    // }
     public function styles(Worksheet $sheet)
     {
         return [
@@ -108,13 +89,22 @@ class ObservationsExport implements FromCollection,WithHeadings,WithBackgroundCo
             'C'  => ['font' => ['size' => 16]],
         ];
     }
-    /**
-     * Write code on Method
-     *
-     * @return response()
-     */
     public function headings(): array
     {
-        return ["الدورة الفصلية","التاريخ","الوقت","المدة","اسم المقرر","عدد المتقدمين للمقرر","اسم القاعة","عدد الطلاب بالقاعة","اسم الشخص","دور الشخص"];
+        return [$this->rotation->name." - ".$this->rotation->year];
+    }
+    public function backgroundColor()
+    {
+        // Return RGB color code.
+        return '000000';
+    
+        // Return a Color instance. The fill type will automatically be set to "solid"
+        return new Color(Color::COLOR_BLUE);
+    
+        // Or return the styles array
+        return [
+             'fillType'   => Fill::FILL_GRADIENT_LINEAR,
+             'startColor' => ['argb' => Color::COLOR_RED],
+        ];
     }
 }

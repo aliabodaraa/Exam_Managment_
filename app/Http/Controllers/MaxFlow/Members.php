@@ -15,14 +15,75 @@ class Members extends Controller
     public function __construct(EnumPersonType $type,Rotation $rotation){
         $this->type=$type;
         $this->rotation=$rotation;
-        $room_heads=$this->rotation->initial_members()->wherePivot('options','{"1":"on"}')->orWherePivot('options','{"1":"on","2":"on"}')->wherePivot('rotation_id',$rotation->id)->toBase()->get()->pluck('id')->toarray();
-        $secertaries=$this->rotation->initial_members()->wherePivot('options','{"2":"on"}')->orWherePivot('options','{"1":"on","2":"on"}')->wherePivot('rotation_id',$rotation->id)->toBase()->get()->pluck('id')->toarray();
+        $room_heads=$this->rotation->initial_members()->wherePivot('options','{"1":"on"}')->
+                                                        orWherePivot('options','{"1":"on","2":"on"}')->
+                                                        wherePivot('rotation_id',$rotation->id)->
+                                                        toBase()->get()->pluck('id')->toarray();
+        $secertaries=$this->rotation->initial_members()->wherePivot('options','{"2":"on"}')->
+                                                        orWherePivot('options','{"1":"on","2":"on"}')->
+                                                        wherePivot('rotation_id',$rotation->id)->
+                                                        toBase()->get()->pluck('id')->toarray();
         $observers=array_merge(array_unique(
+                        // array_merge(
+                        //     User::where('is_active',1)->where('temporary_role')->whereNotIn('id',$room_heads)->toBase()->get()->pluck('id')->toarray()
+                        //     ,$secertaries
+                        // )
                         array_merge(
                             User::where('is_active',1)->where('temporary_role')->whereNotIn('id',$room_heads)->toBase()->get()->pluck('id')->toarray()
-                            ,$secertaries
+                            ,User::whereIn('id',$secertaries)->whereNotIn('id',$room_heads)->toBase()->get()->pluck('id')->toarray()
                         )
                     ));
+
+                    //show each secertary role name-num objections and total num of secertaries and total num of all objections
+                    // $itera=0;
+                    // foreach ($this->rotation->initial_members()->wherePivot('options','{"2":"on"}')->
+                    // orWherePivot('options','{"1":"on","2":"on"}')->
+                    // wherePivot('rotation_id',$rotation->id)->get() as $key => $user) {
+                    //     $count=count($user->coursesObjection);
+                    //     dump($user->username." ----- ".$count);
+                    //     $itera+=$count;
+                    // }
+                    // dd("num total oberver",count($this->rotation->initial_members()->wherePivot('options','{"2":"on"}')->
+                    // orWherePivot('options','{"1":"on","2":"on"}')->
+                    // wherePivot('rotation_id',$rotation->id)->get()),"num total objections",$itera);
+                    //show each secertary role name-num objections and total num of secertaries and total num of all objections
+
+
+
+    // dd(count($this->rotation->initial_members()->wherePivot('options','{"1":"on"}')->
+    //     orWherePivot('options','{"2":"on"}')->
+    //     wherePivot('rotation_id',$rotation->id)->
+    //     toBase()->get())
+
+    //     ,
+
+    //     $this->rotation->initial_members()->wherePivot('options','{"2":"on"}')->
+    //                                                     wherePivot('rotation_id',$rotation->id)->
+    //                                                     toBase()->get()->pluck('id')//38
+
+    //                                                     ,
+    //                                                     $this->rotation->initial_members()->
+    //                                                     wherePivot('options','{"1":"on","2":"on"}')->
+    //                                                     wherePivot('rotation_id',$rotation->id)->
+    //                                                     toBase()->get()->pluck('id'),//12
+    //                                                     $secertaries//50
+    // );
+    $count_users_observations=0;
+    array_map(function($room_head_id) use(&$count_users_observations){
+        $count_users_observations+=User::where('id',$room_head_id)->first()->number_of_observation;
+        return $count_users_observations;
+    } ,$room_heads);
+    array_map(function($secertary_id) use(&$count_users_observations){
+        $count_users_observations+=User::where('id',$secertary_id)->first()->number_of_observation;
+        return $count_users_observations;
+    } ,$secertaries);
+    array_map(function($observer_id) use(&$count_users_observations){
+        $count_users_observations+=User::where('id',$observer_id)->first()->number_of_observation;
+        return $count_users_observations;
+    } ,$observers);     
+    session()->put('count_users_observations',$count_users_observations);
+
+        //dd($room_heads,$secertaries,$observers);
         switch($this->type){
             case EnumPersonType::RoomHead:
                 $members=$room_heads;

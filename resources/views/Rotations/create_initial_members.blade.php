@@ -35,10 +35,9 @@
              style="position: relative;"
             >
                 <span class="badge bg-info result" style="position: absolute;
-                top: 23px;
-                right: 0px;"></span>
+                top: 23px;"></span>
                 {{-- That is not related with controller - Only for Js --}}
-                <label for="searchForUserNameInInitialMembers" class="form-label">Search for members :</label>
+                <label for="searchForUserNameInInitialMembers" class="form-label">البحث عن أعضاء :</label>
                 <input class="form-control searchForUserNameInInitialMembers" 
                 type="text" 
                 onkeyup="searchForUserNameInInitialMembers(JSON.stringify({{ collect($users_and_roomHeads) }}))" placeholder="Serarch Users">

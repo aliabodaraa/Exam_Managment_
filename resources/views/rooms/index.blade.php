@@ -40,7 +40,7 @@
     @if(count($rooms))
         <div class="col-sm-3 mb-1">
             {{-- That is not related with controller - Only for Js --}}
-            <label for="search_user_name" class="form-label">Search :</label>
+            <label for="search_user_name" class="form-label">البحث عن قاعة :</label>
             <input class="form-control" 
             type="text" 
             id="search_room_name" 
@@ -50,14 +50,15 @@
                 <table class="table align-items-center table-flush">
                 <thead>
                 <tr>
-                    <th scope="col" width="10%">room name</th>
-                    <th scope="col" width="10%">capacity</th>
-                    <th scope="col" width="10%">is_active</th>
-                    <th scope="col" width="10%">faculty</th>
-                    <th scope="col" width="10%">location</th>
-                    <th scope="col" width="13%">notes</th>
+                    <th scope="col" width="10%">أسم القاعة</th>
+                    <th scope="col" width="10%">السعة</th>
+                    <th scope="col" width="10%">السعة الإضافيه</th>
+                    <th scope="col" width="10%">الفعالية</th>
+                    <th scope="col" width="10%">الكلية</th>
+                    <th scope="col" width="10%">الموقع</th>
+                    <th scope="col" width="13%">الملاحظات</th>
                     @if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
-                        <th scope="col" width="10%">Actions</th>
+                        <th scope="col" width="10%">خيارات</th>
                     @endif
                 </tr>
                 </thead>
@@ -66,6 +67,7 @@
                             <tr class="room" id="{{$room->id}}">
                                 <td>{{ $room->room_name }}</td>
                                 <td>{{ $room->capacity }}</td>
+                                <td>{{ $room->extra_capacity }}</td>
                                 <td style="display: flex;">
                                     <form id="isActiveForm{{ $room->id }}" method="post" action="{{ route('rooms.isActive', $room->id) }}">
                                         @method('patch')

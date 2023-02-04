@@ -61,6 +61,7 @@ class roomsController extends Controller
             [
                 'room_name'=> $request->room_name,
                 'capacity'=> $request->capacity,
+                'extra_capacity'=> $request->extra_capacity,
                 'location'=> $request->location,
                 'notes'=> $request->notes,
                 'faculty_id' =>  $request['faculty_id'],

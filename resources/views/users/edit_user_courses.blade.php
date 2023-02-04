@@ -24,7 +24,7 @@
                             <tr>
                                 <th scope="col" width="25%">اسم المادة</th>
                                 <th scope="col" width="25%">السنة</th>
-                                <th scope="col" width="25%">القسم المكلف فيه</th>
+                                <th scope="col" width="5%">القسم المكلف فيه</th>
                                 <th scope="col" width="25%">مشترك مع</th>
                             </tr>
                             </thead>

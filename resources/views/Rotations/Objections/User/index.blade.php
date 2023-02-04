@@ -39,10 +39,10 @@
                                         @endphp
                                         <tr class="table-active">
                                             <td>{{ $course->course_name }}</td>
-                                            <td>{{ $date }} </span></td>
-                                            <td>{{ $time }}</td>
+                                            <td>{{ date('D d-m-Y', strtotime($date)) }}</td>
+                                            <td>{{ gmdate('H:i A',strtotime($time)) }}</td>
                                             <td>{{ $duration }}</td>
-                                            <td>{{$course->pivot->created_at}} &nbsp;<span class="badge bg-warning" style="
+                                            <td>{{ date('D d-m-Y H:i A', strtotime($course->pivot->created_at)) }} &nbsp;<span class="badge bg-warning" style="
                                                 position: relative;top: 0;font-size:10px">{{\Carbon\Carbon::parse($course->pivot->created_at)->diffForHumans()}}</span></td>
                                         </tr>
                                     @endforeach

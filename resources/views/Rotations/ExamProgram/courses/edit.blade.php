@@ -3,7 +3,7 @@
 @section('content')
     <div class="bg-light p-4 rounded">
         <h1>
-            Update Course
+            تعديل مقرر {{ $course->course_name }}
             @if($occupied_number_of_students_in_this_course === $entered_students_number)
                 <span class="badge bg-danger">Course Full</span>
             @endif
@@ -45,19 +45,19 @@
                 <div class="row">
                 <div class="left col-sm-3" style="float:left">   
                     <div class="mb-3">
-                        <label for="email" class="form-label">Course Name :</label>
+                        <label for="email" class="form-label">أسم المقرر :</label>
                         <input value="{{ $course->course_name }}"
                             type="text"
                             class="form-control"
                             name="course_name"
-                            placeholder="Email address" required>
+                            placeholder="Email address" required disabled>
                         @if ($errors->has('course_name'))
                             <span class="text-danger text-left">{{ $errors->first('course_name') }}</span>
                         @endif
                     </div>
                     <div class="mb-3">
-                        <label for="studing_year" class="form-label">Studing Year :</label>
-                        <select class="form-control" name="studing_year" class="form-control" required>
+                        <label for="studing_year" class="form-label">سنة المقرر :</label>
+                        <select class="form-control" name="studing_year" class="form-control" required disabled>
                                 <option value="1" {{ ($course->studing_year == 1) ? 'selected': '' }}>First Year</option>
                                 <option value="2" {{ ($course->studing_year == 2) ? 'selected': '' }}>Secound Year</option>
                                 <option value="3" {{ ($course->studing_year == 3) ? 'selected': '' }}>Third Year</option>
@@ -69,8 +69,8 @@
                         @endif
                     </div>
                     <div class="mb-3">
-                        <label for="department" class="form-label">Semester :</label>
-                        <select class="form-control" name="semester" class="form-control" required>
+                        <label for="department" class="form-label">فصل المقرر :</label>
+                        <select class="form-control" name="semester" class="form-control" required disabled>
                                 <option value='1'  {{ ($course->semester == 1) ? 'selected': '' }}>First Semester</option>
                                 <option value='2'  {{ ($course->semester == 2) ? 'selected': '' }}>Secound Semester</option>
                         </select>
@@ -79,30 +79,30 @@
                         @endif
                     </div>
                     <div class="mb-3">
-                        <label for="date" class="form-label">date :</label>
+                        <label for="date" class="form-label">تاريخ المقرر :</label>
                         <input value="{{$date}}"
                             type="date"
                             class="form-control"
                             name="date"
-                            placeholder="date" required>
+                            placeholder="date" required disabled>
                         @if ($errors->has('date'))
                             <span class="text-danger text-left">{{ $errors->first('date') }}</span>
                         @endif
                     </div>
                     <div class="mb-3">
-                        <label for="time" class="form-label">time :</label>
+                        <label for="time" class="form-label">وقت المقرر :</label>
                         <input value="{{$time}}"
                             type="time"
                             class="form-control"
                             name="time"
-                            placeholder="time" required>
+                            placeholder="time" required disabled>
                         @if ($errors->has('time'))
                             <span class="text-danger text-left">{{ $errors->first('time') }}</span>
                         @endif
                     </div>
                     <div class="mb-3">
-                        <label for="duration" class="form-label">duration :</label>
-                        <select class="form-control" name="duration" class="form-control" required>
+                        <label for="duration" class="form-label">مدة المقرر :</label>
+                        <select class="form-control" name="duration" class="form-control" required disabled>
                             <option value="01:00" {{ ($duration == "01:00") ? "selected": "" }}>01:00 hours</option>
                             <option value="01:30" {{ ($duration == "01:30") ? "selected": "" }}>01:30 hours</option>
                             <option value="02:00" {{ ($duration == "02:00") ? "selected": "" }}>2:00 hours</option>
@@ -115,8 +115,8 @@
                             <span class="text-danger text-left">{{ $errors->first('duration') }}</span>
                         @endif
                     </div>
-                    <div class="mb-3">
-                        <label for="faculty_id" class="form-label">faculty_id</label>
+                    {{-- <div class="mb-3">
+                        <label for="faculty_id" class="form-label">كلية المقرر</label>
                         <select class="form-control" name="faculty_id" class="form-control" required>
                             @foreach (App\Models\Faculty::toBase()->get() as $faculty)
                                 <option value='{{ $faculty->id }}' {{ ($course->faculty->id == $faculty->id) ? 'selected': '' }}>{{ $faculty->name }}</option>
@@ -125,10 +125,13 @@
                         @if ($errors->has('faculty_id'))
                             <span class="text-danger text-left">{{ $errors->first('faculty_id') }}</span>
                         @endif
-                    </div>
+                    </div> --}}
+                    <br>
+                    <button type="submit" class="btn btn-dark">تعديل</button>
+
                 </div>
                 <div class="right col-sm-9" style="float:right">
-                        <label for="rooms" class="form-label">rooms :</label>
+                        <label for="rooms" class="form-label">إدارة قاعات المقرر :</label>
                         <div class="mb-3" style="height: 580px;
                         overflow: scroll;">
                             <table class="table table-light">
@@ -138,16 +141,17 @@
                                         {{$occupied_number_of_students_in_this_course === $entered_students_number ? 'disabled': '' }}
                                         >
                                     </th>
-                                    <th scope="col" width="9%">Rooms</th>
-                                    <th scope="col" width="20%">common with</th>
-                                    <th scope="col" width="10%">Capacity/Occupied</th>
-                                    <th scope="col" width="10%">status</th>
-                                    <th scope="col" width="10%">number of members</th>
-                                    <th scope="col" width="30%">Action</th>
+                                    <th scope="col" width="10%">القاعات</th>
+                                    <th scope="col" width="20%">مشترك مع</th>
+                                    <th scope="col" width="15%">السعة/الأماكن المحتلة</th>
+                                    <th scope="col" width="15%">الحالة</th>
+                                    <th scope="col" width="15%">عدد الطلاب في القاعة</th>
+                                    <th scope="col" width="20%">خيارات</th>
                                     {{-- @if($disabled_common_rooms_send)
                                     <th scope="col" width="20%">Warrning Message</th>
                                     @endif --}}
                                 </thead>
+                                {{-- @dump($common_rooms_ids,$joining_rooms) --}}
                                 @php $num_all_courses_occupied_in_all_rooms=0; @endphp
                                 @foreach(App\Models\Room::toBase()->get() as $room)
                                     <tr style="position: relative;top:-1px;">
@@ -249,7 +253,7 @@
                                    z-index: 9;
                                    right: 20%;
                                    height: 90px;
-                                   top: 90px;">
+                                   top: 79px;">
                                         {{-- <h2 class="h6 font-weight-bold text-center">{{ $course->course_name }} progress</h2> --}}
                                        <!-- Progress bar 1 -->
                                        <div id="progress_line" class="col-sm-3 progress mx-1 mt-2" data-value='{{number_format((int)(($occupied_number_of_students_in_this_course/$entered_students_number)*100), 0, '.', '')}}'>
@@ -288,7 +292,6 @@
                         </div>
                 </div>
                 </div>
-                    <button type="submit" class="btn btn-dark">Update Course</button>
             </form>
         </div>
 

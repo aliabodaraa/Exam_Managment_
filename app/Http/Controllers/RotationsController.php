@@ -13,6 +13,7 @@ use App\Http\Controllers\MaxFlow\EnumPersonType;
 
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ObservationsExport;
+use App\Exports\exportObservationsInSpecificDay;
 use App\Imports\UsersImport;
 class rotationsController extends Controller
 {
@@ -47,6 +48,7 @@ class rotationsController extends Controller
     }
 
     public function distributeStudents(Rotation $rotation){
+        ini_set('max_execution_time', 360); //6 minutes
         //dd($rotation->coursesProgram->pluck('id'));
         foreach ($rotation->coursesProgram as $course) {
             $course->distributionRoom()->wherePivot('rotation_id',$rotation->id)->detach();//clear the previous distribution
@@ -76,7 +78,7 @@ public function current_user_observations($user){
 }
 public function distributeMembersOfFaculty(Rotation $rotation){
 
-    ini_set('max_execution_time', 180); //3 minutes
+    ini_set('max_execution_time', 360); //6 minutes
     $graph_room_heads=new Graph(EnumPersonType::RoomHead, $rotation);
     list($paths_room_heads,$paths_info_room_heads)=$graph_room_heads->applyMaxFlowAlgorithm();//dd($paths_room_heads,$paths_info_room_heads,$paths_info_room_heads['users_observations']);
     //dd($paths_room_heads,$paths_info_room_heads);
@@ -255,37 +257,38 @@ public function distributeMembersOfFaculty(Rotation $rotation){
      */
     public function update(Request $request, Rotation $rotation)
     {
-        // $this->validate($request,[
-        //     'name' => [
-        //         'required', 
-        //         Rule::unique("rotations")->where(function ($query) use ($rotation) {
-        //                 return $query->where(
-        //                     [
-        //                         ["year", "=", $rotation->year]
-        //                     ]
-        //                 );
-        //             })->ignore($rotation->id)//verify that the name with year don't repated (both are unique)(unique for escape comparing this routation)
-        //     ],
-        //     'year' => [
-        //         'required', 
-        //         Rule::unique("rotations")->where(function ($query) use ($rotation) {
-        //             return $query->where(
-        //                 [
-        //                     ["name", "=", $rotation->name]
-        //                 ]
-        //             );
-        //         })->ignore($rotation->id)//verify that the name with year don't repated (both are unique)(unique for escape comparing this routation)
-        //     ],
-        //     'start_date' => 'required|date',
-        //     'end_date' => 'required|date|after:start_date',
-        //     'faculty_id' => $request->faculty_id
-        // ],[
-        //     'name.unique'=>'هذه السنة موجوده تتضمن الدورة المحددة',
-        //     'year.unique'=>'هذه الدوره موجوده في السنة المحددة'
-        // ]);
+        dd($rotation);
+        $this->validate($request,[
+            'name' => [
+                'required', 
+                Rule::unique("rotations")->where(function ($query) use ($rotation) {
+                        return $query->where(
+                            [
+                                ["year", "=", $rotation->year]
+                            ]
+                        );
+                    })->ignore($rotation->id)//verify that the name with year don't repated (both are unique)(unique for escape comparing this routation)
+            ],
+            'year' => [
+                'required', 
+                Rule::unique("rotations")->where(function ($query) use ($rotation) {
+                    return $query->where(
+                        [
+                            ["name", "=", $rotation->name]
+                        ]
+                    );
+                })->ignore($rotation->id)//verify that the name with year don't repated (both are unique)(unique for escape comparing this routation)
+            ],
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
+            'faculty_id' => $request->faculty_id
+        ],[
+            'name.unique'=>'هذه السنة موجوده تتضمن الدورة المحددة',
+            'year.unique'=>'هذه الدوره موجوده في السنة المحددة'
+        ]);
         $this->validate($request,[
             'name' => 'required']); 
-        if($rotation->update($request->all())){//???????????????????????
+        if($rotation->update($request->all())){
             return redirect()->route('rotations.index')
             ->withSuccess(__('rotation updated successfully.'));
         }else{
@@ -306,7 +309,7 @@ public function distributeMembersOfFaculty(Rotation $rotation){
         $rotation->delete();
 
         return redirect()->back()
-            ->withDanger(__('rotation deleted successfully.'));
+            ->withSuccess(__('rotation deleted successfully.'));
     }
 
     public function create_initial_members(Rotation $rotation)
@@ -379,7 +382,11 @@ public function distributeMembersOfFaculty(Rotation $rotation){
         return Excel::download(new ObservationsExport($rotation), 'المراقبات الإمتحانية.xlsx');
         //return redirect()->back()->withSuccess(__('تم تحميل ملف المراقبات بنجاح'));
     }
-       
+    public function exportObservationsInSpecificDay(Rotation $rotation,$day) 
+    {
+        return Excel::download(new exportObservationsInSpecificDay($rotation,$day), 'المراقبات الإمتحانية.xlsx');
+        //return redirect()->back()->withSuccess(__('تم تحميل ملف المراقبات بنجاح'));
+    }  
     // /**
     // * @return \Illuminate\Support\Collection
     // */

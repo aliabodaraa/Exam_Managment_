@@ -8,11 +8,22 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-
+use Kyslik\ColumnSortable\Sortable;
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles;
-
+    use HasApiTokens, HasFactory, Notifiable, HasRoles,Sortable;
+    public $sortable = [
+        'id',
+        'email',
+        'username',
+        'role',
+        'number_of_observation',
+        'temporary_role',
+        'faculty_id',
+        'department_id',
+        'city',
+        'property',
+        ];
     /**
      * The database table used by the model.
      *

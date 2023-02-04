@@ -35,7 +35,7 @@ $(function() {
     var k = 0;
     const timer3 = setInterval(() => {
         var value = $("#progress_line").attr('data-value');
-        console.log(value)
+        //console.log(value)
         var left = $("#progress_line").find('.progress-left .progress-bar');
         var right = $("#progress_line").find('.progress-right .progress-bar');
         left.css('transform', 'rotate(0deg)')

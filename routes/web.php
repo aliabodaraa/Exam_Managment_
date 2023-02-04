@@ -56,9 +56,11 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
 
                 Route::patch('/setObservations', 'UsersController@setObservations')->name('users.setObservations');
 
+                Route::get('/search', 'UsersController@search')->name('users.search');
 
                 //Excel
                 Route::get('/observations-export/{rotation}', 'RotationsController@exportObservations')->name('observations.export');
+                Route::get('/observations-export/{rotation}/{day}', 'RotationsController@exportObservationsInSpecificDay')->name('observations.exportObservationsInSpecificDay');
                 //Route::post('/users-import', 'RotationsController@import')->name('users.import');
             });
 
@@ -66,6 +68,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
              * Course Routes
              */
             Route::group(['middleware'=>'adminAccess','prefix' => 'courses'], function() {
+                Route::get('index-filtering', 'CoursesController@indexFiltering');//added
                 Route::get('/', 'CoursesController@index')->name('courses.index');
                 Route::get('/create', 'CoursesController@create')->name('courses.create');
                 Route::post('/create', 'CoursesController@store')->name('courses.store');
@@ -115,10 +118,10 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
 
                 //Rotation ExamProgram
                 //Rotation Objections
-                Route::get('/{rotation}/objections/create', 'CourseRotationUser_ObjectionController@create')->name('rotations.objections.create');
-                Route::post('/{rotation}/objections/create', 'CourseRotationUser_ObjectionController@store')->name('rotations.objections.store');
-                Route::get('/{rotation}/objections/edit', 'CourseRotationUser_ObjectionController@edit')->name('rotations.objections.edit');
-                Route::patch('/{rotation}/objections/update', 'CourseRotationUser_ObjectionController@update')->name('rotations.objections.update');
+                Route::get('/{rotation}/user/{user}/objections/create', 'CourseRotationUser_ObjectionController@create')->name('rotations.objections.create');
+                Route::post('/{rotation}/user/{user}/objections/create', 'CourseRotationUser_ObjectionController@store')->name('rotations.objections.store');
+                Route::get('/{rotation}/user/{user}/objections/edit', 'CourseRotationUser_ObjectionController@edit')->name('rotations.objections.edit');
+                Route::patch('/{rotation}/user/{user}/objections/update', 'CourseRotationUser_ObjectionController@update')->name('rotations.objections.update');
                 //Rotation Objections
                 //Distribute Students && Members of Faculty
                 Route::post('/{rotation}/distributeStudents', 'RotationsController@distributeStudents')->name('rotations.distributeStudents')->middleware('adminAccess');
@@ -160,4 +163,4 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
 
 
 //Livewires
-     Route::get('/search', \App\Http\Livewire\Search::class)->name('search');
+     //Route::get('/search', \App\Http\Livewire\Search::class)->name('search');

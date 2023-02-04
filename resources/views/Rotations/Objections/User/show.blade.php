@@ -8,7 +8,7 @@
         <div class="mt-2">
             @include('layouts.partials.messages')
         </div>
-            @if(count($rotation->coursesObjection))
+        @if(count($rotation->coursesObjection()->wherePivot('user_id', $user->id)->toBase()->get()))
                 <div class="d-flex justify-content-between align-items-center mt-4">
                     <p class="mb-0"><a href="{{ route('objections.user.index', ['user'=>$user->id]) }}" class="text-muted">Show all</a></p>
                     <p class="lead fw-normal mb-0"> : إعتراضاتي في اخر دورة </p>

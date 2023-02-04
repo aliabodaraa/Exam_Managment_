@@ -3,11 +3,13 @@
 @section('content')
     <div class="bg-light p-4 rounded">
         <div class="container mt-4">
-            <h1>
-                Add new course
-                <div class="float-right">
-                    <a href="{{ URL::previous() }}" class="btn btn-dark">Back</a>
-                </div>
+            <h1 class="text-center m-0">
+                إضافة دورة جديدة
+                <a href="{{url()->previous()}}" class="btn btn-dark float-right">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+                    </svg> رجوع
+                </a>
             </h1>
             <div class="mt-2">
                 @include('layouts.partials.messages')
@@ -18,7 +20,7 @@
 
                 @endphp
                 <div class="mb-3">
-                    <label for="name" class="form-label">Rotation Name</label>
+                    <label for="name" class="form-label">أسم الدورة :</label>
                     <select class="form-control" name="name" class="form-control" required>
                         @foreach ($insertion_enabled_rotation as $rot)
                             <option value='{{ $rot }}'>{{ $rot }}</option>
@@ -30,11 +32,10 @@
                 </div>
                 {{-- @dd(date('Y-m-d')) --}}
                 <div class="mb-3">
-                    <label for="start_date" class="form-label">start_date</label>
-                    <input id="date_pickerStart" onclick="myFunction2()" 
+                    <label for="start_date" class="form-label">تاريخ بداية الدورة :</label>
+                    <input class="date_picker_start form-control" onclick="date_picker_start()" 
                         value="{{ old('start_date') }}"
                         type="date"
-                        class="form-control"
                         name="start_date"
                         placeholder="start_date" required>
                     @if ($errors->has('start_date'))
@@ -42,11 +43,10 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="end_date" class="form-label">end_date</label>
-                    <input id="date_pickerEnd" onclick="myFunction2()" 
+                    <label for="end_date" class="form-label">تاريخ نهاية الدورة :</label>
+                    <input class="date_picker_end form-control" onclick="date_picker_end()" 
                         value="{{ old('end_date') }}"
                         type="date"
-                        class="form-control"
                         name="end_date"
                         placeholder="end_date" required>
                     @if ($errors->has('end_date'))
@@ -54,7 +54,7 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="year" class="form-label">Rotation Year</label>
+                    <label for="year" class="form-label">السنة :</label>
                     <input value="{{ date('Y') }}"
                     {{-- this value does not transfer to the rotation controller propaply because we use POST Mothod --}}
                         type="number"
@@ -66,7 +66,7 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="faculty_id" class="form-label">faculty_id</label>
+                    <label for="faculty_id" class="form-label">الكلية :</label>
                     <select class="form-control" name="faculty_id" class="form-control" required>
                         @foreach (App\Models\Faculty::toBase()->get() as $faculty)
                             <option value='{{ $faculty->id }}'>{{ $faculty->name }}</option>
@@ -76,42 +76,8 @@
                         <span class="text-danger text-left">{{ $errors->first('faculty_id') }}</span>
                     @endif
                 </div>
-                <button type="submit" class="btn btn-primary">Save Rotation</button>
+                <button type="submit" class="btn btn-primary">حفظ</button>
             </form>
         </div>
     </div>
-@endsection
-@section('scripts')
-<script type="text/javascript" src="https://code.jquery.com/jquery-1.7.2.min.js"></script>
-<script type="text/javascript" src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
-<script>
-    $(document).ready(function () {
-        myFunction2=()=>{
-            today=new Date(),
-            //today=today.toDateString(),
-            month = '' + (today.getMonth() + 1),
-            day = '' + today.getDate(),
-            year = today.getFullYear();
-            
-            if (month.length < 2) 
-                month = '0' + month;
-            if (day.length < 2) 
-                day = '0' + day;
-          $('#date_pickerStart').attr('min',[year, month, day].join('-'));
-          $('#date_pickerEnd').attr('min',[year, month, day].join('-'));
-          console.log([year, month, day].join('-'));  
-            //       var d = new Date(date),
-            //     month = '' + (d.getMonth() + 1),
-            //     day = '' + d.getDate(),
-            //     year = d.getFullYear();
-
-            // if (month.length < 2) 
-            //     month = '0' + month;
-            // if (day.length < 2) 
-            //     day = '0' + day;
-
-            // return [year, month, day].join('-');
-        }
-    });
-</script>
 @endsection

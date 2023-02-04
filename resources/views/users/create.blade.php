@@ -22,7 +22,7 @@
             <form method="POST" action="{{route('users.store')}}">
                 @csrf
                 <div class="mb-3">
-                    <label for="email" class="form-label">Email :</label>
+                    <label for="email" class="form-label">الإيميل :</label>
                     <input value="{{ old('email') }}"
                         type="email"
                         class="form-control"
@@ -33,7 +33,7 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="username" class="form-label">Username :</label>
+                    <label for="username" class="form-label">الأسم :</label>
                     <input value="{{ old('username') }}"
                         type="text"
                         class="form-control"
@@ -44,14 +44,14 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="password" class="form-label">Password :</label>
+                    <label for="password" class="form-label">كلمة المرور :</label>
                     <input type="password" class="form-control" name="password" value="{{ old('password') }}" placeholder="Password" required="required">
                     @if ($errors->has('password'))
                         <span class="text-danger text-left">{{ $errors->first('password') }}</span>
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="role" class="form-label">Role :</label>
+                    <label for="role" class="form-label">الدور الدئم :</label>
                     <select class="form-control"
                         name="role" required>
                         <option value="">لا يوجد</option>
@@ -67,7 +67,7 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="temporary_role" class="form-label">temporary role :</label>
+                    <label for="temporary_role" class="form-label">الدور المؤقت :</label>
                     <select class="form-control"
                         name="temporary_role">
                         <option value="">لا يوجد</option>
@@ -85,7 +85,7 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="faculty_id" class="form-label">faculty_id :</label>
+                    <label for="faculty_id" class="form-label">الكلية :</label>
                     <select class="form-control" name="faculty_id" class="form-control" required>
                         @foreach (App\Models\Faculty::all() as $faculty)
                             <option value='{{ $faculty->id }}'>{{ $faculty->name }}</option>
@@ -96,7 +96,30 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="number_of_observation" class="form-label">number_of_observation :</label>
+                    <label for="department_id" class="form-label">القسم :</label>
+                    <div class="d-flex">
+                      <label for="programming">
+                        <input type="radio" id="programming"
+                        name="department_id" value="1"
+                        class='toggler-wrapper style-4'/>برمجيات
+                      </label>
+                      <label for="two">
+                        <input type="radio" id="network" 
+                        name="department_id" value="2"
+                        class='toggler-wrapper style-4'/>شبكات
+                      </label>
+                      <label for="two">
+                        <input type="radio" id="artifialIntellegence" 
+                        name="department_id" value="3"
+                        class='toggler-wrapper style-4'/>ذكاء صنعي
+                      </label>
+                    </div>
+                    @if ($errors->has('department_id'))
+                    <span class="text-danger text-left">{{ $errors->first('department_id') }}</span>
+                    @endif
+                </div>
+                <div class="mb-3">
+                    <label for="number_of_observation" class="form-label">عدد المراقبات :</label>
                     <select class="form-control" name="number_of_observation" class="form-control" required>
                         @for ($i = 0; $i <31; $i++)
                             <option value='{{ $i }}'>{{ $i }}</option>
@@ -107,7 +130,7 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="city" class="form-label">City :</label>
+                    <label for="city" class="form-label">المدينة :</label>
                     <input value="{{ old('city') }}"
                         type="text"
                         class="form-control"
@@ -118,7 +141,7 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="property" class="form-label">property : :</label>
+                    <label for="property" class="form-label">العضوية :</label>
                     <select class="form-control" name="property" class="form-control" required>
                             <option value='0'>لا يوجد</option>
                             <option value='1'>عضو هيئة فنية</option>
@@ -128,8 +151,8 @@
                         <span class="text-danger text-left">{{ $errors->first('property') }}</span>
                     @endif
                 </div>
-                <button type="submit" class="btn btn-primary">Save user</button>
-                <a href="{{ URL::previous() }}" class="btn btn-default">Back</a>
+                <button type="submit" class="btn btn-primary">حفظ</button>
+                <a href="{{ URL::previous() }}" class="btn btn-default">إلغاء</a>
             </form>
         </div>
 

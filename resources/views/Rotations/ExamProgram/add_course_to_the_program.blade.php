@@ -92,7 +92,7 @@
     </div>
 
 @endsection
-@section('scripts')
+{{-- @section('scripts')
 <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.2.min.js"></script>
 <script type="text/javascript" src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 <script>
@@ -107,4 +107,4 @@
 
     });
 </script>
-@endsection
+@endsection--}}

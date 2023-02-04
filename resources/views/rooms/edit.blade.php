@@ -32,7 +32,7 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="capacity" class="form-label">Room Name :</label>
+                    <label for="capacity" class="form-label">السعة :</label>
                     <input value="{{ $room->capacity }}"
                         type="number"
                         class="form-control"
@@ -44,7 +44,19 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="location" class="form-label">Room location :</label>
+                    <label for="extra_capacity" class="form-label">السعة الإضافية :</label>
+                    <input value="{{ $room->extra_capacity }}"
+                        type="number"
+                        class="form-control"
+                        name="extra_capacity"
+                        placeholder="extra_capacity"
+                        value="{{$room->extra_capacity}}" required>
+                    @if ($errors->has('extra_capacity'))
+                        <span class="text-danger text-left">{{ $errors->first('extra_capacity') }}</span>
+                    @endif
+                </div>
+                <div class="mb-3">
+                    <label for="location" class="form-label">الموقع :</label>
                     <input value="{{ $room->location }}"
                         type="text"
                         class="form-control"
@@ -56,7 +68,7 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="notes" class="form-label">notes :</label>
+                    <label for="notes" class="form-label">الملاحظات :</label>
                     <textarea cols="30" rows="10"
                         type="text"
                         class="form-control"
@@ -67,7 +79,7 @@
                     @endif
                 </div>
                 <div class="mb-3">
-                    <label for="faculty_id" class="form-label">faculty_id :</label>
+                    <label for="faculty_id" class="form-label">الكلية :</label>
                     <select class="form-control" name="faculty_id" class="form-control" required>
                         @foreach (App\Models\Faculty::toBase()->get() as $faculty)
                             <option value='{{ $faculty->id }}' {{ ($room->faculty->id == $faculty->id) ? 'selected': '' }}>{{ $faculty->name }}</option>
@@ -77,8 +89,8 @@
                         <span class="text-danger text-left">{{ $errors->first('faculty_id') }}</span>
                     @endif
                 </div>
-                <button type="submit" class="btn btn-primary">Update room</button>
-                <a href="{{ route('rooms.index') }}" class="btn btn-default">Cancel</button>
+                <button type="submit" class="btn btn-primary">تعديل</button>
+                <a href="{{ route('rooms.index') }}" class="btn btn-default">إلغاء</button>
             </form>
         </div>
 

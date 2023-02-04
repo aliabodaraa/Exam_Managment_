@@ -5,14 +5,35 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Room;
 use App\Models\Course;
+use App\Models\Department;
 use App\Models\Rotation;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use illuminate\Support\Facades\Auth;
 use App\Http\Controllers\MaxMinRoomsCapacity\Stock;
+use App\Http\Controllers\MaxFlow\Graph;
+use Illuminate\Support\LazyCollection;
+use PhpOffice\PhpSpreadsheet\Helper\Size;
+
+//use Illuminate\Support\Facades\Request;
 class UsersController extends Controller
 {
+    public function search(Request $request)
+    {
+        $se = $request->se;
+        $users = User::where('id','LIKE','%'.$request->se.'%')
+                    ->orWhere('username','LIKE','%'.$request->se.'%')
+                    ->orWhere('email','LIKE','%'.$request->se.'%')
+                    ->orWhere('role','LIKE','%'.$request->se.'%')
+                    ->orWhere('temporary_role','LIKE','%'.$request->se.'%')
+                    ->orWhere('property','LIKE','%'.$request->se.'%')
+                    ->orWhere('city','LIKE','%'.$request->se.'%')
+                    ->sortable()
+                    ->paginate(5);
+
+        return view('users.index', [ 'users' => $users->appends(request()->except('page')), 'se'=>$se ]);
+    }
     /**
      * Display all users
      *
@@ -21,18 +42,34 @@ class UsersController extends Controller
     public function index()
     {
         // $users = User::first()->paginate(20);
-        $users = User::paginate(50);
-        //$users = User::all();
+        $users = User::sortable()->paginate(5);
+        
+        //to delete
+        $num_observations = 0;
+        $count_users_observations=0;
+        if(session()->exists('num_observations')){
+            $num_observations = session()->get('num_observations');
+        }
+        if(session()->exists('count_users_observations')){
+            $count_users_observations = session()->get('count_users_observations');
+        }
+        //to delete
 
-        return view('users.index', compact('users'));
+        //$users = User::sortable()->get();
+
+        return view('users.index', compact('users','num_observations','count_users_observations'));
     }
     public function isActive(Request $request, User $user){
+        $latest_rotation=Rotation::latest()->first();
         if($user->is_active == true){
+            $latest_rotation->initial_members()->wherePivot('user_id',$user->id)->detach();//clear the user for the members list
             $user->is_active = 0;
             $user->save();
             return redirect()->route('users.index')
             ->withSuccess($user->username.' not active now.');
-        }else {   
+        }else {
+            if($user->role==="دكتور")
+                $latest_rotation->initial_members()->attach($user->id,['options'=> '{"1":"on"}']);
             $user->is_active = 1;
             $user->save();
             return redirect()->route('users.index')
@@ -62,7 +99,6 @@ class UsersController extends Controller
     public function store(StoreUserRequest $request)
     {//dd($request->secure());
         //dd($request->getRequestUri());
-        //dd(1123);
         $property='';
         if($request->property==='1')
             $property="عضو هيئة فنية";
@@ -148,6 +184,8 @@ class UsersController extends Controller
      */
     public function update(User $user, UpdateUserRequest $request)
     {   //dd(bcrypt($request['old_password'])==$user->password);
+        //dd( $request);
+
         //dd(Auth::attempt(['email'=>$user->email,'password'=>$request['old_password']]), $request['new_password'] , $request['new_password_verification']);
         if($request['old_password'] && $request['new_password'] && $request['new_password_verification']){
             if(Auth::attempt(['email'=>$user->email,'password'=>$request['old_password']])){
@@ -162,6 +200,7 @@ class UsersController extends Controller
                 ->withDanger(__('incorrect old password.'));
             }
         }
+
         $property='';
         if($request->property==='1')
             $property="عضو هيئة فنية";
@@ -171,7 +210,7 @@ class UsersController extends Controller
         $user->update($custom_arr);
         //$user->syncRoles($request->get('role'));
 
-        return redirect()->route('home.index')
+        return redirect()->route('users.index')
         ->withSuccess(__('User updated successfully.'));
     }
 
@@ -266,11 +305,16 @@ class UsersController extends Controller
 
 
     public function setObservations(Request $request){
+        $all_roles = array_unique(User::pluck('role')->all());
+        $all_property = array_unique(User::pluck('property')->all());
         if($request['role_user']=="all_users")
             $query=User::all();
-        else
+        elseif(in_array($request['role_user'],$all_roles))
             $query=User::where('role',$request['role_user'])->get();
-
+        elseif(in_array($request['role_user'],$all_property))
+            $query=User::where('property',$request['role_user'])->get();
+        else
+            return redirect()->back()->withDanger(__('غير موجود دور '.$request['role_user']));
         foreach ($query as $user) {
             $user->number_of_observation = (int)$request['reset_vlaue'];
             $user->save();

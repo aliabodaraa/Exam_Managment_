@@ -1,6 +1,7 @@
 @extends('layouts.app-master')
 
 @section('content')
+@php  $is_members_distributed=(bool)count($rotation->rooms()->toBase()->get()); @endphp
     <div class="bg-light p-4 rounded">
         <button class="scroll_buttom_button" style="position: fixed;
         top: 367px;
@@ -23,7 +24,7 @@
         </button>
         <div class="container-fluid mt-4">
             <h1 class="text-center">
-                تهيئة الأعضاء في  {{ $rotation->name }}
+                تعديل تعيينات الأعضاء في  {{ $rotation->name }}
                 <div class="float-right">
                     <a href="{{ URL::previous() }}" class="btn btn-dark">Back</a>
                 </div>
@@ -35,10 +36,9 @@
              style="position: relative;"
             >
                 <span class="badge bg-info result" style="position: absolute;
-                top: 23px;
-                right: 0px;"></span>
+                top: 23px;"></span>
                 {{-- That is not related with controller - Only for Js --}}
-                <label for="searchForUserNameInInitialMembers" class="form-label">Search for members :</label>
+                <label for="searchForUserNameInInitialMembers" class="form-label">البحث عن أعضاء :</label>
                 <input class="form-control searchForUserNameInInitialMembers" 
                 type="text" 
                 onkeyup="searchForUserNameInInitialMembers(JSON.stringify({{ collect($users_and_roomHeads) }}))" placeholder="Serarch Users">
@@ -64,6 +64,7 @@
                                             class='toggler-wrapper style-4'
                                             {{ (isset($users_with_options[$user_id]) && array_key_exists(1,$users_with_options[$user_id]) && !in_array($user_id,$disabled_users))?'checked':'' }}
                                             {{ in_array($user_id,$disabled_users)?'disabled':'' }}
+                                            {{ ($is_members_distributed)?'disabled':'' }}
                                             />رئيس قاعة</label>
                                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                             <label for="two">
@@ -72,6 +73,7 @@
                                             class='toggler-wrapper style-4'
                                             {{ (isset($users_with_options[$user_id]) && array_key_exists(2,$users_with_options[$user_id]))?'checked':'' }}
                                             {{ (!in_array($user,$users)||in_array($user_id,$disabled_users))?'disabled':'' }}
+                                            {{ ($is_members_distributed)?'disabled':'' }}
                                             />أمين سر</label>
                                         </div>
                                 </p>
@@ -80,7 +82,7 @@
                     @endforeach
                 </div>
 
-                <button type="submit" class="btn btn-primary mt-4">تعديل</button>
+                <button type="submit" class="btn btn-primary mt-4"{{ (count($rotation->rooms()->toBase()->get()))?'disabled':'' }}>تعديل</button>
                 <a href="{{ route('rotations.index') }}" class="btn btn-default mt-4">إلغاء</button>
             </form>
         </div>
