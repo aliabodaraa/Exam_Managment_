@@ -81,14 +81,14 @@ class Graph extends Controller
         // for(int i =0 ; i<)
 
 
-         for($i=count($this->arr_keys_users_objections_orderd)+$this->count_arr_same_time_courses+1;$i<=count($this->arr_keys_users_objections_orderd)+$this->count_arr_same_time_courses+count($this->arr_keys_courses_num_objections_orderd);$i++)
-             for($j=count($this->arr_keys_users_objections_orderd)+$this->count_arr_same_time_courses+count($this->arr_keys_courses_num_objections_orderd)+1;$j<=count($this->arr_keys_users_objections_orderd)+$this->count_arr_same_time_courses+count($this->arr_keys_courses_num_objections_orderd)+$this->rooms->getLength();$j++)
-                 if($this->arr_graph[$i][$j]>0)
-                     ++Self::$num_observations;
+        //  for($i=count($this->arr_keys_users_objections_orderd)+$this->count_arr_same_time_courses+1;$i<=count($this->arr_keys_users_objections_orderd)+$this->count_arr_same_time_courses+count($this->arr_keys_courses_num_objections_orderd);$i++)
+        //      for($j=count($this->arr_keys_users_objections_orderd)+$this->count_arr_same_time_courses+count($this->arr_keys_courses_num_objections_orderd)+1;$j<=count($this->arr_keys_users_objections_orderd)+$this->count_arr_same_time_courses+count($this->arr_keys_courses_num_objections_orderd)+$this->rooms->getLength();$j++)
+        //          if($this->arr_graph[$i][$j]>0)
+        //              ++Self::$num_observations;
 
-        if($this->type->name == "Observer"){
-            session()->put('num_observations',Self::$num_observations);
-         }
+        // if($this->type->name == "Observer"){
+        //     session()->put('num_observations',Self::$num_observations);
+        //  }
     
         //dd($this->arr_keys_users_objections_orderd,$this->arr_same_time_courses, $this->arr_keys_courses_num_objections_orderd);
     }

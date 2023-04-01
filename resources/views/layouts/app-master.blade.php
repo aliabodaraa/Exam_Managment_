@@ -12,8 +12,11 @@
     <link href="{!! url('assets/bootstrap/css/bootstrap.min.css') !!}" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">{{-- added --}}
     <link rel="stylesheet" href="{!! url('assets/css/popUp_cubic.css') !!}">
+    <link rel="stylesheet" href="{!! url('assets/css/globalStyle.css') !!}">
+      
+    <!-- Custom styles for this template -->
+    {{-- <link href="{!! url('assets/css/app.css') !!}" rel="stylesheet"> --}}
     <style>
-
 
       a{
         text-decoration: none;
@@ -1350,14 +1353,6 @@ body {
   font-weight: 300;
   color: #333;
 }
-*{  font-family: "Simplified Arabic","Times New Roman", "Arial", serif;}
-h1,
-h2,
-h3,
-h4,
-h5 {
-  font-family: 'Times New Roman', serif;
-}
 
 .buttons-wrapper>div {
   display: inline-block;
@@ -1511,7 +1506,6 @@ hr {
  */
 
 pre {
-  font-family: monospace, monospace;
   /* 1 */
   font-size: 1em;
   /* 2 */
@@ -1564,7 +1558,6 @@ strong {
 code,
 kbd,
 samp {
-  font-family: monospace, monospace;
   /* 1 */
   font-size: 1em;
   /* 2 */
@@ -1629,7 +1622,6 @@ input,
 optgroup,
 select,
 textarea {
-  font-family: inherit;
   /* 1 */
   font-size: 100%;
   /* 1 */
@@ -2458,10 +2450,24 @@ div.h4 {
   input{
     direction: rtl;
   }
+  @font-face {
+    font-family: myFirstFontHeading;
+    src: url("assets/fonts/TheSansArab-Black.ttf");
+}
+
+@font-face {
+    font-family: myFirstFontNormal;
+    src: url("assets/fonts/TheSansArab-Bold_0.ttf");
+}
+
+h1,h2.h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6{
+    font-family: myFirstFontHeading
+}
+
+* {
+    font-family: ! myFirstFontNormal
+}
     </style>
-  
-    <!-- Custom styles for this template -->
-    <link href="{!! url('assets/css/app.css') !!}" rel="stylesheet">
 </head>
 <body style="<?php if(URL::full()=='http://127.0.0.1:8000')echo'
             background-image: url(http://127.0.0.1:8000/images/Exam_Time.png);

@@ -60,7 +60,6 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
 
                 //Excel
                 Route::get('/observations-export/{rotation}', 'RotationsController@exportObservations')->name('observations.export');
-                Route::get('/observations-export/{rotation}/{day}', 'RotationsController@exportObservationsInSpecificDay')->name('observations.exportObservationsInSpecificDay');
                 //Route::post('/users-import', 'RotationsController@import')->name('users.import');
             });
 

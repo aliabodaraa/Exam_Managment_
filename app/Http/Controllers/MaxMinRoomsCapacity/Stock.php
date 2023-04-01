@@ -197,7 +197,12 @@ class Stock extends Controller
                          ->orderBy("course_rotation.date")->get() as $i => $all_obseravation_info){
                             $table['observations'][$i]['date']=$all_obseravation_info['date'];
                             $table['observations'][$i]['time']=$all_obseravation_info['time'];
-                            $table['observations'][$i]['roleIn']=$all_obseravation_info['roleIn'];
+                            if($all_obseravation_info['roleIn']==="RoomHead")
+                                $table['observations'][$i]['roleIn']="رئيس فاعة";
+                            elseif($all_obseravation_info['roleIn']==="Secertary")
+                                $table['observations'][$i]['roleIn']="أمين سر";
+                            elseif($all_obseravation_info['roleIn']==="Observer")
+                                $table['observations'][$i]['roleIn']="مراقب";
                             $table['observations'][$i]['room_name']=Room::where('id',$all_obseravation_info['room_id'])->toBase()->first()->room_name;
                             $table['observations'][$i]['course_name']=Stock::getNamesSharedCoursesWithCommonRoom($rotationInfo,$all_obseravation_info['course_id'],$all_obseravation_info['room_id'],$all_obseravation_info['date'],$all_obseravation_info['time']);
                             if($rotation_id == Rotation::latest()->toBase()->get()[0]->id)

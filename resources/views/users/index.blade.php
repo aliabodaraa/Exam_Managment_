@@ -6,18 +6,17 @@
     @endphp
     <div class="bg-light p-4 rounded">
         <div class="row">
-            <div class="col-lg-2 dropdown">
+            {{-- <div class="col-lg-2 dropdown">
                 <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
                   {{ App\Models\Faculty::where('id',Auth::user()->faculty_id)->toBase()->first()->name }}
                 </button>
                 <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
                 @foreach(App\Models\Faculty::all() as $faculty)
                   <li><a class="dropdown-item active">{{ $faculty->name }}</a></li>
-                  {{-- <li><hr class="dropdown-divider"></li> --}}
                   @endforeach
                 </ul>
-              </div>
-            <div class="col-lg-7 col-sm-8 col-xs-12">
+            </div> --}}
+            <div class="col-lg-9 col-sm-8 col-xs-12">
                 <h1 class="text-center m-0">
                     <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-people" viewBox="0 0 16 16">
                         <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8Zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022ZM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816ZM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0Zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/>
@@ -39,9 +38,9 @@
                 </div>
             </div>
         </div>
-<span class="badge bg-success">{{ $num_observations??0 }} عدد المراقبات التي تحتاجها القاعات</span>
+{{-- <span class="badge bg-success">{{ $num_observations??0 }} عدد المراقبات التي تحتاجها القاعات</span>
 <span class="badge bg-primary">{{ count($latest_rotation->users()->toBase()->get()) }} عدد المراقبات التي تم فرزها</span>
-<span class="badge bg-primary">{{ $count_users_observations??0 }} عدد المراقبات للأشخاص</span>
+<span class="badge bg-primary">{{ $count_users_observations??0 }} عدد المراقبات للأشخاص</span> --}}
 
         <div class="mt-2">
             @include('layouts.partials.messages')
@@ -68,7 +67,7 @@
                 </div>
             </form>
         {{-- search in laravel Req-Res --}}
-            @if(count($users))
+            @if(count($users) && (Auth::user()->username == "admin" || Auth::user()->temporary_role == "عميد"))
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 set-observations" style="direction: rtl;float:right">
                 <form method="post" class="row g-3"  style="margin-top: 15px;" action="{{ route('users.setObservations') }}">
                     @method('patch')
@@ -140,7 +139,9 @@
                     <th scope="col" width="15%">@sortablelink('department_id',"القسم")</th>
                     <th scope="col" width="5%">@sortablelink('city',"المدينة")</th>
                     <th scope="col" width="5%">@sortablelink('number_of_observation'," المراقبات")</th>
-                    <th scope="col" width="5%">الفعالية</th>
+                    @if(Auth::user()->username == "admin" || Auth::user()->temporary_role == "عميد")
+                        <th scope="col" width="5%">الفعالية</th>
+                    @endif
                     <th scope="col" width="15%">المواد التي يدرسها</th>
                     {{-- <th scope="col">faculty</th> --}}
                     <th scope="col" width="11%">خيارات</th>
@@ -166,6 +167,7 @@
                                 <td>
                                     <span class="badge bg-secondary">{{$user->number_of_observation}}</span>
                                 </td>
+                                @if(Auth::user()->username == "admin" || Auth::user()->temporary_role == "عميد")
                                 <td style="display: flex;">
                                     <form id="isActiveForm{{ $user->id }}" method="post" action="{{ route('users.isActive', $user->id) }}">
                                         @method('patch')
@@ -179,6 +181,7 @@
                                         <img id="img_warning" src="{{ asset('images/warning.png') }}" alt="danger" style="width: 20px;height: 20px;">
                                     @endif
                                 </td>
+                                @endif
                                 <td>
                                     @foreach ($user->teaches()->toBase()->get() as $course)
                                         <span class="badge bg-dark">{{ $course->course_name }}</span>
@@ -231,7 +234,7 @@
                                                     $num_objections_current_user=count($user->rotationsObjection()->where('id',$latest_rotation->id)->toBase()->get());
                                                 @endphp
                                                 {{-- here --}}
-                                                @if($user->is_active && $user->number_of_observation && !$user->temporary_role)
+                                                @if($user->is_active && $user->number_of_observation && !$user->temporary_role && !count($latest_rotation->users))
                                                     @if($num_objections_current_user)
                                                             <a href="{{ route('objections.user.index', ['user'=>$user->id]) }}" class="position-relative btn btn-sm me-2 btn-secondary">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill-down" style=" float:left;" viewBox="0 0 16 16">

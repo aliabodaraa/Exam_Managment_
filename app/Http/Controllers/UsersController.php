@@ -45,19 +45,19 @@ class UsersController extends Controller
         $users = User::sortable()->paginate(5);
         
         //to delete
-        $num_observations = 0;
-        $count_users_observations=0;
-        if(session()->exists('num_observations')){
-            $num_observations = session()->get('num_observations');
-        }
-        if(session()->exists('count_users_observations')){
-            $count_users_observations = session()->get('count_users_observations');
-        }
+        // $num_observations = 0;
+        // $count_users_observations=0;
+        // if(session()->exists('num_observations')){
+        //     $num_observations = session()->get('num_observations');
+        // }
+        // if(session()->exists('count_users_observations')){
+        //     $count_users_observations = session()->get('count_users_observations');
+        // }
         //to delete
 
         //$users = User::sortable()->get();
 
-        return view('users.index', compact('users','num_observations','count_users_observations'));
+    return view('users.index', compact('users'/*,'num_observations','count_users_observations'*/));
     }
     public function isActive(Request $request, User $user){
         $latest_rotation=Rotation::latest()->first();

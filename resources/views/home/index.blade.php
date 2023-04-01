@@ -151,10 +151,10 @@
             @if(count($latest_rotation->users()->toBase()->get()))
                 @foreach ($courses_rooms_roles as $course_name => $course_rooms_roles)
                         <div class="d-grid gap-2 mb-2">
-                                <div class="container alert alert-light alert-dismissible fade show" role="alert" style="direction: rtl">
+                                <div class="container alert alert-warning alert-dismissible fade show" role="alert" style="direction: rtl">
                                     <a href="{{route('rotations.course.edit',['rotation'=>$latest_rotation->id,'course'=>App\Models\Course::query()->where('course_name',$course_name)->toBase()->first()->id])}}" class="badge bg-warning btn btn-info btn-sm btn-outline-light rounded">{{ $course_name }}</a>
                                         @foreach ($course_rooms_roles as $room_name => $course_room_roles)
-                                            <div class="container alert alert-dark alert-dismissible fade show" role="alert" style="direction: rtl">
+                                            <div class="container alert alert-light alert-dismissible fade show" role="alert" style="direction: rtl;border: 1px solid #ffc107;">
                                                 <h4 class="alert-heading">تحذير !!<h4>
                                                 <hr>
                                                 <div class="row">
@@ -177,8 +177,7 @@
         @endauth
 
         @guest
-        <div style="direction: rtl">
-            <h1>أهلا وسهلا</h1>
+        <div class="container" style="direction: rtl">
             <h2>{{session('success')}}</h2>
             <p class="lead">يمكنك تسجيل الدخول و التفاعل مع الموقع بحسب دورك في كليتك</p>
         </div>
