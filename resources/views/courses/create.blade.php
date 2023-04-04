@@ -90,7 +90,7 @@
                         <span class="text-danger text-left">{{ $errors->first('faculty_id') }}</span>
                     @endif
                 </div>
-                <button type="submit" class="btn btn-primary">Save course</button>
+                <button type="submit" class="btn btn-primary">حفظ</button>
                 {{-- <a href="{{ route('courses.index') }}" class="btn btn-default">Back</a> --}}
             </form>
         </div>

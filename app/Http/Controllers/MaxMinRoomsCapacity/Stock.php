@@ -133,7 +133,7 @@ class Stock extends Controller
             $num_students_taken_in_each_room_from_other=[];
             if($course_in_time->id == $course->id) continue;
             foreach ($course_in_time->distributionRoom()->wherePivot('rotation_id',$rotation->id)->toBase()->get() as $room) {
-                if(in_array($room->id, $disabled_rooms) && in_array($room->id,$rooms_this_course)){
+                if(in_array($room->id, $disabled_rooms) /*&& in_array($room->id,$rooms_this_course)*/){/* get all joining and manage rooms */
                     $num_students_taken_in_each_room_from_other[$room->id]=Stock::getOccupiedNumberOfStudentsInThisCourseInSpecificRoom($rotation, $course_in_time, $room->id);
                     array_push($common_rooms_ids,$room->id);
                 }

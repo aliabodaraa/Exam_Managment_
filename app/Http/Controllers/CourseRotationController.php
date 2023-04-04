@@ -28,6 +28,8 @@ class CourseRotationController extends Controller
 
         //calc accual_common_rooms_for_specific_course
         list($accual_common_rooms_for_specific_course,$common_rooms_ids)=Stock::getAccualCommonRoomsForSpecificRotationCourse($rotation, $course);
+        //dd("ali",$accual_common_rooms_for_specific_course,$common_rooms_ids);
+
         list($room_heads_in_this_rotation_course_room, $secertaries_in_this_rotation_course_room, $observers_in_this_rotation_course_room)=Stock::getUsersInSpecificRotationCourseRoom($rotation,$course,$specific_room->id);
 
         $occupied_number_of_students_in_this_course_in_this_room=Stock::getOccupiedNumberOfStudentsInThisCourseInSpecificRoom($rotation, $course, $specific_room->id);

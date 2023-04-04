@@ -3,10 +3,7 @@
 @section('content')
     <div class="bg-light p-4 rounded">
         <h1>
-            تعديل مقرر {{ $course->course_name }}
-            @if($occupied_number_of_students_in_this_course === $entered_students_number)
-                <span class="badge bg-danger">Course Full</span>
-            @endif
+            إدارة قاعات مقرر {{ $course->course_name }}
             <div class="float-right">
                 <a href="{{url()->previous()}}" class="btn btn-dark">رجوع
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
@@ -142,11 +139,11 @@
                                         >
                                     </th>
                                     <th scope="col" width="10%">القاعات</th>
-                                    <th scope="col" width="20%">مشترك مع</th>
-                                    <th scope="col" width="15%">السعة/الأماكن المحتلة</th>
+                                    <th scope="col" width="24%">مشترك مع</th>
+                                    <th scope="col" width="20%">السعة/الأماكن المحتلة</th>
                                     <th scope="col" width="15%">الحالة</th>
                                     <th scope="col" width="15%">عدد الطلاب في القاعة</th>
-                                    <th scope="col" width="20%">خيارات</th>
+                                    <th scope="col" width="15%">خيارات</th>
                                     {{-- @if($disabled_common_rooms_send)
                                     <th scope="col" width="20%">Warrning Message</th>
                                     @endif --}}
@@ -190,13 +187,16 @@
                                                                     }
                                                             @endphp 
                                                             @if($number_taken_in_this_room_course)
-                                                            <a style="text-decoration: none;" href="{{ route("rotations.get_room_for_course",[$rotation->id,$course_belongs->id,$room->id]) }}" class="badge bg-{{($course->id == $course_belongs->id ) ? 'danger': 'secondary'}}">{{$course_belongs->course_name}}</a>
-                                                            <span class="badge bg-danger" style="
-                                                            right:14px;
-                                                            border-radius: 62px;
-                                                            position: relative;
-                                                            font-size: 11px;
-                                                            top: -12px;">{{$number_taken_in_this_room_course;}}</span>
+                                                            <a style="position: relative;margin: 0 8px 8px 0;text-decoration: none;" href="{{ route("rotations.get_room_for_course",[$rotation->id,$course_belongs->id,$room->id]) }}" class="badge bg-{{($course->id == $course_belongs->id ) ? 'danger': 'secondary'}}">
+                                                                {{$course_belongs->course_name}}
+                                                                <span class="badge bg-danger" style="
+                                                                right: -10px;
+                                                                border-radius: 62px;
+                                                                position: absolute;
+                                                                font-size: 7px;
+                                                                top: -18px;">{{$number_taken_in_this_room_course}}</span>
+                                                            </a>
+
                                                             @endif
                                                         @endforeach
                                                 </div>
@@ -253,7 +253,7 @@
                                    z-index: 9;
                                    right: 20%;
                                    height: 90px;
-                                   top: 79px;">
+                                   top: 50px;">
                                         {{-- <h2 class="h6 font-weight-bold text-center">{{ $course->course_name }} progress</h2> --}}
                                        <!-- Progress bar 1 -->
                                        <div id="progress_line" class="col-sm-3 progress mx-1 mt-2" data-value='{{number_format((int)(($occupied_number_of_students_in_this_course/$entered_students_number)*100), 0, '.', '')}}'>
@@ -265,7 +265,10 @@
                                            </span>
                                            <div class="progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
                                                <div id="progress_value" class="h3 font-weight-bold text-<?php if((($occupied_number_of_students_in_this_course/$entered_students_number)*100)<30) echo'danger';elseif((($occupied_number_of_students_in_this_course/$entered_students_number)*100)<=60) echo 'warning'; elseif((($occupied_number_of_students_in_this_course/$entered_students_number)*100)<=80) echo 'primary';else echo 'success';?>">{{number_format((int)(($occupied_number_of_students_in_this_course/$entered_students_number)*100), 0, '.', '')}}</div><span class="h4 font-weight-bold text-<?php if((($occupied_number_of_students_in_this_course/$entered_students_number)*100)<30) echo'danger';elseif((($occupied_number_of_students_in_this_course/$entered_students_number)*100)<=60) echo 'warning'; elseif((($occupied_number_of_students_in_this_course/$entered_students_number)*100)<=80) echo 'primary';else echo 'success';?>">%</span>
-                                           </div>
+                                                @if($occupied_number_of_students_in_this_course === $entered_students_number)
+                                                    <span class="badge bg-danger" style="position: absolute;top: inherit;">Full</span>
+                                                @endif
+                                            </div>
                                        </div>
                                        <!-- END -->
                                        <!-- Demo info -->

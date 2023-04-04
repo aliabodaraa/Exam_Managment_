@@ -45,11 +45,27 @@
               @if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
                       <li class="{{ preg_match("*rooms*", URL::full()) ? 'Active':''}}"><a href="{{ route('rooms.index') }}" class="nav-link px-2 text-white">القاعات</a></li>
                       <li class="{{ !str_ends_with(URL::full(),"create_user_courses") && !str_ends_with(URL::full(),"edit_user_courses") && preg_match("*courses*", URL::full()) ? 'Active':''}}"><a href="{{ route('courses.index') }}" class="nav-link px-2 text-white">المقررات</a></li>{{-- conditions orchestrated is important --}}
-                      <li class="{{ preg_match("*rotations*", URL::full()) ? 'Active':''}}"><a href="{{ route('rotations.index') }}" class="nav-link px-2 text-white">الدورات الامتحانية</a></li>
+                      @if((preg_match("*rotations*",URL::full()) && preg_match("*course*",URL::full()) && preg_match("*edit*",URL::full())) {{-- rotations/*/course/*/edit --}}
+                      || (preg_match("*rotations*",URL::full()) && preg_match("*course*",URL::full()) && preg_match("*room*",URL::full()))
+                      || (!str_contains(URL::full(),"observations") && (
+                                            (preg_match("*rotations*", URL::full()) && (str_ends_with(URL::full(),"objections/create") || str_ends_with(URL::full(),"objections/edit"))) 
+                                            || 
+                                            ( str_contains(URL::full(),"objections/user") && str_ends_with(URL::full(),"index") )
+                      )
+                      )
+                      ||(str_contains(URL::full(),"observations")))
+                        <li>
+                          <a href="{{ route('rotations.program.show',$latest_rotation->id) }}" class="nav-link px-2 text-white"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar3" viewBox="0 0 16 16">
+                          <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z"/>
+                          <path d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                          </svg> البرنامج الامتحاني</a>
+                        </li>
+                      @else
+                        <li class="{{ preg_match("*rotations*", URL::full()) ? 'Active':''}}"><a href="{{ route('rotations.index') }}" class="nav-link px-2 text-white">الدورات الامتحانية</a></li>
+                      @endif
               @else
                       @php
                           // $is_find_in_names_list_in_latest_rotation=(bool)count($latest_rotation->initial_members()->where('id',Auth::user()->id)->toBase()->get());
-
                       //  App\Models\Course::with('rotationsObjection')->whereHas('rotationsObjection', function($query) use($latest_rotation->id){
                       //      $query->where('user_id',Auth::user()->id)->where('rotation_id',$latest_rotation->id);})->pluck('id')->toArray();
                           list($all_rotations_table, $observations_number_in_latest_rotation)=App\Http\Controllers\MaxMinRoomsCapacity\Stock::calcInfoForEachRotationForSpecificuser(Auth::user());

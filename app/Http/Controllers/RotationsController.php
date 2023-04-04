@@ -106,41 +106,42 @@ public function distributeMembersOfFaculty(Rotation $rotation){
                     foreach ($observers_observations as $observer_observation)
                         $s->courses()->attach($observer_observation['course'],['rotation_id'=>$rotation->id,'room_id'=>$observer_observation['room'],'roleIn'=>$observer_observation['roleIn']]);
                 }
-
                 //start fill common rooms between multiplue courses
-                $common_courses_rooms_taken=[];
+                $course_taken=[];
                 foreach ($rotation->coursesProgram()->get() as $course){
-                    $rooms_taken=[];
-                    //calc Joining rooms and disabled rooms and courses_common_with_time
-                    list($disabled_rooms, $joining_rooms, $courses_common_with_time)=Stock::getDisabledAndJoiningRoomsAndCommonCoursesWithTime($rotation, $course);
+                    list($disabled_rooms, $joining_rooms, $courses_common_with_time)=Stock::getDisabledAndJoiningRoomsAndCommonCoursesWithTime($rotation, $course);                    //calc Joining rooms and disabled rooms and courses_common_with_time
+                    if(count($courses_common_with_time)===1) continue;
+                    if(!isset($course_taken[$course->id])) $course_taken[$course->id]=[];
+                    $rooms_this_course=Stock::getRoomsForSpecificCourse($rotation, $course);
                     foreach ($course->distributionRoom()->wherePivot('rotation_id',$rotation->id)->get() as $room){
-                        //if($this->verifyTakeRoomInCourse($common_courses_rooms_taken,$course->id,$room->id)) continue;
-                        if(in_array($room->id,$rooms_taken)) continue;
-                        array_push($rooms_taken,$room->id);
-                        $rooms_this_course=Stock::getRoomsForSpecificCourse($rotation, $course);
+                        if(in_array($room->id,$course_taken[$course->id])) continue;
+                        $room_heads_in_this_rotation_course_room=$secertaries_in_this_rotation_course_room=$observers_in_this_rotation_course_room=null;
                         if(in_array($room->id, $disabled_rooms) && in_array($room->id, $rooms_this_course) ){//Manage Room
-                            $course_filled_with_users=$room_heads_in_this_rotation_course_room=$secertaries_in_this_rotation_course_room=$observers_in_this_rotation_course_room=null;
+                            list($room_heads_in_this_rotation_course_room,$secertaries_in_this_rotation_course_room, $observers_in_this_rotation_course_room)=Stock::getUsersInSpecificRotationCourseRoom($rotation,$course,$room->id);
+                            $courses_have_not_members=[];
+                            $members_taken=false;
                             foreach ($courses_common_with_time as $course_common_with_time) {//fill the remaining rooms that belongs to the other courses with the same members in catched course
-                                if(count($room->users()->wherePivot('course_id',$course_common_with_time->id)->toBase()->get())){
+                                $rooms_in_courses_common_with_time=Stock::getRoomsForSpecificCourse($rotation, $course_common_with_time);
+                                if(!in_array($room->id,$rooms_in_courses_common_with_time)) continue;
+                                if($members_taken || count($room->users()->wherePivot('rotation_id',$rotation->id)->wherePivot('course_id',$course_common_with_time->id)->toBase()->get())){
                                     list($room_heads_in_this_rotation_course_room, $secertaries_in_this_rotation_course_room, $observers_in_this_rotation_course_room)=Stock::getUsersInSpecificRotationCourseRoom($rotation,$course_common_with_time,$room->id);
-                                    $course_filled_with_users=$course_common_with_time->id;
-                                    break;
+                                    $members_taken=true;
+                                }else{
+                                    array_push($courses_have_not_members,$course_common_with_time);
                                 }
+                                $course_taken[$course_common_with_time->id][]=$room->id;
                             }
-                            //dump($courses_common_with_time,$room_heads_in_this_rotation_course_room, $secertaries_in_this_rotation_course_room, $observers_in_this_rotation_course_room);
-                            foreach ($courses_common_with_time as $course_common_with_time) {//fill the remaining rooms that belongs to the other courses with the same members in catched course
-                                $arr=$common_courses_rooms_taken[$course_common_with_time->id]??[];
-                                array_push($arr,$room->id);
-                                if($course_common_with_time->id != $course_filled_with_users){
-                                    $room->users()->wherePivot('rotation_id',$rotation->id)->wherePivot('course_id',$course_common_with_time->id)->detach();
-                                    $room->users()->attach($room_heads_in_this_rotation_course_room, ['rotation_id'=>$rotation->id,'course_id'=>$course_common_with_time->id,'roleIn'=> 'RoomHead']);
-                                    $room->users()->attach($secertaries_in_this_rotation_course_room, ['rotation_id'=>$rotation->id,'course_id'=>$course_common_with_time->id,'roleIn'=> 'Secertary']);
-                                    $room->users()->attach($observers_in_this_rotation_course_room, ['rotation_id'=>$rotation->id,'course_id'=>$course_common_with_time->id,'roleIn'=> 'Observer']);
-                                }
+                            //publish members to the all related sameTime courses
+                            foreach ($courses_have_not_members as $course_have_not_members) {//will the remaining rooms that belongs to the other courses with the same members in catched course
+                                //$room->users()->wherePivot('rotation_id',$rotation->id)->wherePivot('course_id',$course_have_not_members->id)->detach();
+                                $course_have_not_members->users()->attach($room_heads_in_this_rotation_course_room, ['rotation_id'=>$rotation->id,'room_id'=>$room->id,'roleIn'=> 'RoomHead']);
+                                $course_have_not_members->users()->attach($secertaries_in_this_rotation_course_room, ['rotation_id'=>$rotation->id,'room_id'=>$room->id,'roleIn'=> 'Secertary']);
+                                $course_have_not_members->users()->attach($observers_in_this_rotation_course_room, ['rotation_id'=>$rotation->id,'room_id'=>$room->id,'roleIn'=> 'Observer']);
                             }
                         }
                     }
                 }
+                //dd(11);
                //end fill common rooms between multiplue courses
             }else{
                 return redirect()->back()->withWarning(__('لا يوجد مراقبين كفايه للفرز من فضلك قم بتعديل تعيينات الأعضاء وإضافة مراقبين '));

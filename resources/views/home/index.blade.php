@@ -7,7 +7,20 @@
         </div>
         @auth
         @php
-            $is_find_in_names_list_in_latest_rotation=(bool)count($latest_rotation->initial_members()->where('id',Auth::user()->id)->toBase()->get());
+            // $is_find_in_names_list_in_latest_rotation=(bool)count($latest_rotation->initial_members()->where('id',Auth::user()->id)->toBase()->get());
+            // $course=App\Models\Course::find(87);
+            // dd(App\Http\Controllers\MaxMinRoomsCapacity\Stock::getDisabledAndJoiningRoomsAndCommonCoursesWithTime($latest_rotation, $course));
+
+            //dd($latest_rotation->coursesProgram()->get()->pluck('id'));
+
+
+
+
+
+
+
+
+
         @endphp
         @if(! auth()->user()->is_active && auth()->user()->number_of_observation == 0)
             @if(!auth()->user()->temporary_role)
