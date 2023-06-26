@@ -33,7 +33,7 @@ class Members extends Controller
                             ,User::whereIn('id',$secertaries)->whereNotIn('id',$room_heads)->toBase()->get()->pluck('id')->toarray()
                         )
                     ));
-
+        //dd($room_heads,$secertaries,$observers);
                     //show each secertary role name-num objections and total num of secertaries and total num of all objections
                     // $itera=0;
                     // foreach ($this->rotation->initial_members()->wherePivot('options','{"2":"on"}')->

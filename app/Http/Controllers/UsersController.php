@@ -42,8 +42,10 @@ class UsersController extends Controller
     public function index()
     {
         // $users = User::first()->paginate(20);
-        $users = User::sortable()->paginate(5);
-        
+        // $users = User::sortable()->paginate(5);
+        // $users = User::all();
+        $users = User::first()->paginate(10);
+        //var_dump($users);
         //to delete
         // $num_observations = 0;
         // $count_users_observations=0;
@@ -83,7 +85,7 @@ class UsersController extends Controller
      */
     public function create()
     {
-        return view('users.create', 
+        return view('users.create',
         // ['roles' => Role::latest()->get()]
     );
     }
@@ -107,7 +109,7 @@ class UsersController extends Controller
         $custom_arr=array_merge($request->except('property'),['property'=>$property]);
         $user = User::create(
             // you also can be to write this User::create($request->validated()); but go to StoreUserRequest and make all fields required
-            $custom_arr   
+            $custom_arr
         );
         //return Response::json($user);
         return redirect()->route('users.index')
@@ -156,7 +158,7 @@ class UsersController extends Controller
             'rotations_numbers' => array_unique($user->rotations->toBase()->pluck('id')->toArray()),
             'observations_number_in_latest_rotation' => $observations_number_in_latest_rotation
         ]);
-    }                             
+    }
     /**
      * Edit user data
      *
@@ -319,7 +321,7 @@ class UsersController extends Controller
             $user->number_of_observation = (int)$request['reset_vlaue'];
             $user->save();
         }
-                  
+
         return redirect()->route('users.index')
         ->withSuccess(__('User Observations updated successfully.'));
     }

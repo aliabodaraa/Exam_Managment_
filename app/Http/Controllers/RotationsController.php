@@ -71,7 +71,7 @@ class rotationsController extends Controller
         return redirect("/rotations/$rotation->id/show")
         ->withSuccess(__('You have successfully distribute all students to the sutable rooms'));
     }
-//distribute students into rooms 
+//distribute students into rooms
 //distributeMembersOfFaculty
 public function current_user_observations($user){
     return $user->id;
@@ -81,15 +81,22 @@ public function distributeMembersOfFaculty(Rotation $rotation){
     ini_set('max_execution_time', 360); //6 minutes
     $graph_room_heads=new Graph(EnumPersonType::RoomHead, $rotation);
     list($paths_room_heads,$paths_info_room_heads)=$graph_room_heads->applyMaxFlowAlgorithm();//dd($paths_room_heads,$paths_info_room_heads,$paths_info_room_heads['users_observations']);
+    //dd("stop");
     //dd($paths_room_heads,$paths_info_room_heads);
     if(count($paths_room_heads)){
+        //dump("_____________________");
         $graph_secertaries=new Graph(EnumPersonType::Secertary, $rotation, $paths_info_room_heads);//dd("Alignment");
         list($paths_secertaries,$paths_info_secertaries)=$graph_secertaries->applyMaxFlowAlgorithm();
         //dd($paths_secertaries,$paths_info_secertaries);
+        //dd("stop");
+
         if(count($paths_secertaries)){
+            //dump("_____________________");
+
             $graph_observers=new Graph(EnumPersonType::Observer, $rotation, $paths_info_room_heads, $paths_info_secertaries);
             list($paths_observers,$paths_info_observers)=$graph_observers->applyMaxFlowAlgorithm();
             //dd($paths_room_heads,$paths_info_room_heads,$paths_secertaries,$paths_info_secertaries,$paths_observers,$paths_info_observers);
+            //dd("stop");
             if(count($paths_observers)){
                 foreach ($paths_info_room_heads['users_observations'] as $room_head_id => $room_heads_observations){
                     $s=User::where('id',$room_head_id)->first();
@@ -211,7 +218,7 @@ public function distributeMembersOfFaculty(Rotation $rotation){
         //dd($request['year']);
         $this->validate($request,[
             'name' => [
-                'required', 
+                'required',
                 Rule::unique('rotations')//verify that the name with year don't repated (both are unique)
                        ->where('year', $request['year'])
             ],
@@ -261,7 +268,7 @@ public function distributeMembersOfFaculty(Rotation $rotation){
         dd($rotation);
         $this->validate($request,[
             'name' => [
-                'required', 
+                'required',
                 Rule::unique("rotations")->where(function ($query) use ($rotation) {
                         return $query->where(
                             [
@@ -271,7 +278,7 @@ public function distributeMembersOfFaculty(Rotation $rotation){
                     })->ignore($rotation->id)//verify that the name with year don't repated (both are unique)(unique for escape comparing this routation)
             ],
             'year' => [
-                'required', 
+                'required',
                 Rule::unique("rotations")->where(function ($query) use ($rotation) {
                     return $query->where(
                         [
@@ -288,7 +295,7 @@ public function distributeMembersOfFaculty(Rotation $rotation){
             'year.unique'=>'هذه الدوره موجوده في السنة المحددة'
         ]);
         $this->validate($request,[
-            'name' => 'required']); 
+            'name' => 'required']);
         if($rotation->update($request->all())){
             return redirect()->route('rotations.index')
             ->withSuccess(__('rotation updated successfully.'));
@@ -331,7 +338,7 @@ public function distributeMembersOfFaculty(Rotation $rotation){
                 $rotation->initial_members()->attach($user_id,['options'=> json_encode($options)]);
         }else{
             return redirect()->back()
-            ->withWarning(__('please select at least on user'));   
+            ->withWarning(__('please select at least on user'));
         }
         return redirect()->route('rotations.program.show',$rotation->id)
             ->withSuccess(__('store members successfully.'));
@@ -357,7 +364,7 @@ public function distributeMembersOfFaculty(Rotation $rotation){
                 $rotation->initial_members()->attach($user_id,['options'=> json_encode($options)]);
         }else{
             return redirect()->back()
-            ->withWarning(__('please select at least on user'));   
+            ->withWarning(__('please select at least on user'));
         }
         return redirect()->route('rotations.program.show',$rotation->id)
             ->withSuccess(__('update members successfully.'));
@@ -378,23 +385,23 @@ public function distributeMembersOfFaculty(Rotation $rotation){
         /**
     * @return \Illuminate\Support\Collection
     */
-    public function exportObservations(Rotation $rotation) 
+    public function exportObservations(Rotation $rotation)
     {
         return Excel::download(new ObservationsExport($rotation), 'المراقبات الإمتحانية.xlsx');
         //return redirect()->back()->withSuccess(__('تم تحميل ملف المراقبات بنجاح'));
     }
-    public function exportObservationsInSpecificDay(Rotation $rotation,$day) 
+    public function exportObservationsInSpecificDay(Rotation $rotation,$day)
     {
         return Excel::download(new exportObservationsInSpecificDay($rotation,$day), 'المراقبات الإمتحانية.xlsx');
         //return redirect()->back()->withSuccess(__('تم تحميل ملف المراقبات بنجاح'));
-    }  
+    }
     // /**
     // * @return \Illuminate\Support\Collection
     // */
-    // public function import() 
+    // public function import()
     // {
     //     Excel::import(new UsersImport,request()->file('file'));
-               
-    //     return back();
-    // }
-}
+
+    //Excel::import(new UsersImport,request()->file('file'));
+
+    }

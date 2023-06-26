@@ -24,7 +24,7 @@ class MaxFlow extends Controller
     public function __construct(int $length_graph,$members,$courses,$count_arr_same_time_courses , $rooms){
         Self::$V = $length_graph;
         $this->members=$members;
-    
+
         $this->courses=$courses;
         $this->count_arr_same_time_courses=$count_arr_same_time_courses;
 
@@ -37,10 +37,10 @@ class MaxFlow extends Controller
         $visited=[];
         for ($i = 0; $i < Self::$V; ++$i)
             $visited[$i] = false;
-       
+
         $visited[count($this->members)+$this->count_arr_same_time_courses+count($this->courses)+1]=Self::$science_room_visited;
         //if(Self::$current_user )
- 
+
         // Create a queue, enqueue source vertex and mark
         // source vertex as visited
         $queue=[];
@@ -65,13 +65,13 @@ class MaxFlow extends Controller
 
                         //     Self::$current_user=$parent[$parent[$parent[$parent[$t]]]];
                         //     //dump($parent[$parent[$parent[$parent[$v]]]]);
-                        
+
                         //     return true;
                         // }
 
 
                         //
- 
+
             for ( $v = 0; $v < Self::$V; $v++) {
                 ////dump($visited);
                 if ($visited[$v] == false && $rGraph[$u][$v] > 0) {
@@ -85,7 +85,7 @@ class MaxFlow extends Controller
 
                         Self::$current_user=$parent[$parent[$parent[$parent[$v]]]];
                         //dump($parent[$parent[$parent[$parent[$v]]]]);
-                        
+
                         return true;
                     }
                     array_push($queue,$v);
@@ -96,7 +96,7 @@ class MaxFlow extends Controller
         }
         // We didn't reach sink in BFS starting from source,
         // so return false
-        return false;               
+        return false;
     }
 
     // Returns the maximum flow from s to t in the given
@@ -106,11 +106,11 @@ class MaxFlow extends Controller
         $v=0;
         $paths=[];
 
-        
+
         // Create a residual graph and fill the residual
         // graph with given capacities in the original graph
         // as residual capacities in residual graph
- 
+
         // Residual graph where rGraph[i][j] indicates
         // residual capacity of edge from i to j (if there
         // is an edge. If rGraph[i][j] is 0, then there is
@@ -119,15 +119,15 @@ class MaxFlow extends Controller
         for ($u = 0; $u < Self::$V; $u++)
             for ($v = 0; $v < Self::$V; $v++)
                 $rGraph[$u][$v] = $graph[$u][$v];
- 
+
         // This array is filled by BFS and to store path
         $parent =[];
         for ($v = 0; $v <Self::$V ; $v++) {
             $parent[$v] =0;
         }
- 
+
         $max_flow = 0; // There is no flow initially
- 
+
         // Augment the flow while there is path from source
         // to sink
         while ($this->bfs($rGraph, $s, $t, $parent)) {
@@ -199,12 +199,12 @@ class MaxFlow extends Controller
             // Add path flow to overall flow
             $max_flow += $path_flow;
             $path=array_reverse($path);
-            
+
             array_push($paths,$path);
         }
         //Ali------move changes to the out
         $graph = $rGraph;
- 
+        //dump(count($paths));
         // Return the overall flow
         return $paths;
     }

@@ -38,7 +38,7 @@ class Stock extends Controller
         $curr_date=$rotation->coursesProgram()->where('id',$course->id)->first()->pivot->date;
         $curr_time=$rotation->coursesProgram()->where('id',$course->id)->first()->pivot->time;
         $curr_duration=$rotation->coursesProgram()->where('id',$course->id)->first()->pivot->duration;
-    
+
         foreach (Course::with('distributionRoom')->whereHas('distributionRoom', function($query) use($room,$rotation){
         $query->where('room_id',$room->id)->where('rotation_id',$rotation->id);})->toBase()->get() as $courseM)
                 if((count($rotation->coursesProgram()->wherePivot('date',$curr_date)->wherePivot('time','>=',$curr_time)->wherePivot('time','<=',gmdate('H:i:s',strtotime($curr_time)+strtotime($curr_duration)))->where('id',$courseM->id)->get())
@@ -56,7 +56,7 @@ class Stock extends Controller
         $date=$rotation->coursesProgram()->where('id',$course->id)->first()->pivot->date;
         $time=$rotation->coursesProgram()->where('id',$course->id)->first()->pivot->time;
         $duration=$rotation->coursesProgram()->where('id',$course->id)->first()->pivot->duration;
-        return array($date, $time, $duration);   
+        return array($date, $time, $duration);
     }
     //calculate date time duration for specific course
 
@@ -78,7 +78,7 @@ class Stock extends Controller
         $occupied_number_of_students_in_this_course_room=0;
         foreach ($course->distributionRoom()->wherePivot('rotation_id',$rotation->id)->where('id',$roomS_id)->get() as $room)
             $occupied_number_of_students_in_this_course_room=$room->pivot->num_student_in_room;
-        
+
         return $occupied_number_of_students_in_this_course_room;
     }
     //calc number students in this courseRoom
@@ -138,7 +138,7 @@ class Stock extends Controller
                     array_push($common_rooms_ids,$room->id);
                 }
             }
-            $accual_common_rooms_for_specific_course[$course_in_time->id]=$num_students_taken_in_each_room_from_other;    
+            $accual_common_rooms_for_specific_course[$course_in_time->id]=$num_students_taken_in_each_room_from_other;
             }
             //dd($accual_common_rooms_for_specific_course,$common_rooms_ids);
         return array($accual_common_rooms_for_specific_course,array_unique($common_rooms_ids));
@@ -148,8 +148,16 @@ class Stock extends Controller
 
 //////////////////User's observations function___________________///////////////////
     //get common rooms as string
-    public static function getNamesSharedCoursesWithCommonRoom($rotation, $course_id, $room_id, $date, $time){
+    public static function getNamesSharedCoursesWithCommonRoom($rotation, $course_id, $room_id, $date, $time, $info_room_taken){
         $str_courses_common_names="";
+        $iter=0;
+        foreach ($info_room_taken as $key => $room_inf_taken) {
+            if($room_id === $room_inf_taken['room_id'] && $date === $room_inf_taken['date'] && $time === $room_inf_taken['time'] )
+            $iter++;
+        }
+        if($iter>1)
+        return $str_courses_common_names;
+
         $course=Course::where('id',$course_id)->first();//dd($date, $time);
         $arr_courses_taken=[];
         foreach (Room::select("course_rotation.course_id")
@@ -159,7 +167,8 @@ class Stock extends Controller
                      ->where("course_rotation.time","=",$time);})
         ->join("course_room_rotation",function($join){
                 $join->on("course_room_rotation.rotation_id","=","course_rotation.rotation_id")
-                     ->on("course_room_rotation.course_id","=","course_rotation.course_id");})->get() as $course) {
+                     ->on("course_room_rotation.course_id","=","course_rotation.course_id");})
+                     ->where("course_room_rotation.room_id","=",$room_id)->get() as $course) {
                         if(!in_array($course->course_id,$arr_courses_taken)){
                             array_push($arr_courses_taken,$course->course_id);
                             $str_courses_common_names.="/".Course::where('id',$course->course_id)->first()->course_name;
@@ -187,14 +196,14 @@ class Stock extends Controller
             $table['start_date']=$rotationInfo->start_date;
             $table['end_date']=$rotationInfo->end_date;
             //array_push($rotations_numbers, $rotation_id);
-            $common_course_name_once=[];
+            $num_of_observations=0;
             foreach(Rotation::
             select("*")->where('id',$rotation_id)->join("course_rotation","course_rotation.rotation_id","=","rotations.id")
             ->join("course_room_rotation_user",function($join) use($user){
                     $join->on("course_room_rotation_user.rotation_id","=","course_rotation.rotation_id")
                          ->on("course_room_rotation_user.course_id","=","course_rotation.course_id")
                          ->where("course_room_rotation_user.user_id","=",$user->id);})
-                         ->orderBy("course_rotation.date")->get() as $i => $all_obseravation_info){
+                         ->orderBy("course_rotation.date")->orderBy("course_rotation.time")->get() as $i => $all_obseravation_info){
                             $table['observations'][$i]['date']=$all_obseravation_info['date'];
                             $table['observations'][$i]['time']=$all_obseravation_info['time'];
                             if($all_obseravation_info['roleIn']==="RoomHead")
@@ -204,12 +213,27 @@ class Stock extends Controller
                             elseif($all_obseravation_info['roleIn']==="Observer")
                                 $table['observations'][$i]['roleIn']="مراقب";
                             $table['observations'][$i]['room_name']=Room::where('id',$all_obseravation_info['room_id'])->toBase()->first()->room_name;
-                            $table['observations'][$i]['course_name']=Stock::getNamesSharedCoursesWithCommonRoom($rotationInfo,$all_obseravation_info['course_id'],$all_obseravation_info['room_id'],$all_obseravation_info['date'],$all_obseravation_info['time']);
+                            $info_room_taken[]=['room_id'=>$all_obseravation_info['room_id'],'date'=>$all_obseravation_info['date'],'time'=>$all_obseravation_info['time']];
+                            $table['observations'][$i]['course_name']=Stock::getNamesSharedCoursesWithCommonRoom($rotationInfo,$all_obseravation_info['course_id'],$all_obseravation_info['room_id'],$all_obseravation_info['date'],$all_obseravation_info['time'],$info_room_taken);
+                            if($table['observations'][$i]['course_name']==="")//without repeat the common room observations
+                                unset($table['observations'][$i]);
+                            else
                             if($rotation_id == Rotation::latest()->toBase()->get()[0]->id)
                                 $observations_number_in_latest_rotation++;
             }
             $all_rotations_table[$rotation_id]=$table;
         }
+        // dd(array_column($all_rotations_table[30]["observations"],'date'));
+        // $a=$all_rotations_table[30]["observations"];
+        // $counter=0;
+        // $new=array_map(function($obs) use($a,&$counter){
+        //     if(in_array($obs['date'],array_column($a,'date'))&&in_array($obs['time'],array_column($a,'time')))
+        //         $counter++;
+        //     //dd($obs['date']);
+        //     // if($obs['data'])
+        //     return $obs;
+        // } ,$all_rotations_table[30]["observations"]);
+        // dd($counter);
         return array($all_rotations_table, $observations_number_in_latest_rotation);
     }
 //////////////////User's observations function___________________///////////////////
@@ -220,28 +244,28 @@ class Stock extends Controller
         $roomHeadsArr=[];
         $secertariesArr=[];
         $observersArr=[];
-        foreach ($course->users()->wherePivot('rotation_id',$rotation->id)->wherePivot('room_id',$room_id)->get() as $user) 
+        foreach ($course->users()->wherePivot('rotation_id',$rotation->id)->wherePivot('room_id',$room_id)->get() as $user)
             if($user->pivot->roleIn == "RoomHead")
                 array_push($roomHeadsArr,$user->id);
             elseif($user->pivot->roleIn == "Secertary")
                 array_push($secertariesArr,$user->id);
             elseif($user->pivot->roleIn == "Observer")
                 array_push($observersArr,$user->id);
-            
+
         return array($roomHeadsArr, $secertariesArr, $observersArr);
 
     }
     public static function getUsersInSpecificRotationCourse($rotation,$course){
         $members_in_course=[];
-        foreach ($course->rooms()->wherePivot('rotation_id',$rotation->id)->toBase()->get() as $room) 
+        foreach ($course->rooms()->wherePivot('rotation_id',$rotation->id)->toBase()->get() as $room)
             $members_in_course[$room->id]=Stock::getUsersInSpecificRotationCourseRoom($rotation,$course,$room->id);
-            
+
         return $members_in_course;
 
     }
     public static function getUsersInSpecificRotation($rotation){
         $members_in_rotation=[];
-        foreach ($rotation->coursesProgram()->toBase()->get() as $course) 
+        foreach ($rotation->coursesProgram()->toBase()->get() as $course)
             $members_in_rotation[$course->id]=Stock::getUsersInSpecificRotationCourse($rotation,$course);
 
         return $members_in_rotation;
@@ -270,7 +294,7 @@ class Stock extends Controller
     }
 
     public static function getUsersInJoiningRoomsForDisabledThemWithRotationCourse($rotation,$course){
-        
+
         $all_disabled_users_in_joining_room=[];
         list($date, $time, $duration)=Stock::getDateTimeDuration_ForThisCourse($rotation, $course);
         list(,$joining_rooms,$courses_common_with_time)=Stock::getDisabledAndJoiningRoomsAndCommonCoursesWithTime($rotation, $course, $date, $time, $duration);
@@ -283,7 +307,7 @@ class Stock extends Controller
                                 $all_disabled_users_in_joining_room=array_merge($all_disabled_users_in_joining_room,$roomHrads);
                                 $all_disabled_users_in_joining_room=array_merge($all_disabled_users_in_joining_room,$secertaries);
                                 $all_disabled_users_in_joining_room=array_merge($all_disabled_users_in_joining_room,$observers);
-                                }                    
+                                }
                         }
             }
         }
@@ -305,7 +329,7 @@ class Stock extends Controller
                                 $secertaries_in_current_joining_in_this_rotation_course_room=array_merge($secertaries_in_current_joining_in_this_rotation_course_room,$secertaries);
                                 $observers_in_current_joining_in_this_rotation_course_room=array_merge($observers_in_current_joining_in_this_rotation_course_room,$observers);
                                 break;
-                            }   
+                            }
                         }
             }
         }

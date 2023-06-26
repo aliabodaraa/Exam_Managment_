@@ -27,14 +27,19 @@
             <div class="col-lg-3 col-sm-4 col-xs-12">
                 <div class="collect-index-btns gap-1">
                     @if(Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد")
+                    <a href="#usersList" data-bs-toggle="modal" class='btn btn-secondary float-right mb-4'>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people" viewBox="0 0 16 16">
+                        <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8Zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022ZM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816ZM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0Zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/>
+                      </svg> قائمة أسماء أعضاء الكلية</a>
+                    @include('layouts.partials.popUpUsersList')
                         <a href="{{ route('users.create') }}" class="btn btn-primary float-right mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-add" viewBox="0 0 16 16">
                             <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0Zm-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/>
                             <path d="M8.256 14a4.474 4.474 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10c.26 0 .507.009.74.025.226-.341.496-.65.804-.918C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4s1 1 1 1h5.256Z"/>
                           </svg> إضافة مستخدم</a>
                     @endif
-                    <a href="{{url()->previous()}}" class="btn btn-dark"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
+                    {{-- <a href="{{url()->previous()}}" class="btn btn-dark"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
-                    </svg> رجوع</a>
+                    </svg> رجوع</a> --}}
                 </div>
             </div>
         </div>
@@ -50,9 +55,9 @@
             {{-- search in js --}}{{-- That is not related with controller - Only for Js --}}
             {{-- <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12">
                 <label for="search_user" class="form-label">البحث عن أعضاء :</label>
-                <input class="form-control" 
-                type="text" 
-                id="search_user" 
+                <input class="form-control"
+                type="text"
+                id="search_user"
                 onkeyup="let usersObj=searchUsers(JSON.stringify({{ App\Models\User::where('faculty_id',auth()->user()->faculty->id)->toBase()->get() }}),'{{ auth()->user()->faculty->name }}');/*sessionStorage.setItem('users_storage', usersObj);document.getElementById('btnClickedValue').value = usersObj;*/" placeholder="Serarch Users"/>
             </div> --}}
             {{-- search in js --}}
@@ -130,21 +135,22 @@
             <table class="table table-light">
                 <thead>
                 <tr>
-                    <th scope="col" width="3%">@sortablelink('id','#')</th>
+                    {{-- <th scope="col" width="3%">@sortablelink('id','#')</th> --}}
                     <th scope="col" width="10%">@sortablelink('email',"الإيميل")</th>
                     <th scope="col" width="10%">@sortablelink('username',"الأسم")</th>
                     <th scope="col" width="7%">@sortablelink('property',"العضوية")</th>
                     <th scope="col" width="7%">@sortablelink('role','الدور الدائم')</th>
                     <th scope="col" width="7%">@sortablelink('temporary_role','الدور المؤقت')</th>
-                    <th scope="col" width="15%">@sortablelink('department_id',"القسم")</th>
+                    <th scope="col" width="6%">@sortablelink('department_id',"القسم")</th>
                     <th scope="col" width="5%">@sortablelink('city',"المدينة")</th>
                     <th scope="col" width="5%">@sortablelink('number_of_observation'," المراقبات")</th>
                     @if(Auth::user()->username == "admin" || Auth::user()->temporary_role == "عميد")
                         <th scope="col" width="5%">الفعالية</th>
                     @endif
                     <th scope="col" width="15%">المواد التي يدرسها</th>
+                    <th scope="col" width="10%">الصفة في أخر دوره</th>
                     {{-- <th scope="col">faculty</th> --}}
-                    <th scope="col" width="11%">خيارات</th>
+                    <th scope="col" width="15%">خيارات</th>
                 </tr>
                 </thead>
                 <tbody id="user-list" name="users-list">
@@ -154,9 +160,27 @@
                         </tr>
                     @else
                         @foreach($users as $user)
+                        @php
+                                $room_heads=$latest_rotation->initial_members()->wherePivot('options','{"1":"on"}')->
+                                                        orWherePivot('options','{"1":"on","2":"on"}')->
+                                                        wherePivot('rotation_id',$latest_rotation->id)->
+                                                        toBase()->get()->pluck('id')->toarray();
+                                $secertaries=$latest_rotation->initial_members()->wherePivot('options','{"2":"on"}')->
+                                                                                orWherePivot('options','{"1":"on","2":"on"}')->
+                                                                                wherePivot('rotation_id',$latest_rotation->id)->
+                                                                                toBase()->get()->pluck('id')->toarray();
+                                $observers=array_merge(array_unique(array_merge(
+                                    App\Models\User::where('is_active',1)->where('temporary_role')->whereNotIn('id',$room_heads)->toBase()->get()->pluck('id')->toarray()
+                                    ,App\Models\User::whereIn('id',$secertaries)->whereNotIn('id',$room_heads)->toBase()->get()->pluck('id')->toarray()
+                                )));
+                        $roles=[];
+                        if(in_array($user->id,$room_heads)){ array_push($roles,"رئيس قاعة");}
+                        if(in_array($user->id,$secertaries)) {array_push($roles,"أمين سر");}
+                        if(in_array($user->id,$observers)) {array_push($roles,"مراقب");}
+                        $roles= implode(" - ", $roles);
+                        @endphp
                             <tr class="{{Auth::user()->id==$user->id? 'text-success':''}} user" id="{{$user->id}}">
-                                <td>{{ $user->id }}</td>
-
+                                {{-- <td>{{ $user->id }}</td> --}}
                                 <td>{{ $user->email }}</td>
                                 <td>{{ $user->username }}</td>
                                 <td><span class="badge bg-{{($user->property==='عضو هيئة تدريسية')?'primary':'info' }}">{{ $user->property }}</span></td>
@@ -185,7 +209,7 @@
                                 <td>
                                     @foreach ($user->teaches()->toBase()->get() as $course)
                                         <span class="badge bg-dark">{{ $course->course_name }}</span>
-                                    @endforeach    
+                                    @endforeach
                                 </td>
                                     {{-- <td>
                                         @php
@@ -202,9 +226,9 @@
                                                 @if( (!in_array($course->pivot->date,$dates_distinct) && !in_array($course->pivot->time,$times_distinct) ) ||
                                                     ( in_array($course->pivot->date,$dates_distinct) && !in_array($course->pivot->time,$times_distinct) ) ||
                                                     (!in_array($course->pivot->date,$dates_distinct) &&  in_array($course->pivot->time,$times_distinct) ) )
-                                                        @php 
+                                                        @php
                                                             array_push($dates_distinct,$course->pivot->date);
-                                                            array_push($times_distinct,$course->pivot->time); 
+                                                            array_push($times_distinct,$course->pivot->time);
                                                         @endphp
                                                 @endif
                                             @endforeach
@@ -213,10 +237,16 @@
                                         <span class="badge bg-secondary">{{count($dates_distinct)}}</span>
                                     </td> --}}
                                 {{-- <td><span class="badge bg-{{ ($user->faculty->name===Auth::user()->faculty->name)?'success':'dark' }}">{{ $user->faculty->name }}</span></td> --}}
+                                <td><span class="badge bg-dark">{{ $roles}}</span></td>
+                                @php
+                                    $num_observatios_current_user=App\Http\Controllers\MaxMinRoomsCapacity\Stock::calcInfoForEachRotationForSpecificuser($user)[1];
+                                    $num_objections_current_user=count($user->rotationsObjection()->where('id',$latest_rotation->id)->toBase()->get());
+                                    $is_runned_algorithm=(bool)count($latest_rotation->users);
+                                @endphp
                                 <td>
                                     <div class="btn-group-vertical" class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="font-size: 1px; width:100%;padding-right: 4px;">
                                         {{-- <a href="{{ route('users.show', $user->id) }}" class="btn btn-primary btn-sm me-2">Show</a> --}}
-                                        @if((Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد") && $num_observations_current_user=count($user->rooms()->where('rotation_id',$latest_rotation->id)->toBase()->get()))
+                                        @if((Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد") && $num_observatios_current_user)
                                                   <a href="{{ route('users.observations', $user->id) }}" class="position-relative btn btn-sm me-2 btn-success">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" style=" float:left;" viewBox="0 0 16 16">
                                                         <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
@@ -224,17 +254,15 @@
                                                     </svg>
                                                     المراقبات
                                                       <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
-                                                        {{ $num_observations_current_user }}
+                                                        {{ $num_observatios_current_user }}
                                                         <span class="visually-hidden">unread messages</span>
                                                       </span>
                                                   </a>
                                         @endif
                                         @if((Auth::user()->temporary_role == "رئيس شعبة الامتحانات" || Auth::user()->temporary_role == "عميد"))
-                                                @php
-                                                    $num_objections_current_user=count($user->rotationsObjection()->where('id',$latest_rotation->id)->toBase()->get());
-                                                @endphp
-                                                {{-- here --}}
-                                                @if($user->is_active && $user->number_of_observation && !$user->temporary_role && !count($latest_rotation->users))
+
+                                        {{-- here --}}
+                                                @if($user->is_active && $user->number_of_observation && !$user->temporary_role )
                                                     @if($num_objections_current_user)
                                                             <a href="{{ route('objections.user.index', ['user'=>$user->id]) }}" class="position-relative btn btn-sm me-2 btn-secondary">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill-down" style=" float:left;" viewBox="0 0 16 16">
@@ -247,10 +275,13 @@
                                                                     <span class="visually-hidden">unread messages</span>
                                                                 </span>
                                                             </a>
-                                                            <a href="{{ route('rotations.objections.edit',[$latest_rotation,$user]) }}" class="position-relative btn btn-sm me-2 btn-warning">تعديل الإعتراضات بالنيابة</a>
-
+                                                            @if(!$is_runned_algorithm)
+                                                                <a href="{{ route('rotations.objections.edit',[$latest_rotation,$user]) }}" class="position-relative btn btn-sm me-2 btn-warning">تعديل الإعتراضات بالنيابة</a>
+                                                            @endif
                                                     @else
+                                                        @if(!$is_runned_algorithm)
                                                             <a href="{{ route('rotations.objections.create',[$latest_rotation,$user]) }}" class="position-relative btn btn-sm me-2 btn-secondary">إنشاء إعتراضات بالنيابة</a>
+                                                        @endif
                                                     @endif
                                                 @endif
                                                 {{-- here --}}
@@ -268,7 +299,7 @@
                                             <a href="#exampleModalToggle{{ $user->id }}" data-bs-toggle="modal" class="btn btn-danger btn-sm" ><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill-x" style=" float:left;" viewBox="0 0 16 16">
                                                 <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm-9 8c0 1 1 1 1 1h5.256A4.493 4.493 0 0 1 8 12.5a4.49 4.49 0 0 1 1.544-3.393C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4Z"/>
                                                 <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm-.646-4.854.646.647.646-.647a.5.5 0 0 1 .708.708l-.647.646.647.646a.5.5 0 0 1-.708.708l-.646-.647-.646.647a.5.5 0 0 1-.708-.708l.647-.646-.647-.646a.5.5 0 0 1 .708-.708Z"/>
-                                              </svg> حذف</a> 
+                                              </svg> حذف</a>
                                         @endif
                                     </div>
                                 </td>

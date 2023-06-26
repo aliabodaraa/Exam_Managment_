@@ -11,11 +11,11 @@ foreach ($courses_common_with_time as $course_belongs) {
 }}
 //dump($accual_common_rooms_for_specific_course,$courses_common_with_time);
 
-//collect all users in all rooms except this room 
+//collect all users in all rooms except this room
 $users_in_course_not_in_this_room=[];
 foreach (App\Http\Controllers\MaxMinRoomsCapacity\Stock::getUsersInSpecificRotationCourse($rotation,$course) as $room_number => $users_ids) {
     if($room_number != $specific_room->id)
-    for ($i=0; $i <3 ; $i++) { 
+    for ($i=0; $i <3 ; $i++) {
     if(count($users_ids[$i])>0)
         foreach ($users_ids[$i] as $user_id) {
             array_push($users_in_course_not_in_this_room,$user_id);
@@ -144,7 +144,7 @@ $remaining_places_in_this_course=$entered_students_number-($occupied_number_of_s
                 {{-- fly code to top --}}
         </div>
 
-            <h2 class="m-4"> تعديل القاعة <b>{{$specific_room->room_name}}</b> في مقرر <b>{{$course->course_name}}</b> 
+            <h2 class="m-4"> تعديل القاعة <b>{{$specific_room->room_name}}</b> في مقرر <b>{{$course->course_name}}</b>
                 <div class="" style="float: right;">
                     <a href="{{url()->previous()}}" class="btn btn-dark">رجوع
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
@@ -160,12 +160,14 @@ $remaining_places_in_this_course=$entered_students_number-($occupied_number_of_s
                 $c=($remaining_places_in_this_course>$remaining_places_in_this_room_from_all_courses)
                 ?$occupied_number_of_students_in_this_course_in_this_room+$remaining_places_in_this_room_from_all_courses
                 :$occupied_number_of_students_in_this_course_in_this_room+$remaining_places_in_this_course;
+
+                $is_runned_algorithm=(bool)count($rotation->users);
             @endphp
             <form method="post" action="/rotations/{{ $rotation->id }}/course/{{ $course->id }}/room/{{ $specific_room->id }}">
                     @method('patch')
                     @csrf
                     <div class="row m-2">
-                            <div class="col-sm-9">
+                            <div class="col-sm-{{ $is_runned_algorithm?9:12 }}">
                                     {{-- @if($total_capacity>=$occupied_places_in_this_room_from_all_courses) --}}
                                         <label for="num_student_in_room" class="form-label">عدد الطلاب في  <mark>{{$specific_room->room_name}}</mark>  :</label>
                                         <select class="form-control" name="num_student_in_room" class="form-control" required>
@@ -179,125 +181,129 @@ $remaining_places_in_this_course=$entered_students_number-($occupied_number_of_s
                                     <span class="text-danger text-left">{{ $errors->first('num_student_in_room') }}</span>
                                 @endif
                             </div>
-
-                        <div class="col-sm-3">
-                            {{-- That is not related with controller - Only for Js --}}
-                            <label for="search_user_name" class="form-label">البحث عن أعضاء :</label>
-                            <input class="form-control" 
-                            type="text" 
-                            id="search_user_name" 
-                            onkeyup="searchForUserName(JSON.stringify({{ App\Models\User::toBase()->get() }}))" placeholder="Serarch Users">
-                        </div>
+                        @if($is_runned_algorithm)
+                            <div class="col-sm-3">
+                                {{-- That is not related with controller - Only for Js --}}
+                                <label for="search_user_name" class="form-label">البحث عن أعضاء :</label>
+                                <input class="form-control"
+                                type="text"
+                                id="search_user_name"
+                                onkeyup="searchForUserName(JSON.stringify({{ App\Models\User::toBase()->get() }}))" placeholder="Serarch Users">
+                            </div>
+                        @endif
                     </div>
-  
-                    <label for="members" class="form-label" style="margin-left:16px;margin-top:16px">الأعضاء :</label>
-                    <div class="mb-3" style="margin:0 5px;">
-                        <div class="row num_of_members" style="flex-flow: nowrap;color: black;padding: 6px;background-color: #eceded;border-radius: 15px;width:99%;margin:0 5px">
-                            <div class="col-sm-4" style="width:33%;background-color: #f8f9fa;border-radius: 15px 0 0 15px;height: 60px;text-align: center;margin-right:5px">
-                                <h1 id="num_roomHeads" style="margin-top: 9px;"></h1>
+
+                    @if($is_runned_algorithm)
+                        {{-- to prevent choosing members before run fordFerkrson --}}
+                        <label for="members" class="form-label" style="margin-left:16px;margin-top:16px">الأعضاء :</label>
+                        <div class="mb-3" style="margin:0 5px;">
+                            <div class="row num_of_members" style="flex-flow: nowrap;color: black;padding: 6px;background-color: #eceded;border-radius: 15px;width:99%;margin:0 5px">
+                                <div class="col-sm-4" style="width:33%;background-color: #f8f9fa;border-radius: 15px 0 0 15px;height: 60px;text-align: center;margin-right:5px">
+                                    <h1 id="num_roomHeads" style="margin-top: 9px;"></h1>
+                                </div>
+                                <div class="col-sm-4" style="width:33%;background-color: #f8f9fa;text-align: center;height: 60px;margin-right:5px">
+                                    <h1 id="num_secertaries" style="margin-top: 9px;"></h1>
+                                </div>
+                                <div class="col-sm-4" style="width:33.4%;background-color: #f8f9fa;height: 60px;border-radius: 0 15px 15px 0;text-align: center">
+                                    <h1 id="num_observers" style="margin-top: 9px;"></h1>
+                                </div>
                             </div>
-                            <div class="col-sm-4" style="width:33%;background-color: #f8f9fa;text-align: center;height: 60px;margin-right:5px">
-                                <h1 id="num_secertaries" style="margin-top: 9px;"></h1>
-                            </div>
-                            <div class="col-sm-4" style="width:33.4%;background-color: #f8f9fa;height: 60px;border-radius: 0 15px 15px 0;text-align: center">
-                                <h1 id="num_observers" style="margin-top: 9px;"></h1>
-                            </div>
-                        </div>
-                        @php $counter=0; @endphp
-                    @foreach(App\Models\User::toBase()->get() as $user)
-                            <?php if($user->id==1) continue; ?>
-                                <div id="{{$user->id}}" class="user {{$user->id}} d1 bg-white"" style="display: block;border: 1px solid #d5d5d5;cursor: disabled;
-                                border-radius: 7px;width:32.5%;position:relative;float:right;right:6px;
-                                padding: 20px 20px 20px 0px;margin:5px;height: 100px;
-                                {{--border:{{(count($dates_distinct)==$user->number_of_observation)?'1px solid #dc35467c':''}}--}}
-                                ">
-                                    <h5 style="float:right;">Room-Head</h5>
-                                        <input type="checkbox" style="float:right;"
-                                        name="roomheads[{{ $user->id }}]"
-                                        value="{{ $user->id }}"
-                                        class="roomheads toggler-wrapper style-4"
-                                        @if(!in_array($specific_room->id, $joining_rooms))
-                                        {{ in_array($user->id, $room_heads_in_this_rotation_course_room)
-                                        ? 'checked'
-                                        : '' }}
-                                        {{ in_array($user->id, $users_in_course_not_in_this_room) || in_array($user->id, $all_disabled_users_in_joining_room)
-                                        ? 'disabled'
-                                        : '' }}
-                                        @elseif(in_array($specific_room->id, $joining_rooms))
-                                        {{ in_array($user->id, $room_heads_in_current_joining_in_this_rotation_course_room)
+                            @php $counter=0; @endphp
+                            @foreach(App\Models\User::toBase()->get() as $user)
+                                <?php if($user->id==1) continue; ?>
+                                    <div id="{{$user->id}}" class="user {{$user->id}} d1 bg-white"" style="display: block;border: 1px solid #d5d5d5;cursor: disabled;
+                                    border-radius: 7px;width:32.5%;position:relative;float:right;right:6px;
+                                    padding: 20px 20px 20px 0px;margin:5px;height: 100px;
+                                    {{--border:{{(count($dates_distinct)==$user->number_of_observation)?'1px solid #dc35467c':''}}--}}
+                                    ">
+                                        <h5 style="float:right;">Room-Head</h5>
+                                            <input type="checkbox" style="float:right;"
+                                            name="roomheads[{{ $user->id }}]"
+                                            value="{{ $user->id }}"
+                                            class="roomheads toggler-wrapper style-4"
+                                            @if(!in_array($specific_room->id, $joining_rooms))
+                                            {{ in_array($user->id, $room_heads_in_this_rotation_course_room)
                                             ? 'checked'
                                             : '' }}
-                                        {{ in_array($user->id, $users_in_course_not_in_this_room) || in_array($user->id, $pure_disabled_users_for_joining_room)
+                                            {{ in_array($user->id, $users_in_course_not_in_this_room) || in_array($user->id, $all_disabled_users_in_joining_room)
                                             ? 'disabled'
                                             : '' }}
-                                        @endif
-                                            >
-                                            
-
-                                            <h5 style="float:right;">Secertary</h5>
-                                            <input type="checkbox" style="float:right;"
-                                            name="secertaries[{{ $user->id }}]"
-                                            value="{{ $user->id }}"
-                                            class='secertaries toggler-wrapper style-4'
-                                            @if(!in_array($specific_room->id, $joining_rooms))
-                                            {{ in_array($user->id, $secertaries_in_this_rotation_course_room)
-                                                ? 'checked'
-                                                : '' }}
-                                            {{ in_array($user->id, $users_in_course_not_in_this_room) || in_array($user->id, $all_disabled_users_in_joining_room)
-                                                ? 'disabled'
-                                                : '' }}
                                             @elseif(in_array($specific_room->id, $joining_rooms))
-                                            {{ in_array($user->id, $secertaries_in_current_joining_in_this_rotation_course_room)
+                                            {{ in_array($user->id, $room_heads_in_current_joining_in_this_rotation_course_room)
                                                 ? 'checked'
                                                 : '' }}
                                             {{ in_array($user->id, $users_in_course_not_in_this_room) || in_array($user->id, $pure_disabled_users_for_joining_room)
                                                 ? 'disabled'
                                                 : '' }}
-                                            @else
-                                            
-                                            @endif                                          
+                                            @endif
                                                 >
-                                                <h5 style="float:right;">Observer</h5>
+
+
+                                                <h5 style="float:right;">Secertary</h5>
                                                 <input type="checkbox" style="float:right;"
-                                                name="observers[{{ $user->id }}]"
+                                                name="secertaries[{{ $user->id }}]"
                                                 value="{{ $user->id }}"
-                                                class='observers toggler-wrapper style-4'
+                                                class='secertaries toggler-wrapper style-4'
                                                 @if(!in_array($specific_room->id, $joining_rooms))
-                                                {{ in_array($user->id, $observers_in_this_rotation_course_room)
+                                                {{ in_array($user->id, $secertaries_in_this_rotation_course_room)
                                                     ? 'checked'
                                                     : '' }}
                                                 {{ in_array($user->id, $users_in_course_not_in_this_room) || in_array($user->id, $all_disabled_users_in_joining_room)
                                                     ? 'disabled'
                                                     : '' }}
                                                 @elseif(in_array($specific_room->id, $joining_rooms))
-                                                {{ in_array($user->id, $observers_in_current_joining_in_this_rotation_course_room)
+                                                {{ in_array($user->id, $secertaries_in_current_joining_in_this_rotation_course_room)
                                                     ? 'checked'
                                                     : '' }}
                                                 {{ in_array($user->id, $users_in_course_not_in_this_room) || in_array($user->id, $pure_disabled_users_for_joining_room)
                                                     ? 'disabled'
                                                     : '' }}
                                                 @else
-                                                
-                                                @endif  
+
+                                                @endif
                                                     >
-                                                    <br>
-                                                    <h5 style="float:right;align-items:start"><b>{{ $user->username }}</b></h5>
-                                                    <h4 style="position: absolute;top:-10px;display:inline-flex"><a href="{{ route('users.observations', $user->id) }}" class="badge bg-
-                                                        {{-- {{(count($dates_distinct)==$user->number_of_observation)?'danger':'success'}} --}}
-                                                        ">
-                                                        {{-- {{count($dates_distinct)}}/{{$user->number_of_observation}} --}}
-                                                    </a></h4>
-                                </div>
-                        @endforeach
+                                                    <h5 style="float:right;">Observer</h5>
+                                                    <input type="checkbox" style="float:right;"
+                                                    name="observers[{{ $user->id }}]"
+                                                    value="{{ $user->id }}"
+                                                    class='observers toggler-wrapper style-4'
+                                                    @if(!in_array($specific_room->id, $joining_rooms))
+                                                    {{ in_array($user->id, $observers_in_this_rotation_course_room)
+                                                        ? 'checked'
+                                                        : '' }}
+                                                    {{ in_array($user->id, $users_in_course_not_in_this_room) || in_array($user->id, $all_disabled_users_in_joining_room)
+                                                        ? 'disabled'
+                                                        : '' }}
+                                                    @elseif(in_array($specific_room->id, $joining_rooms))
+                                                    {{ in_array($user->id, $observers_in_current_joining_in_this_rotation_course_room)
+                                                        ? 'checked'
+                                                        : '' }}
+                                                    {{ in_array($user->id, $users_in_course_not_in_this_room) || in_array($user->id, $pure_disabled_users_for_joining_room)
+                                                        ? 'disabled'
+                                                        : '' }}
+                                                    @else
+
+                                                    @endif
+                                                        >
+                                                        <br>
+                                                        <h5 style="float:right;align-items:start"><b>{{ $user->username }}</b></h5>
+                                                        <h4 style="position: absolute;top:-10px;display:inline-flex"><a href="{{ route('users.observations', $user->id) }}" class="badge bg-
+                                                            {{-- {{(count($dates_distinct)==$user->number_of_observation)?'danger':'success'}} --}}
+                                                            ">
+                                                            {{-- {{count($dates_distinct)}}/{{$user->number_of_observation}} --}}
+                                                        </a></h4>
+                                    </div>
+                            @endforeach
+                            </div>
                         </div>
-                </div>
+                    @endif
                 <br>
                 <div class="buttons" style="margin-top: 80px;float: left;margin-bottom: 30px;">
                     <button type="submit" class="btn btn-dark">تعديل</button>
                     <a href="{{ URL::previous() }}" class="btn btn-default">إلغاء</a>
                 </div>
-        </form>
+            </form>
         <div class="no-results" style="display:none;">No results!</div>
-                                
+
 </div>
 @endsection

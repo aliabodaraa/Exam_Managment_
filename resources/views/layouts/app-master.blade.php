@@ -13,11 +13,29 @@
     <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">{{-- added --}}
     <link rel="stylesheet" href="{!! url('assets/css/popUp_cubic.css') !!}">
     <link rel="stylesheet" href="{!! url('assets/css/globalStyle.css') !!}">
-      
+
     <!-- Custom styles for this template -->
     {{-- <link href="{!! url('assets/css/app.css') !!}" rel="stylesheet"> --}}
     <style>
+      @font-face {
+          font-family: 'myFirstFontHeading';
+          src: url("assets/fonts/TheSansArab-Black.ttf");
+      }
 
+      @font-face {
+          font-family: 'myFirstFontNormal';
+          src: url("assets/fonts/TheSansArab-Bold_0.ttf");
+      }
+
+      h1,h2.h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6{
+          font-family: 'myFirstFontHeading';
+      }
+      body{
+        font-family: 'myFirstFontNormal',sans-serif ;
+      }
+      *{
+        font-family: 'myFirstFontNormal';
+      }
       a{
         text-decoration: none;
       }
@@ -167,7 +185,7 @@
 
 
 /*--------------------------------------------------------------
-3.0 Effects Styles 
+3.0 Effects Styles
 --------------------------------------------------------------*/
 
 
@@ -2312,12 +2330,12 @@ div.h4 {
   .faculty{
     position: absolute;
     top: 6px;left: 100px;
-  }  
+  }
   #nav_row{
     font-size:16px;
   }
 }
-/* @media (min-width: 768px) and (max-width: 1170.99px) { 
+/* @media (min-width: 768px) and (max-width: 1170.99px) {
  *{background-color: red}
  } */
 #nav_content_internal{
@@ -2450,23 +2468,7 @@ div.h4 {
   input{
     direction: rtl;
   }
-  @font-face {
-    font-family: myFirstFontHeading;
-    src: url("assets/fonts/TheSansArab-Black.ttf");
-}
 
-@font-face {
-    font-family: myFirstFontNormal;
-    src: url("assets/fonts/TheSansArab-Bold_0.ttf");
-}
-
-h1,h2.h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6{
-    font-family: myFirstFontHeading
-}
-
-* {
-    font-family: ! myFirstFontNormal
-}
     </style>
 </head>
 <body style="<?php if(URL::full()=='http://127.0.0.1:8000')echo'

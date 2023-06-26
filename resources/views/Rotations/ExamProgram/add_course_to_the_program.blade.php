@@ -1,7 +1,7 @@
 @extends('layouts.app-master')
 
 @section('content')
-    <div class="container" style="margin-top: -50px;">
+    <div class="container">
         <h1 class="text-center">إضافة مادة إلى برنامج {{ $rotation->name }} {{ $rotation->year }}
             <div class="float-right">
                 <a href="{{ URL::previous() }}" class="btn btn-dark">Back</a>

@@ -40,7 +40,7 @@
                 @method('patch')
                 @csrf
                 <div class="row">
-                <div class="left col-sm-3" style="float:left">   
+                <div class="left col-sm-3" style="float:left">
                     <div class="mb-3">
                         <label for="email" class="form-label">أسم المقرر :</label>
                         <input value="{{ $course->course_name }}"
@@ -185,7 +185,7 @@
                                                                         $number_taken_in_this_room_course=App\Http\Controllers\MaxMinRoomsCapacity\Stock::getOccupiedNumberOfStudentsInThisCourseInSpecificRoom($rotation, $course_belongs, $room->id);
                                                                         $num_all_courses_occupied_this_room+=$number_taken_in_this_room_course;
                                                                     }
-                                                            @endphp 
+                                                            @endphp
                                                             @if($number_taken_in_this_room_course)
                                                             <a style="position: relative;margin: 0 8px 8px 0;text-decoration: none;" href="{{ route("rotations.get_room_for_course",[$rotation->id,$course_belongs->id,$room->id]) }}" class="badge bg-{{($course->id == $course_belongs->id ) ? 'danger': 'secondary'}}">
                                                                 {{$course_belongs->course_name}}
@@ -205,12 +205,12 @@
                                             {{-- Capacity / Occupied --}}
                                              @if(in_array($room->id, $rooms_this_course) || in_array($room->id, $joining_rooms) || in_array($room->id, $common_rooms_ids))
                                                 <span class="badge bg-{{(($room->capacity+$room->extra_capacity) - $num_all_courses_occupied_this_room)?'primary':'danger'}}">{{($room->capacity+$room->extra_capacity)}}/{{$num_all_courses_occupied_this_room}}</span>
-                                             @endif 
+                                             @endif
                                         </td>
                                         <td>
                                             {{-- status --}}
                                             @if(in_array($room->id, $rooms_this_course) || in_array($room->id, $joining_rooms) || in_array($room->id, $common_rooms_ids))
-                                                <span class="badge bg-{{(($room->capacity+$room->extra_capacity) - $num_all_courses_occupied_this_room)?'secondary':'danger'}}">{{(($room->capacity+$room->extra_capacity) - $num_all_courses_occupied_this_room)?($room->capacity+$room->extra_capacity) - $num_all_courses_occupied_this_room.' Free':'Full'}}</span>        
+                                                <span class="badge bg-{{(($room->capacity+$room->extra_capacity) - $num_all_courses_occupied_this_room)?'secondary':'danger'}}">{{(($room->capacity+$room->extra_capacity) - $num_all_courses_occupied_this_room)?($room->capacity+$room->extra_capacity) - $num_all_courses_occupied_this_room.' Free':'Full'}}</span>
                                             @endif
                                         </td>
                                         <td>
@@ -224,7 +224,7 @@
                                             @endif
                                         </td>
                                         <td>
-                                            @if(in_array($room->id, $joining_rooms)) 
+                                            @if(in_array($room->id, $joining_rooms))
                                             {{-- count_taken_student_in_all_rooms_in_this_course--}}
                                                     <a href="/rotations/{{ $rotation->id }}/course/{{ $course->id }}/room/{{ $room->id }}" class="btn-sm btn btn-warning" style="
                                                     {{  ($occupied_number_of_students_in_this_course === $entered_students_number) ? 'pointer-events: none;background-color: #ffc10773;border-color: #ffc10773;':''}}
@@ -234,7 +234,7 @@
                                             @endif
                                             <a href="/rotations/{{ $rotation->id }}/course/{{ $course->id }}/room/{{ $room->id }}" class="btn-sm btn @php echo (in_array($room->id,$common_rooms_ids))? 'btn-success':'btn-danger'; @endphp"
                                                 {{-- /{{ route('courses.get_room_for_course', ['rotation'=>$rotation->id,'course'=>$course->id,'specific_room'=>$room->id]) }} --}}
-                                            style="{{ (!in_array($room->id, $common_rooms_ids)&& in_array($room->id,$disabled_common_rooms_send)) ? 'pointer-events: none;background-color:#999' : '' }} ;display:none;">{{(in_array($room->id,$common_rooms_ids)) ?'Manage':'specify members'}}
+                                            style="{{ (!in_array($room->id, $common_rooms_ids)&& in_array($room->id,$disabled_common_rooms_send)) ? 'pointer-events: none;background-color:#999' : '' }} ;display:none;">{{(in_array($room->id,$common_rooms_ids)) ?'Manage':'إداره القاعة'}}
                                             </a>
                                         </td>
                                         {{-- @if(in_array($room->id,$disabled_common_rooms_send))

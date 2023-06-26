@@ -35,7 +35,14 @@
             @php
                 list($all_rotations_table, $observations_number_in_latest_rotation)=App\Http\Controllers\MaxMinRoomsCapacity\Stock::calcInfoForEachRotationForSpecificuser(Auth::user());
             @endphp
-
+            {{-- <div class="position-relative m-4">
+                <div class="progress" style="height: 1px;">
+                  <div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <button type="button" class="position-absolute top-0 start-0 translate-middle btn btn-sm btn-primary rounded-pill" style="width: 2rem; height:2rem;">1</button>
+                <button type="button" class="position-absolute top-0 start-50 translate-middle btn btn-sm btn-primary rounded-pill" style="width: 2rem; height:2rem;">2</button>
+                <button type="button" class="position-absolute top-0 start-100 translate-middle btn btn-sm btn-secondary rounded-pill" style="width: 2rem; height:2rem;">3</button>
+            </div> --}}
             <div class="text-center mb-4">
                 <div class="btn-group" role="group" aria-label="Basic example">
                     @if(count($rotation->coursesProgram()->toBase()->get()) )
@@ -89,7 +96,7 @@
                                     <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
                                 </svg> تهيئة البرنامج الإمتحاني</a>
                                 @include('layouts.partials.initialization.initializationInExamProgram',['route_info' => ['rotations.initExamProgram',$rotation->id],'header_text'=>'تهيئة البرنامج الإمتحاني','description'=>'!!هل أنت متاكد أنك تريد تهيئة البرنامج الإمتحاني , سيؤدي ذلك لحذف كل المقررات بالكامل'])
-                                
+
                                 <a href="#intializationInExamProgramModalToggle" data-bs-toggle="modal" class='btn btn-dark rounded-0 rounded-end'><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar-x" viewBox="0 0 16 16">
                                     <path d="M6.146 7.146a.5.5 0 0 1 .708 0L8 8.293l1.146-1.147a.5.5 0 1 1 .708.708L8.707 9l1.147 1.146a.5.5 0 0 1-.708.708L8 9.707l-1.146 1.147a.5.5 0 0 1-.708-.708L7.293 9 6.146 7.854a.5.5 0 0 1 0-.708z"/>
                                     <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
@@ -107,7 +114,7 @@
                         <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2z"/>
                         <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1z"/>
                         </svg> إضافة مقرر للبرنامج
-                    </a>    
+                    </a>
                     @endif
                 </div>
             </div>
@@ -169,7 +176,7 @@
                         <td class="date" align="center" height="100">
                             <b>{{ date('D d-m-Y', strtotime($date)) }}</b>
                         </td>
-                        @php 
+                        @php
                             $counter_one=0;
                             $counter_two=0;
                             $counter_three=0;
@@ -264,7 +271,7 @@
                                                         <span class="badge bg-secondary m-0">{{gmdate('H:i A',strtotime($time))}}</span>
                                                 </div>
                                             @else
-                                                <a href="#exampleModalToggle{{ $id_course }}" data-bs-toggle="modal" class="badge bg-danger rounded">حذف</a>                                                
+                                                <a href="#exampleModalToggle{{ $id_course }}" data-bs-toggle="modal" class="badge bg-danger rounded">حذف</a>
                                                 <span class="badge bg-secondary m-0">{{gmdate('H:i A',strtotime($time))}}</span>
                                             @endif
                                             @include('layouts.partials.popUpDelete',['route_info' => ['rotations.course.delete_course_from_program', $rotation->id, $id_course],'description' => "هل أنت متأكد أنك تريد حذف المقرر $courseQ->course_name"])
@@ -277,13 +284,8 @@
             </tbody>
         </table>
         @else
-            <div class="alert text-black alert-success" role="alert" style="margin-top: 20px;">
-                <h4 class="alert-heading">Sorry<h4>
-                <p>The Program has not any course yet .</p>
-                <hr>
-                <p class="mb-0">Whenever you need to add a new course, click the green button .</p>
-            <h1><a href="{{url()->previous()}}" class="btn btn-secondary"> Back</a></h1>
-            {{-- problem in back --}}
+            <div class="alert text-black alert-warning text-center mt-5" role="alert">
+                <h3 class="alert-heading">الدورة فارغة من المقررات<h3>
             </div>
         @endif
       </div>
