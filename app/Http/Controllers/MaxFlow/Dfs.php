@@ -19,11 +19,14 @@ class Dfs extends Controller
             $this->parents[$i]=-1;
         }
         $this->curr_node=$node;
+        //dump(count($this->status));
         $this->dfsIterative($this->curr_node);
     }
     public function dfsIterative(int $node) {
         $this->status[$node]=2;
-        for ( $j = 0; $j < count($this->status); $j++){
+        //Bug Possibility[Asem]
+        //No bug since the graph construction is discreted
+        for ( $j = 0; $j < count($this->status)-1; $j++){
             if($this->adj[$node][$j] == 1){
                 if($this->status[$j]==1){
                     $this->treeEdges[]=[$node,$j];
