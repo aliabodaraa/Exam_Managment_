@@ -56,7 +56,7 @@ class Graph extends Controller
             // for ($i=count($this->members->getMembers())+$this->count_arr_same_time_courses+count($this->courses->getCourses())+1; $i < count($this->members->getMembers())+$this->count_arr_same_time_courses+count($this->courses->getCourses())+count($this->rooms->getRooms())+1 ; $i++) {
             //     dump($this->arr_graph[$i]);
             // }
-            dump($this->arr_graph);
+            //dump($this->arr_graph);
         }
     }
 
@@ -95,7 +95,7 @@ class Graph extends Controller
               for($j=count($this->arr_keys_users_objections_orderd)+$this->count_arr_same_time_courses+count($this->arr_keys_courses_num_objections_orderd)+1;$j<=count($this->arr_keys_users_objections_orderd)+$this->count_arr_same_time_courses+count($this->arr_keys_courses_num_objections_orderd)+$this->rooms->getLength();$j++)
                   if($this->arr_graph[$i][$j]==1)
                       $this->num_observations+=$this->arr_graph[$i][$j];
-                      dump('num_observationsoooooooo'.$this->num_observations);
+                      //dump('num_observationsoooooooo'.$this->num_observations);
         // $obsesameCourseoooooooo=0;
         // for($i=count($this->arr_keys_users_objections_orderd)+1;$i<=count($this->arr_keys_users_objections_orderd)+$this->count_arr_same_time_courses;$i++)
         // for($j=count($this->arr_keys_users_objections_orderd)+$this->count_arr_same_time_courses+1;$j<=count($this->arr_keys_users_objections_orderd)+$this->count_arr_same_time_courses+count($this->arr_keys_courses_num_objections_orderd);$j++)
@@ -329,15 +329,15 @@ class Graph extends Controller
         //dump('.....'.$this->length_graph);
         $obj_max = new MaxFlow($this->length_graph,$this->members->getMembers(),$this->courses->getCourses(),$this->count_arr_same_time_courses , $this->rooms->getRooms());
 
-        dump('Members Count:'.count($this->members->getMembers()));
-        dump('Same time Count:'.($this->count_arr_same_time_courses));
-        dump('courses Count:'.count($this->courses->getCourses()));
-        dump('Rooms Count:'.count($this->rooms->getRooms()));
+        //dump('Members Count:'.count($this->members->getMembers()));
+        //dump('Same time Count:'.($this->count_arr_same_time_courses));
+        //dump('courses Count:'.count($this->courses->getCourses()));
+        //dump('Rooms Count:'.count($this->rooms->getRooms()));
         if($this->type->name == "Observer"){
 
-            dump($this->arr_graph);
+           //dump($this->arr_graph);
         }else{
-            dump($this->arr_graph);
+            //dump($this->arr_graph);
         }
         //dump($this->arr_graph[102]);
         // dump($this->arr_graph[47]);
@@ -357,8 +357,8 @@ class Graph extends Controller
             // $numOfRoomsThat_is_Connected++;
             // dump('num Of Rooms That is Connected '.$numOfRoomsThat_is_Connected);
         $paths=$obj_max->fordFulkerson($this->arr_graph, 0, $this->length_graph-1);
-        dump('--------');
-        dump($this->arr_graph[105]);
+        //dump('--------');
+        //dump($this->arr_graph[105]);
         // dump($this->arr_graph[47]);
         // dump($this->arr_graph[48]);
         // dump($this->arr_graph[49]);
@@ -402,9 +402,9 @@ class Graph extends Controller
 
         if($this->type->name == "Observer"){
 
-            dd($this->arr_graph);
+            //dd($this->arr_graph);
         }else{
-            dump($this->arr_graph);
+            //dump($this->arr_graph);
         }
 
         return array($paths,$pathsInfo);

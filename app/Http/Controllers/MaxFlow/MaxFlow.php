@@ -19,6 +19,7 @@ class MaxFlow extends Controller
     private array $rooms;
     private int $count_arr_same_time_courses;
 
+    private array $observers_taken;
     public static int $count_of_paths=0;
     //=====================  Asem  =====================
     public function __construct(int $length_graph,$members,$courses,$count_arr_same_time_courses , $rooms){
@@ -30,8 +31,10 @@ class MaxFlow extends Controller
 
         ///dd($this->members ,"----",array_reverse($this->members ) );
         $this->rooms=$rooms;
+        $this->observers_taken=array();
     }
     public function bfs(array &$rGraph,int $s, int $t, array &$parent) : bool {
+        $is_postponed=[];
         $visited=[];
         for ($i = 0; $i < Self::$V; ++$i)
             $visited[$i] = false;
@@ -43,7 +46,17 @@ class MaxFlow extends Controller
         $parent[$s] = -1;
         while (count($queue) != 0) {
             // Asem Very important !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
             $u = array_shift($queue);
+            //if(Self::$count_of_paths>=643){
+                //dump("Vertex: ".$u." ,Parent: ".$parent[$u] );
+            //}
+            if(in_array($u,$this->observers_taken) && $parent[$u]==$s && !in_array($u,$is_postponed) ){
+                //dump("hi");
+                array_push($queue,$u);
+                array_push($is_postponed,$u);
+                continue;
+            }
             //dump($u);
             for ( $v = 0; $v < Self::$V; $v++) {
                 if ($visited[$v] == false && $rGraph[$u][$v] > 0) {
@@ -93,9 +106,17 @@ class MaxFlow extends Controller
             }
             $max_flow += $path_flow;
             $path=array_reverse($path);
+
+            //dump($path);
+            array_push($this->observers_taken,$path[0]);
+            //var_dump($this->observers_taken);
+            if(count($this->observers_taken)==count($this->members)){
+                $this->observers_taken=array();
+            }
             // //===================Asem==============================================
             if(count($path)==5){
-                Self::$count_of_paths=Self::$count_of_paths+1;
+                //Undo Me:
+                //Self::$count_of_paths=Self::$count_of_paths+1;
                 $pure_parent=array(); // Build pure_parent array with |path| whereas parent array with |V|
                 $counter_index=4;
                 $k=Self::$V-1;
@@ -141,7 +162,16 @@ class MaxFlow extends Controller
             $path_length=count($path);
             $hint_paths=array();
             //$undo_path_from_user_x_and_give_it_to_user_y=array();
+
+            //dump("max_flow ".$max_flow);
+            //Delete Me
+            Self::$count_of_paths=$max_flow;
+            // if(Self::$count_of_paths>=643){
+            //     dump("+========".Self::$count_of_paths);
+            // }
             if($path_length>5){
+
+                //dump($max_flow);
                 $i=$path_length-1;
                 $undo_path_from_user_x_and_give_it_to_user_y=array();
                 $new_path_for_user_x=array();
@@ -184,12 +214,16 @@ class MaxFlow extends Controller
             }else{
                 array_push($paths,$path);
             }
+            $parent =[];
+            for ($v = 0; $v <Self::$V ; $v++) {
+                $parent[$v] =-2;
+            }
         }
         $graph = $rGraph;
-        dump("max_flow ".$max_flow);
+        //dump("max_flow ".$max_flow);
         $pathsDebug=array();
-        for($i=500;$i<count($paths);$i++)
-            array_push($pathsDebug,$paths[$i]);
+        //for($i=500;$i<count($paths);$i++)
+            //array_push($pathsDebug,$paths[$i]);
        // dump($pathsDebug);
         //dd($graph);
         return $paths;
