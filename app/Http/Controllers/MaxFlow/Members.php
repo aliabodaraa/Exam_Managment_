@@ -15,10 +15,16 @@ class Members extends Controller
     public function __construct(EnumPersonType $type,Rotation $rotation){
         $this->type=$type;
         $this->rotation=$rotation;
+        $room_head_doctors= User::where('role','دكتور')->toBase()->get()->pluck('id')->toarray();
         $room_heads=$this->rotation->initial_members()->wherePivot('options','{"1":"on"}')->
                                                         orWherePivot('options','{"1":"on","2":"on"}')->
                                                         wherePivot('rotation_id',$rotation->id)->
                                                         toBase()->get()->pluck('id')->toarray();
+        //dump($room_head_doctors);
+        $room_head_doctors=array_intersect($room_head_doctors,$room_heads);
+        //dump($x);
+        $room_heads=array_unique(array_merge($room_head_doctors,$room_heads));
+        //dd($room_heads);
         $secertaries=$this->rotation->initial_members()->wherePivot('options','{"2":"on"}')->
                                                         orWherePivot('options','{"1":"on","2":"on"}')->
                                                         wherePivot('rotation_id',$rotation->id)->
@@ -80,7 +86,7 @@ class Members extends Controller
     array_map(function($observer_id) use(&$count_users_observations){
         $count_users_observations+=User::where('id',$observer_id)->first()->number_of_observation;
         return $count_users_observations;
-    } ,$observers);     
+    } ,$observers);
     session()->put('count_users_observations',$count_users_observations);
 
         //dd($room_heads,$secertaries,$observers);
@@ -110,7 +116,7 @@ class Members extends Controller
     }
     public function getNumOfObservationsForSpecificMember($member_id){
         $num_observation_for_passed_member_id=User::where('id',$member_id)->toBase()->first()->number_of_observation;
-        
+
         return $num_observation_for_passed_member_id;
     }
     public function geMemberWithTeachedSubjects($member_id) {//get the subjects that the member are teaching them
