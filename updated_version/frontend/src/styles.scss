@@ -1,0 +1,26 @@
+@import "../node_modules/tailwindcss/base.css";
+@import  "../node_modules/tailwindcss/components.css";
+@import  "../node_modules/tailwindcss/utilities.css";
+
+// @use '@angular/material' as mat;
+// @import "tailwindcss/base";
+// @import "tailwindcss/components";
+// @import "tailwindcss/utilities";
+// @include mat.core();
+// $my-theme: mat.define-theme((
+//  color: (
+//     theme-type: dark,
+//     primary: mat.$violet-palette,
+//   ),
+// ));
+// html {
+//   // Emit theme-dependent styles for common features used across multiple components.
+//   @include mat.core-theme($my-theme);
+
+//   // Emit styles for MatButton based on `$my-theme`. Because the configuration
+//   // passed to `define-theme` omits typography, `button-theme` will not
+//   // emit any typography styles.
+//   @include mat.button-theme($my-theme);
+
+//   // Include the theme mixins for other components you use here.
+// }

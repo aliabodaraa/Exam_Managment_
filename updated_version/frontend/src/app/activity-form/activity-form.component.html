@@ -1,0 +1,288 @@
+<!-- {{entry_organizer_name??"aaaaaaaaa"}}
+
+
+{{form.errors|json}} -->
+<div class="shadow-md p-3 rounded-md text-justify">
+    <ng-container [ngSwitch]="pageType">
+        <h1 *ngSwitchCase="'edit'">{{'activity-form.header_title_edit'|translate}}</h1>
+        <h1 *ngSwitchCase="'new'">{{'activity-form.header_title_new'|translate}}</h1>
+    </ng-container>
+    <form [formGroup]="form" (ngSubmit)="save()" class="sm:text-3xl flex flex-col gap-4">
+        <div class="flex flex-col gap-4 sm:flex-row">
+            <div class="w-100 sm:w-1/2">
+                <div id="title_field">
+                    <label class="text-justify block text-sm font-medium text-slate-700"
+                        for="title">{{'activity-form.title.label'|translate}} :</label>
+                    <input type="text" id="title" formControlName="dc:title" class="h-11 block w-full px-2 py-1 bg-white rounded-md text-sm shadow-sm
+                                border border-transparent focus:outline-none"
+                        placeholder="{{'activity-form.title.placeholder'|translate}}" />
+                    <div *ngIf="f['dc:title']?.invalid &&(f['dc:title'].touched || submitted)">
+                        <span class="text-xs text-red-500"
+                            *ngIf="f['dc:title'].errors?.required">{{'error-messages.mandatory'|translate}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-col gap-4 sm:flex-row">
+            <div class="w-100 sm:w-1/2">
+                <div id="description_field">
+                    <label class="text-justify block text-sm font-medium text-slate-700"
+                        for="description">{{'activity-form.description.label'|translate}} :</label>
+                    <textarea formControlName="dc:description" id="description" cols="30" rows="20" class="h-11 block w-full px-2 py-1 bg-white rounded-md text-sm shadow-sm max-h-20
+                                border border-transparent focus:outline-none"
+                        placeholder="{{'activity-form.description.placeholder'|translate}}"></textarea>
+                    <div *ngIf="f['dc:description']?.invalid &&(f['dc:description'].touched || submitted)">
+                        <span class="text-xs text-red-500"
+                            *ngIf="f['dc:description'].errors?.required">{{'error-messages.mandatory'|translate}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="w-100 sm:w-1/2">
+                <div id="categorization_field">
+                    <label class="text-justify block text-sm font-medium text-slate-700"
+                        for="categorization">{{'activity-form.categorization.label'|translate}}
+                        :</label>
+                    <input type="text" id="categorization" formControlName="activity:categorization" class="h-11 block w-full px-2 py-1 bg-white rounded-md text-sm shadow-sm
+                                border border-transparent focus:outline-none"
+                        placeholder="{{'activity-form.categorization.placeholder'|translate}}" />
+                    <div
+                        *ngIf="f['activity:categorization']?.invalid &&(f['activity:categorization'].touched || submitted)">
+                        <span class="text-xs text-red-500"
+                            *ngIf="f['activity:categorization'].errors?.required">{{'error-messages.mandatory'|translate}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-col gap-4 sm:flex-row text-sm">
+            <div class="w-100 sm:w-1/2">
+                <div id="startDate_field">
+                    <label class="text-justify block text-sm font-medium text-slate-700"
+                        for="startDate">{{'activity-form.start_date.label'|translate}}
+                        :</label>
+                    <!-- <input id="startDate" formControlName="activity:startDate"
+                        [ngClass]="{ 'is-invalid': submitted && f['activity:startDate'].errors }"
+                        placeholder="{{'activity-form.start_date.placeholder'|translate}}" type="date"
+                        (click)="setMaxDate()" class="h-11 block w-full px-2 py-1 bg-white rounded-md text-sm shadow-sm
+                                border border-transparent focus:outline-none"> -->
+                    <cts-dynamic-form-hijri-dateitem (click)="setMaxDate()"
+                        placeholder="{{'activity-form.start_date.placeholder'|translate}}"
+                        formControlName="activity:startDate">
+                    </cts-dynamic-form-hijri-dateitem>
+                    <div class="date-level-validation">
+                        <span *ngIf="form.errors?.dateRange" class="text-xs text-red-500">
+                            {{'error-messages.date_order_start'|translate}}
+                        </span>
+                    </div>
+                    <div *ngIf="f['activity:startDate']?.invalid &&(f['activity:startDate'].touched || submitted)">
+                        <span class="text-xs text-red-500"
+                            *ngIf="f['activity:startDate'].errors?.required">{{'error-messages.mandatory'|translate}}</span>
+                    </div>
+                </div>
+            </div>
+            <!-- {{f['activity:startDate'].value}} -->
+            <div class="w-100 sm:w-1/2">
+                <div id="endDate_field">
+                    <div id="endDate_field">
+                        <label class="text-justify block text-sm font-medium text-slate-700"
+                            for="endDate">{{'activity-form.end_date.label'|translate}}
+                            :</label>
+                        <!-- <input id="endDate" formControlName="activity:endDate" (click)="setMinDate()"
+                            [ngClass]="{ 'is-invalid': submitted && f['activity:endDate'].errors }"
+                            placeholder="{{'activity-form.end_date.placeholder'|translate}}" type="date" class="h-11 block w-full px-2 py-1 bg-white rounded-md text-sm shadow-sm
+                                border border-transparent focus:outline-none"> -->
+
+                        <cts-dynamic-form-hijri-dateitem (click)="setMinDate()"
+                            placeholder="{{'activity-form.end_date.placeholder'|translate}}"
+                            formControlName="activity:endDate">
+                        </cts-dynamic-form-hijri-dateitem>
+                        <div *ngIf="f['activity:endDate']?.invalid &&(f['activity:endDate'].touched || submitted)">
+                            <span class="text-xs text-red-500"
+                                *ngIf="f['activity:endDate'].errors?.required">{{'error-messages.mandatory'|translate}}</span>
+                        </div>
+                    </div>
+                    <div class="date-level-validation">
+                        <span *ngIf="form.errors?.dateRange" class="text-xs text-red-500">
+                            {{'error-messages.date_order_end'|translate}}
+                        </span>
+                    </div>
+                </div>
+                <!-- {{f['activity:endDate'].value}} -->
+            </div>
+        </div>
+        <div class="flex flex-col sm:flex-row text-sm gap-4 justify-between">
+            <div class="sm:w-1/2">
+                <div id="organize_select_field">
+                    <label class="text-justify block text-sm font-medium text-slate-700"
+                        for="organize_select">{{'activity-form.organizer_selection.label'|translate}}
+                        :</label>
+                    <ng-select id="organize_select"
+                        placeholder="{{'activity-form.organizer_selection.placeholder'|translate}}"
+                        [items]="organizers_objects" bindLabel="name" bindValue="id" class="text-sm" [searchable]="true"
+                        formControlName="activity:organizers" (scrollToEnd)="getCustomizedOrganizersObjects()"
+                        [loading]="select_is_loaading"></ng-select>
+                    <div *ngIf="f['activity:organizers']?.invalid &&(f['activity:organizers'].touched || submitted)">
+                        <div *ngIf="f['activity:organizers'].errors?.required" class="text-xs text-red-500">
+                            {{'error-messages.mandatory'|translate}}</div>
+                    </div>
+                </div>
+            </div>
+            <!-- {{f['activity:organizers'].value}} -->
+            <div class="sm:w-1/2 flex flex-col justify-flex-end" style="justify-content: flex-end;">
+                <div class="sm:w-100 flex justify-between">
+                    <div id="timeFrom_field">
+                        <label class="text-justify block text-sm font-medium text-slate-700"
+                            for="timeFrom">{{'activity-form.time_from'|translate}}
+                            :</label>
+                        <ngb-timepicker formControlName="activity:timeFrom" [spinners]="false"
+                            [ngClass]="{ 'is-invalid': submitted && f['activity:timeFrom'].errors}"
+                            [ngStyle]="{backgroundColor:'red'}"></ngb-timepicker>
+                        <!-- {{f['activity:timeFrom'].value|json}} -->
+                        <div *ngIf="f['activity:timeFrom'].touched || submitted">
+                            <div *ngIf="f['activity:timeFrom'].errors?.required" class="text-xs text-red-500">
+                                {{'error-messages.mandatory'|translate}}</div>
+                        </div>
+                    </div>
+                    <div id="timeTo_field">
+                        <label class="text-justify block text-sm font-medium text-slate-700"
+                            for="timeTo">{{'activity-form.time_to'|translate}}
+                            :</label>
+                        <ngb-timepicker formControlName="activity:timeTo" [spinners]="false"
+                            [ngClass]="{ 'is-invalid': submitted && f['activity:timeTo'].errors}"
+                            [ngStyle]="{backgroundColor:'red'}"></ngb-timepicker>
+                        <!-- {{f['activity:timeTo'].value|json}} -->
+                        <div *ngIf="f['activity:timeTo'].touched || submitted">
+                            <div *ngIf="f['activity:timeTo'].errors?.required" class="text-xs text-red-500">
+                                {{'error-messages.mandatory'|translate}}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="time-level-validation">
+                    <span *ngIf="form.errors?.timeRange"
+                        class="text-xs text-red-500">{{'error-messages.time_order'|translate}}</span>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-col gap-4 sm:flex-row">
+            <label class="absolute block text-sm font-medium text-slate-700"
+                for="city">{{'activity-form.location.location_title'|translate}}
+                :</label>
+            <div class="w-100 flex flex-col gap-2 mt-7 pl-2 sm:w-1/2 sm:m-w-1/2" [formGroup]="accessLocation">
+                <div id="city_field">
+                    <label class="text-justify block text-xs font-medium text-slate-700"
+                        for="city">{{'activity-form.location.city.label'|translate}}
+                        :</label>
+                    <input type="text" id="city" formControlName="city" class="h-11 block w-full px-2 py-1 bg-white rounded-md text-sm shadow-sm
+                                border border-transparent focus:outline-none"
+                        placeholder="{{'activity-form.location.city.placeholder'|translate}}" />
+                    <div
+                        *ngIf="accessLocation.controls.city?.invalid &&(accessLocation.controls.city.touched || submitted)">
+                        <span *ngIf="accessLocation.controls.city.errors?.required"
+                            class="text-xs text-red-500">{{'error-messages.mandatory'|translate}}</span>
+                    </div>
+                </div>
+                <div id="geographicLocation_field">
+                    <label class="text-justify block text-xs font-medium text-slate-700"
+                        for="geographicLocation">{{'activity-form.location.geographic.label'|translate}}
+                        :</label>
+                    <input type="text" id="geographicLocation" formControlName="geographicLocation" class="h-11 block w-full px-2 py-1 bg-white rounded-md text-sm shadow-sm
+                                border border-transparent focus:outline-none"
+                        placeholder="{{'activity-form.location.geographic.placeholder'|translate}}" />
+                    <div
+                        *ngIf="accessLocation.controls.geographicLocation?.invalid &&(accessLocation.controls.geographicLocation.touched || submitted)">
+                        <span *ngIf="accessLocation.controls.geographicLocation.errors?.required"
+                            class="text-xs text-red-500">{{'error-messages.mandatory'|translate}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="w-100 sm:w-1/2">
+                <label class="text-justify block text-sm font-medium text-slate-700"
+                    for="coverPictureInput">{{'activity-form.cover_picture'|translate}}
+                    :</label>
+
+                <div id="coverPicture_field" class="flex flex-col relative">
+                    <input hidden="true" id="coverPictureInput" type="file" (change)="onAttachFileChange($event)"
+                        accept=".png, .jpg, .jpeg">
+
+                    <button type="button" (click)="clickCoverPictureInput()" *ngIf="!coverPictureUrl" class="w-32 h-9 text-white text-sm text-center font-medium rounded-md bg-gray-700
+                              {{form.valid?'hover:bg-gray-800 cursor-pointer':'cursor-not-allowed'}}
+                              opacity-{{isImageLoading?'70':'100'}}
+                              focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700
+                              dark:focus:ring-blue-800" [disabled]="isImageLoading">
+                        <svg *ngIf="isImageLoading" aria-hidden="true" role="status"
+                            class="inline w-4 h-4 me-3 text-white animate-spin" viewBox="0 0 100 101" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                fill="#E5E7EB" />
+                            <path
+                                d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                fill="currentColor" />
+                        </svg>
+                        <ng-container [ngSwitch]="isImageLoading">
+                            <span *ngSwitchCase="true">{{'activity-form.Uploading'|translate}}</span>
+                            <span *ngSwitchCase="false">{{'activity-form.Upload'|translate}}</span>
+                        </ng-container>
+                    </button>
+                    <mat-card class="activity-picture-card" *ngIf="coverPictureUrl">
+                        <mat-card-header>
+                            <mat-card-subtitle>Activity Image Upload</mat-card-subtitle>
+                            <mat-card-title>Activity</mat-card-title>
+                        </mat-card-header>
+                        <mat-card-content>
+                            <img id="coverPictureUrl" [src]="coverPictureUrl" alt="cover_picture"
+                                class="w-full max-h-52 object-contain img-thumbnail {{isImageLoading?'opacity-40':''}}"
+                                style="top: 38%;right: 41%;">
+                            <mat-divider></mat-divider>
+                        </mat-card-content>
+                        <mat-card-actions *ngIf="!isImageLoading">
+                            <button mat-raised-button color="warn" type="button" (click)="resetCoverImage()">
+                                Delete<i class="bi bi-trash3-fill text-md cursor-pointer"></i>
+                            </button>
+                            <button mat-raised-button mat-primary type="button" (click)="clickCoverPictureInput()">
+                                Edit
+                                <i class="bi bi-pencil-square text-blue-600 text-md cursor-pointer"></i>
+                            </button>
+                        </mat-card-actions>
+                        <mat-card-footer *ngIf="isImageLoading">
+                            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                        </mat-card-footer>
+                    </mat-card>
+
+                    <ng-container *ngIf="isImageLoading">
+                        <svg aria-hidden="true" role="status"
+                            class="absolute w-full h-5 top-1/2 right-0 inline text-gray-200 animate-spin dark:text-gray-700"
+                            viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                fill="currentColor" />
+                            <path
+                                d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                fill="#1C64F2" />
+                        </svg>
+                    </ng-container>
+                    <span *ngIf="accessCoverPicture?.errors"
+                        class="text-xs text-red-500">{{'error-messages.mandatory'|translate}}</span>
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="mt-10 w-1/6 h-11 text-white text-sm text-center font-medium rounded-md bg-gray-700
+            {{!form.valid || !isImageLoading?'cursor-not-allowed':'hover:bg-gray-800 cursor-pointer'}}
+            opacity-{{!form.valid || submitted || isImageLoading?'60':'100'}}
+            focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700
+            dark:focus:ring-blue-800" [disabled]="!form.valid || isImageLoading">
+            <svg *ngIf="submitted" aria-hidden="true" role="status" class="inline w-4 h-4 mx-2 text-white animate-spin"
+                viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                    fill="#E5E7EB" />
+                <path
+                    d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                    fill="currentColor" />
+            </svg>
+            <ng-container [ngSwitch]="submitted">
+                <ng-container *ngSwitchCase="true">{{'activity-form.Saving'|translate}}</ng-container>
+                <ng-container *ngSwitchCase="false">{{'activity-form.Save'|translate}}</ng-container>
+            </ng-container>
+        </button>
+    </form>
+</div>

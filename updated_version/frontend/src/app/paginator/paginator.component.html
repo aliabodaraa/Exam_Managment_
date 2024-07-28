@@ -1,0 +1,76 @@
+<div *ngIf="loaded" class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+    <div class="flex flex-1 justify-between sm:hidden">
+        <a
+            class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Previous</a>
+        <a
+            class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Next</a>
+    </div>
+    <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+        <div>
+            <p class="text-sm text-gray-700">
+                Showing
+                <span class="font-medium">{{current_page}}</span>
+                of
+                <span class="font-medium">{{last_page}}</span>
+                results
+            </p>
+        </div>
+        <div class="flex gap-x-4">
+            <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                <button (click)="next(previous_page)" class="normal-paginator-btn-prev" [disabled]="!has_previous">
+                    <span class="sr-only">Previous</span>
+                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd"
+                            d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </button>
+
+                <ng-container *ngIf="current_page !==1 && previous_page !==1">
+                    <button (click)="next(1)" aria-current="page" class="normal-paginator-btn">1</button>
+                </ng-container>
+                <span *ngIf="(current_page >= 4 && current_page < last_page-1)||current_page>=last_page-1"
+                    class="normal-paginator-btn-middle">...</span>
+                <ng-container *ngIf="has_previous">
+                    <button (click)="next(previous_page)" aria-current="page"
+                        class="normal-paginator-btn">{{previous_page}}</button>
+                </ng-container>
+
+                <button (click)="next(current_page)" aria-current="page"
+                    class="active-paginator-btn">{{current_page}}</button>
+
+                <ng-container *ngIf="has_next">
+                    <button (click)="next(next_page)" aria-current="page"
+                        class="normal-paginator-btn">{{next_page}}</button>
+                </ng-container>
+                <span *ngIf="(current_page > 1 && current_page < last_page-2)||current_page == 1"
+                    class="normal-paginator-btn-middle">...</span>
+
+                <ng-container *ngIf="last_page !==current_page && next_page !==last_page">
+                    <button (click)="next(last_page)" aria-current="page"
+                        class="normal-paginator-btn">{{last_page}}</button>
+                </ng-container>
+
+
+                <button (click)="next(next_page)" class="normal-paginator-btn-next" [disabled]="!has_next">
+                    <span class="sr-only">Next</span>
+                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd"
+                            d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </button>
+
+            </nav>
+            <select id="iterms_per_pages" [(ngModel)]="iterms_per_page" (change)="next(current_page,true)"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                <ng-container *ngFor="let item of [1,2,3,4,5];let index=index">
+                    <option [value]="index+1">{{index+1}}</option>
+                </ng-container>
+
+            </select>
+            {{loaded_?"A":"B"}}
+
+        </div>
+    </div>
+</div>
