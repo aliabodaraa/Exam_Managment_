@@ -1,0 +1,34 @@
+{
+    "toolbar": {
+        "home": "الصفحة الرئيسية",
+        "rooms": "القاعات",
+        "courses": "المقررات",
+        "users": "الموظفين",
+        "rounds": "الدورات الإمتحانية"
+    },
+    "paginator": {
+        "nextBtn": "التالي",
+        "prevBtn": "السابق"
+    },
+    "VOC": {
+        "ROLES": {
+            "VOC_ROLE_ADMIN": "Admin",
+            "VOC_ROLE_PROFESSOR": "استاذ دكتور",
+            "VOC_ROLE_ENGINEER": "مهندس",
+            "VOC_ROLE_DOCTOR": "دكتور",
+            "VOC_ROLE_TEACHER": "مدرس",
+            "VOC_ROLE_GRADUATE_STUDENT": "طالب دراسات",
+            "VOC_ADMINISTRATIVE_OFFICER": "موظف إداري"
+        },
+        "TEMPORARY_ROLES": {
+            "VOC_TEMPORARY_ROLE_DEAN": "عميد",
+            "VOC_TEMPORARY_ROLE_ADMINISTRATIVE_DEPUTY": "نائب إداري",
+            "VOC_TEMPORARY_ROLE_SCIENTIFIC_VICE": "نائب علمي",
+            "VOC_TEMPORARY_ROLE_HEAD_OF_DEPARTMENT": "رئيس قسم",
+            "VOC_TEMPORARY_ROLE_HEAD_OF_CIRCLE": "رئيس دائرة",
+            "VOC_TEMPORARY_ROLE_HEAD_OF_EXAMINATIONS_DEPARTMENT": "رئيس شعبة الإمتحانات",
+            "VOC_TEMPORARY_ROLE_TIMEKEEPER": "مراقف دوام",
+            "VOC_TEMPORARY_ROLE_HEAD_OF_STUDENT_AFFAIRS": "رئيس شعبة شؤون الطلاب"
+        }
+    }
+}

@@ -1,0 +1,9 @@
+<!-- Table -->
+<lib-table [data]="data" [withPaginator]="true" (changePaginator)="getNextPage($event)"></lib-table>
+
+<!-- Portal -->
+<ng-container *cdkPortal>
+  <button mat-fab color="accent" (click)="openDialog()">
+    <mat-icon>add</mat-icon>
+  </button>
+</ng-container>

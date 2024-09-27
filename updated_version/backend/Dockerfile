@@ -10,4 +10,4 @@ COPY . .
 
 EXPOSE 80
 
-CMD ["nodemon", "app.ts"]
+CMD ["npx", "nodemon", "-L", "app.ts"]

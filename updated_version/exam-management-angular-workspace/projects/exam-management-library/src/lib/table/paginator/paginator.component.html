@@ -1,0 +1,83 @@
+<div *ngIf="langs$|async as current_lang"
+    class="flex items-center {{data_count>0?'justify-between':'justify-center'}} border-t border-gray-200 dark:border-red-600 bg-white px-4 py-3 md:px-6 border text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 w-full p-2.5 dark:bg-gray-700 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mt-3">
+    <div class="flex flex-1 justify-between md:hidden">
+        <button class="bg-red-700">aaaaaaaasaaa</button>
+        <button class="btn" [ngClass]="{'disabled-btn': !has_previous}" (click)="next(previous_page)"
+            [disabled]="!has_previous">{{'paginator.prevBtn'|translate}}</button>
+        <button class="btn" [ngClass]="{'disabled-btn': !has_next}" (click)="next(next_page)"
+            [disabled]="!has_next">{{'paginator.nextBtn'|translate}}</button>
+    </div>
+    <div *ngIf="data_count>0;else no_data_fetched" class="hidden md:flex md:flex-1 md:items-center md:justify-between">
+        <div class="flex flex-col justify-center">
+            <p class="text-sm text-gray-700 dark:text-gray-400">
+                Showing
+                <span class="font-medium">{{current_page}}</span>
+                of
+                <span class="font-medium">{{last_page}}</span>
+                pages
+            </p>
+        </div>
+        <div class="flex gap-x-4">
+            <nav class="isolate inline-flex -space-x-px rounded-xl shadow-sm" aria-label="Pagination">
+                <button (click)="next(previous_page)" class="normal-paginator-btn-leaf"
+                    [ngClass]="{'rounded-l-xl':current_lang==='en','rounded-r-xl':current_lang==='ar','disabled-btn': !has_previous}"
+                    [disabled]="!has_previous">
+                    <ng-container *ngIf="current_lang==='en';else ar_section">
+                        <mat-icon [svgIcon]="'icons:paginator-prev'" class="h-5 w-5 paginator-prev"></mat-icon>
+                    </ng-container>
+                    <ng-template #ar_section>
+                        <mat-icon [svgIcon]="'icons:paginator-next'" class="h-5 w-5 paginator-prev"></mat-icon>
+                    </ng-template>
+                </button>
+
+                <ng-container *ngIf="current_page !==1 && previous_page !==1">
+                    <button (click)="next(1)" aria-current="page" class="normal-paginator-btn">1</button>
+                </ng-container>
+                <span *ngIf="(current_page >= 4 && current_page < last_page-1)||current_page>=last_page-1"
+                    class="normal-paginator-btn-middle">...</span>
+                <ng-container *ngIf="has_previous">
+                    <button (click)="next(previous_page)" aria-current="page"
+                        class="normal-paginator-btn">{{previous_page}}</button>
+                </ng-container>
+
+                <button (click)="next(current_page)" aria-current="page"
+                    class="active-paginator-btn">{{current_page}}</button>
+
+                <ng-container *ngIf="has_next">
+                    <button (click)="next(next_page)" aria-current="page"
+                        class="normal-paginator-btn">{{next_page}}</button>
+                </ng-container>
+                <span *ngIf="(current_page > 1 && current_page < last_page-2)||current_page == 1"
+                    class="normal-paginator-btn-middle">...</span>
+
+                <ng-container *ngIf="last_page !==current_page && next_page !==last_page">
+                    <button (click)="next(last_page)" aria-current="page"
+                        class="normal-paginator-btn">{{last_page}}</button>
+                </ng-container>
+
+
+                <button (click)="next(next_page)" class="normal-paginator-btn-leaf"
+                    [ngClass]="{'rounded-r-xl':current_lang==='en','rounded-l-xl':current_lang==='ar','disabled-btn': !has_next}"
+                    [disabled]="!has_next">
+                    <ng-container *ngIf="current_lang==='en';else ar_section_">
+                        <mat-icon [svgIcon]="'icons:paginator-next'" class="h-5 w-5 paginator-prev"></mat-icon>
+                    </ng-container>
+                    <ng-template #ar_section_>
+                        <mat-icon [svgIcon]="'icons:paginator-prev'" class="h-5 w-5 paginator-prev"></mat-icon>
+                    </ng-template>
+                </button>
+
+            </nav>
+            <select id="iterms_per_pages" [(ngModel)]="iterms_per_page" (change)="next(current_page,true)"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-slate-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                <ng-container *ngFor="let item of dataCountArr;let index=index">
+                    <option [value]="index+1">{{index+1}}</option>
+                </ng-container>
+            </select>
+        </div>
+    </div>
+    <ng-template #no_data_fetched>
+        no data fetched
+    </ng-template>
+
+</div>

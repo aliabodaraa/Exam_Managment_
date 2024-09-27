@@ -1,0 +1,15 @@
+.howToLibTitle {
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+.resource-container{
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .resource-container{
+    width: 32%;
+  }
+}

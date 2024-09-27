@@ -1,0 +1,58 @@
+.dark {
+  .dark\:brightness-full {
+    filter: brightness(0) invert(1);
+  }  
+  .dark\:bg-tax-card-first-Row {
+    background: linear-gradient(180deg, rgba(21, 47, 60, 0.00) 0%, #15303D 73.9%) !important;
+  }
+  
+  .dark\:bg-tax-card-second-Row {
+    background: linear-gradient(180deg, rgba(21, 39, 47, 0.00) 0%, #152931 73.9%) !important;
+  }
+
+  .dark\:bg-knwl-tax-card {
+    background: linear-gradient(180deg, rgba(21, 39, 47, 0.00) 0%, #172D35 73.9%) !important;
+  }
+  .mat-checkbox-frame {
+    @apply border-munsell-blue #{!important};
+  }
+
+  .mat-checkbox-checked {
+    .mat-checkbox-background {
+      @apply bg-munsell-blue #{!important};
+    }
+  }
+
+  .mat-ripple-element,.active-menu::before  {
+    @apply bg-munsell-blue #{!important};
+  }
+
+  .container input:checked ~ .checkmark {
+    @apply bg-munsell-blue #{!important};
+  }
+
+  .container:hover input ~ .checkmark {
+    @apply bg-munsell-blue #{!important};
+  }
+  .recentPublishedFilterBtn.nonSelected {
+    @apply bg-transparent text-burnished-brown hover:border-munsell-blue #{!important};
+  }
+  .recentPublishedFilterBtn.selected {
+    @apply bg-munsell-blue text-white hover:border-munsell-blue #{!important};
+  }
+
+  .matMenuGeneralStyle {
+    background: #19262C;
+    .menuItem {
+        @apply bg-transparent text-white;
+    }
+    .menuItem:hover {
+        background: #35444E;
+    }
+    .menuItem.selected {
+      @apply text-munsell-blue;
+        background: #0F171E;
+    }
+  }
+
+}

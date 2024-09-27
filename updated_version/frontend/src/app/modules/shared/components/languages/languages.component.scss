@@ -1,0 +1,14 @@
+.langBtn { 
+    width: 70px;
+    height: 32px;
+    border-radius: 36px;
+    // border: 2px solid  #FFF;
+    background:  rgba(255, 255, 255, 0.20);
+    color: #FFF;
+}
+.square{
+    @apply rounded-full text-center w-16 h-8 bg-azureish-White dark:bg-white text-yankees-blue dark:text-munsell-blue;
+}
+.circle{
+    @apply rounded-full text-center w-6 h-6 bg-azureish-White dark:bg-white border border-gray-100 text-yankees-blue dark:text-munsell-blue;
+}

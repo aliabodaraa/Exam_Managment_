@@ -1,5 +1,5 @@
 import { DataTypes, Deferrable } from "sequelize";
-import { sequelize } from "../util/database";
+import sequelize from "../util/database";
 
 export const Department = sequelize.define(
     "department",

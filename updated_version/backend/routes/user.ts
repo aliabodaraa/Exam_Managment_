@@ -1,12 +1,13 @@
 import express from "express";
-import { getIndex, getUser, storeUser } from "../controllers/user";
+import { getIndex, getRoles, getUser, storeUser, updateUser,deleteUser } from "../controllers/user";
+import { protect, restrict } from "../controllers/auth";
 
 const router = express.Router();
 
-// /users/index => GET
-router.get("/index", getIndex);
-router.post("/store", storeUser);
-// /users/:userId => GET
-router.get("/:userId", getUser);
+// /users/roles => GET
+router.get("/roles", getRoles);
 
-module.exports = router;
+router.route('/').get(protect, getIndex).post(storeUser);
+router.route('/:id').get(getUser).patch(updateUser).delete(protect, restrict('VOC_ROLE_ADMIN','VOC_TEMPORARY_ROLE_DEAN'), deleteUser);
+
+export default router;

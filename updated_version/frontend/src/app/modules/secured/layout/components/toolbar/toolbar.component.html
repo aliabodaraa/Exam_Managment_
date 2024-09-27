@@ -1,0 +1,41 @@
+<div class="toolbar-style shadow-md bg-indigo-600 dark:bg-indigo-950 text-white scrollStyle">
+  <div class="flex flex-row w-2/3 items-center">
+    <div class="w-1/6 flex justify-center itmes-center h-14">
+      <div class="flex flex-shrink-0 w-full h-full logo"></div>
+    </div>
+    <div class="toolbar-style w-5/6">
+      <ng-container *ngFor="let menu of toolbarMenus">
+        <!-- <ng-container *permission=" { name: menu.accessCondition || allow} "> -->
+        <ng-container>
+          <div class="menu-style hover:text-munsell-blue" [routerLinkActive]="'active-menu'" [routerLink]="menu.url"
+            *ngIf="((menu.key !== 'directory' && menu.key !== 'management') || (menu.key === 'directory'));">
+            <ng-container *ngTemplateOutlet="
+                menuItem;
+                context: { $implicit: menu }
+                ">
+            </ng-container>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+  <div class="flex flex-row items-center gap-x-7 justify-end w-1/3 h-3/5">
+    <button class="flex items-center flex-shrink-0" [routerLink]="['/myAccessRequests']">
+      <mat-icon class="mx-1" [svgIcon]="'icons:docs'"></mat-icon>
+      <span ctTranslate="toolbar.myAccessRequests">{{'myAccessRequests' | translate}}</span>
+    </button>
+
+    <mat-icon (click)="changeTheme()" matTooltip="{{
+      ((themeServ.theme === 'light') ? 'themeMode.dark' :  'themeMode.light') |translate}}"
+      class="text-white-smoke flex-shrink-0 cursor-pointer"
+      [svgIcon]="(themeServ.theme === 'light') ? 'icons:moon' : 'icons:sun'">
+    </mat-icon>
+    <app-languages></app-languages>
+    <!-- <app-user [user]="user" [loading]="loading" [mode]="'myProfile'"></app-user> -->
+  </div>
+</div>
+<ng-template #menuItem let-item>
+  <mat-icon [svgIcon]="item.icon"></mat-icon>
+  <span class="mx-1">{{'toolbar.' + item.key | translate}} </span>
+</ng-template>
+<mat-progress-bar [color]="progressColor$|async" mode="determinate" [value]="progress$|async"></mat-progress-bar>

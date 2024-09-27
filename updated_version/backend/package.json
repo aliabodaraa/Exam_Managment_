@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js",
+    "start": "nodemon app.ts",
     "start:dev": "npx nodemon"
   },
   "keywords": [],
@@ -18,13 +18,17 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
+    "dotenv": "^16.4.5",
     "ejs": "^3.1.9",
     "express": "^4.18.2",
     "express-handlebars": "^7.1.2",
     "hbs": "^4.2.0",
+    "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.9.1",
     "pug": "^3.0.2",
-    "sequelize": "^6.37.1"
+    "sequelize": "^6.37.1",
+    "validator": "^13.12.0"
   }
 }

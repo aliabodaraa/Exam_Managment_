@@ -1,0 +1,17 @@
+<div class="flex flex-col gap-y-3 pb-5 w-full h-full items-center bg-white">
+  <app-system-breadcrumb class="w-full"></app-system-breadcrumb>
+  <mat-icon [svgIcon]="'icons:forbidden'" class="w-full h-96"></mat-icon>
+  <div class="w-full">
+    <div
+      class="flex flex-col w-full items-center   relative z-99 justify-center gap-y-5 successSubmitMsgsSection">
+      <span class="font-semi-bold text-gray-800 text-6xl" ctTranslate="some_thing_wrong">{{"some_thing_wrong" |
+        translate}}</span>
+      <span class="font-semi-bold text-gray-600 w-1/2 text-center text-xl" ctTranslate="error500_msg">{{"error500_msg"
+        |translate}}</span>
+    </div>
+    <div class="w-full text-center">
+      <span class="font-bold inline-block text-gray-700 text-center text-xl mt-10 cursor-pointer" (click)="logOut()"
+    ctTranslate="noaccess.logout">{{"noaccess.logout" | translate}}</span>
+    </div>
+  </div>
+</div>

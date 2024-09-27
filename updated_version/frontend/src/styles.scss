@@ -1,26 +1,235 @@
-@import "../node_modules/tailwindcss/base.css";
-@import  "../node_modules/tailwindcss/components.css";
-@import  "../node_modules/tailwindcss/utilities.css";
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+@import "../node_modules/@angular/material/prebuilt-themes/indigo-pink.css";
+@import '../styles/tailwindCustomClasses.scss';
+@import '../styles/fonts.css';
+//@import '../../exam-management-angular-workspace/dist/exam-management-library/styles/table/components/paginator/paginator.component.scss';
+@import '../../exam-management-angular-workspace/dist/exam-management-library/tailwind.css';
 
-// @use '@angular/material' as mat;
-// @import "tailwindcss/base";
-// @import "tailwindcss/components";
-// @import "tailwindcss/utilities";
-// @include mat.core();
-// $my-theme: mat.define-theme((
-//  color: (
-//     theme-type: dark,
-//     primary: mat.$violet-palette,
-//   ),
-// ));
-// html {
-//   // Emit theme-dependent styles for common features used across multiple components.
-//   @include mat.core-theme($my-theme);
+body {
+  overflow: hidden;
+  @apply font-DIN-Next-LT #{!important};
+}
 
-//   // Emit styles for MatButton based on `$my-theme`. Because the configuration
-//   // passed to `define-theme` omits typography, `button-theme` will not
-//   // emit any typography styles.
-//   @include mat.button-theme($my-theme);
+// scrollbar style
+::-webkit-scrollbar-thumb {
+  border-radius: 0.175rem !important;
+  @apply bg-indigo-600 dark:bg-indigo-800 opacity-60 #{!important};
+}
 
-//   // Include the theme mixins for other components you use here.
-// }
+::-webkit-scrollbar {
+  width: 10px !important;
+  height: 10px !important;
+  @apply bg-white dark:bg-gray-800 z-50
+}
+
+.rtl {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+.mat-checkbox-indeterminate.mat-accent .mat-checkbox-background,
+.mat-checkbox-checked.mat-accent .mat-checkbox-background {
+  @apply dark:bg-indigo-600 bg-indigo-950 #{!important};
+}
+
+.mat-accent {
+  @apply dark:bg-indigo-600 bg-indigo-950 #{!important};
+}
+
+// ------------------------------custom dialog style------------------------------------->
+
+.mat-mdc-dialog-surface.mdc-dialog__surface {
+  @apply bg-white dark:bg-slate-800 rounded-2xl #{!important};
+}
+
+mat-dialog-title {
+  @apply text-turquoise dark:text-bright-gray;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+
+
+
+
+
+
+/* You can add global styles to this file, and also import other style files */
+@import '@angular/cdk/overlay-prebuilt.css';
+
+:root {
+  --color-primary: #004859;
+  --color-accent: #ff8888;
+  --color-accent-secondary: #ffc15a;
+  --color-accent-secondary-darker: #faa415;
+  --color-success: #4caf50;
+  --color-error: #ff5722;
+  --color-info: #449eff;
+  --color-background: #eceff1;
+  --color-text: #263238;
+  --color-text-light: #607d8b;
+  --height-header: 64px;
+  --height-footer: 48px;
+  --border-radius: 10px;
+  --spacing-step: 8px;
+  --font-size-h1: 34px;
+}
+
+
+form a {
+  color: var(--color-accent);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+form {
+  padding: calc(var(--spacing-step) * 3);
+  box-sizing: border-box;
+  border-radius: var(--border-radius);
+  // background: var(--color-background);
+  // min-width: 395px;
+  width: 100%;
+  // max-width: 450px;
+}
+
+form label,
+form input:not([type="checkbox"]),
+fieldset,
+button {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+form input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin-right: var(--spacing-step);
+}
+
+form fieldset {
+  border-radius: var(--border-radius);
+  border: 1px solid var(--color-text-light);
+  margin-top: var(--spacing-step);
+}
+
+form button {
+  margin-top: calc(var(--spacing-step) * 2);
+  // background-color: var(--color-accent-secondary);
+  border: var(--color-accent-secondary-darker) 1px solid;
+  color: var(--color-text);
+  font-weight: bold;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &:active {
+    background-color: var(--color-accent-secondary-darker);
+    border: var(--color-accent-secondary) 1px solid;
+  }
+
+  &.reset-button {
+    background-color: transparent;
+    border: var(--color-primary) 1px solid;
+  }
+}
+
+input,
+select {
+  border: var(--color-text) solid 2px;
+}
+
+form legend {
+  font-weight: bold;
+}
+
+form input,
+form button,
+form select {
+  border-radius: 5px;
+  font-size: 18px;
+  padding: 10px 11px;
+}
+
+select {
+  width: 100%;
+}
+
+form .ng-valid.ng-dirty:not([formGroupName]):not([formArrayName]):not([ngModelGroup]):not(form):not(paper-textarea) {
+  border: 2px solid var(--color-success);
+}
+
+form .ng-invalid.ng-dirty:not([ngModelGroup="address"]):not([formGroupName="address"]):not([formArrayName]):not(form) {
+  border: 2px solid var(--color-error);
+}
+
+
+form button[disabled] {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-color: rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+}
+
+@keyframes input-message-animation {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}
+
+@mixin input-message() {
+  font-size: 12px;
+  box-sizing: border-box;
+  padding: 2px 13px;
+  animation-name: input-message-animation;
+  animation-duration: 300ms;
+}
+
+form .input-error {
+  @include input-message();
+  color: var(--color-error);
+}
+
+form .input-info {
+  @include input-message();
+  color: var(--color-info)
+}
+
+form .review-textarea {
+  border-radius: var(--border-radius);
+  background-color: white;
+  padding: calc(var(--spacing-step) * 2);
+  margin-top: var(--spacing-step);
+  min-height: 74px;
+  box-sizing: border-box;
+
+  h4 {
+    margin-bottom: var(--spacing-step);
+
+    &:empty:before {
+      content: attr(data-placeholder);
+      opacity: 0.6;
+    }
+  }
+
+  p,
+  div {
+    &:empty:before {
+      content: attr(data-placeholder);
+      opacity: 0.6;
+    }
+  }
+}

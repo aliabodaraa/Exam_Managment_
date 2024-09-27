@@ -1,45 +1,83 @@
 import { Request, Response, NextFunction } from "express";
 import { User } from "../models/user";
-import { ITEMS_PER_PAGE, getDataWithPagination } from "../util/paginator";
+import { ITEMS_PER_PAGE, getModelDataWithPagination } from "../util/paginator";
+import CustomError from "../utils/CustomError";
+import { ValidationErrorItem } from "sequelize";
+import jwt from 'jsonwebtoken';
 
+export const getRoles = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const roles = [
+            "VOC_ROLE_PROFESSOR",
+            "VOC_ROLE_ENGINEER",
+            "VOC_ROLE_DOCTOR",
+            "VOC_ROLE_TEACHER",
+            "VOC_ROLE_GRADUATE_STUDENT",
+            "VOC_ADMINISTRATIVE_OFFICER",
+        ];
+        const temporary_roles = [
+            "VOC_TEMPORARY_ROLE_DEAN",
+            "VOC_TEMPORARY_ROLE_ADMINISTRATIVE_DEPUTY",
+            "VOC_TEMPORARY_ROLE_SCIENTIFIC_VICE",
+            "VOC_TEMPORARY_ROLE_HEAD_OF_DEPARTMENT",
+            "VOC_TEMPORARY_ROLE_HEAD_OF_CIRCLE",
+            "VOC_TEMPORARY_ROLE_HEAD_OF_EXAMINATIONS_DEPARTMENT",
+            "VOC_TEMPORARY_ROLE_TIMEKEEPER",
+            "VOC_TEMPORARY_ROLE_HEAD_OF_STUDENT_AFFAIRS",
+        ];
+        return res.status(200).json({ roles, temporary_roles });
+    } catch (err: any) {
+        console.error("ERROR FETCHING users' roles");
+        console.error(err.message);
+        res.status(500).json({ message: "Failed to fetch users' roles." });
+    }
+};
 export const getIndex = async (
     req: Request,
     res: Response,
     next: NextFunction
 ) => {
-    //go to http://127.0.0.1:3000/users/index?page=46
+    //go to http://127.0.0.1:3000/users/index?pageIndex=46&itermsPerPage=5&term=a&searchMode=true
     const pageIndex = +req.query.pageIndex! || 1;
     const itermsPerPage = +req.query.itermsPerPage! || ITEMS_PER_PAGE;
+    const term: string = (req.query.term as string) || "";
+    const searchMode = req.query.searchMode === "true";
 
     try {
         const {
             data,
             data_count,
             has_next,
-            remaining_items,
             has_previous,
             next_page,
             previous_page,
             last_page,
             current_page,
             iterms_per_page,
-        } = await getDataWithPagination(
+            paginator_length,
+        } = await getModelDataWithPagination<typeof User>(
             User,
             pageIndex,
             ["faculty", "department"],
-            itermsPerPage
+            itermsPerPage,
+            term,
+            searchMode
         );
         res.status(200).json({
             data,
             data_count,
             has_next,
-            remaining_items,
             has_previous,
             next_page,
             previous_page,
             last_page,
             current_page,
             iterms_per_page,
+            paginator_length,
         });
 
         console.log("FETCHED users");
@@ -49,6 +87,7 @@ export const getIndex = async (
         res.status(500).json({ message: "Failed to load users." });
     }
 };
+
 
 export const getUser = async (
     req: Request,
@@ -56,61 +95,65 @@ export const getUser = async (
     next: NextFunction
 ) => {
     try {
-        const data = await User.findByPk(req.params.userId, {
+        const user = await User.scope('withoutPassword').findByPk(req.params.id, {
             include: ["faculty", "department"],
         });
-        res.status(200).json({ data });
-
-        console.log("FETCHED users");
+        if(!user){
+            return next(new CustomError('User with that ID is not found!', 404));
+        }
+        res.status(200).json({message: "User Retrieved Successfully",user });
     } catch (err: any) {
-        console.error("ERROR FETCHING users");
-        console.error(err.message);
-        res.status(500).json({ message: "Failed to load users." });
+        return next(err);
     }
 };
+const signToken=(id:string)=>{
+    return jwt.sign({ id }, process.env.JWT_SECRET_STR, {expiresIn:process.env.JWT_LOGIN_EXPIRES})
+}
 export const storeUser = async (
     req: Request,
     res: Response,
     next: NextFunction
 ) => {
-    let {
-        email,
-        username,
-        password,
-        role,
-        temporary_role,
-        facultyId,
-        departmentId,
-        number_of_observation,
-        city,
-        property,
-    } = req.body;
-    console.log(req.body, "HERRRRRRE");
-    let modified_property = "";
-    if (property === "1") modified_property = "عضو هيئة فنية";
-    else if (property === "2") modified_property = "عضو هيئة تدريسية";
-
     try {
-        const user = await User.create({
-            email,
-            username,
-            password,
-            role,
-            temporary_role,
-            facultyId,
-            departmentId,
-            number_of_observation,
-            city,
-            property: modified_property,
-        });
-        res.status(201).json({ message: "User saved", user });
+        const user = await User.create(req.body);
+        const token = signToken(user.dataValues.id)
+        res.status(201).json({ message: "User saved", user, token });
         console.log("STORED NEW User");
     } catch (err: any) {
-        console.error("ERROR In STORED NEW User");
-        console.error(err.message);
-        res.status(500).json({ message: "Failed to save user." });
+        return next(err);
     }
 };
+
+export const updateUser = async (
+    req: Request,
+    res: Response,
+    next: NextFunction) => {
+    try{
+        const updateUser = await User.findByPk(req.params.id);
+        if(!updateUser){
+            return next(new CustomError('User with that ID is not found!', 404));
+        }
+        await updateUser.update(req.body);
+        res.status(200).json({message: "User Updated", user: updateUser});
+    }catch(err:any){
+        return next(err);
+    }
+}
+export const deleteUser = async (
+    req: Request,
+    res: Response,
+    next: NextFunction) => {
+    try{
+        const destroyedUser = await User.findByPk(req.params.id);
+        if(!destroyedUser){
+            return next(new CustomError('User with that ID is not found!', 404));
+        }
+        await destroyedUser.destroy();
+        res.status(200).json({message: "User Destroyed Successfully"});
+    }catch(err:any){
+        return next(err);
+    }
+}
 
 //   app.delete('/goals/:id', async (req, res) => {
 //     console.log('TRYING TO DELETE GOAL');

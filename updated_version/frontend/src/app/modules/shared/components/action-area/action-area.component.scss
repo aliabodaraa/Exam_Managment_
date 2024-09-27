@@ -1,0 +1,13 @@
+:host {
+  display: flex;
+  min-width: 100px;
+  background-color: #ffffff00;
+  box-sizing: border-box;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 15px 5px;
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+}

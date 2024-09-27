@@ -1,0 +1,34 @@
+{
+  "toolbar": {
+    "home": "Home",
+    "rooms": "Rooms",
+    "courses": "Courses",
+    "users": "Users",
+    "rounds": "Rounds"
+  },
+  "paginator": {
+    "nextBtn": "Next",
+    "prevBtn": "Previous"
+  },
+  "VOC": {
+    "ROLES": {
+      "VOC_ROLE_ADMIN": "Admin",
+      "VOC_ROLE_PROFESSOR": "Professor",
+      "VOC_ROLE_ENGINEER": "Engineer",
+      "VOC_ROLE_DOCTOR": "Doctor",
+      "VOC_ROLE_TEACHER": "Teacher",
+      "VOC_ROLE_GRADUATE_STUDENT": "Graduate Student",
+      "VOC_ADMINISTRATIVE_OFFICER": "Administrative Officer"
+    },
+    "TEMPORARY_ROLES": {
+      "VOC_TEMPORARY_ROLE_DEAN": "Dean",
+      "VOC_TEMPORARY_ROLE_ADMINISTRATIVE_DEPUTY": "Administrative Deputy",
+      "VOC_TEMPORARY_ROLE_SCIENTIFIC_VICE": "Scientific Vice",
+      "VOC_TEMPORARY_ROLE_HEAD_OF_DEPARTMENT": "Head Of Department",
+      "VOC_TEMPORARY_ROLE_HEAD_OF_CIRCLE": "Head Of Circle",
+      "VOC_TEMPORARY_ROLE_HEAD_OF_EXAMINATIONS_DEPARTMENT": "Head Of Examinations Department",
+      "VOC_TEMPORARY_ROLE_TIMEKEEPER": "Timekeeper",
+      "VOC_TEMPORARY_ROLE_HEAD_OF_STUDENT_AFFAIRS": "Head Of Student Affairs"
+    }
+  }
+}

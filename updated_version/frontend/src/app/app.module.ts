@@ -1,44 +1,62 @@
-import { PortalModule } from '@angular/cdk/portal';
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, inject } from '@angular/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MaterialModule } from './material.module';
-import { HeaderComponent } from './header/header.component';
-import { SidebarComponent } from './sidebar/sidebar.component';
-import { ActionAreaComponent } from './action-area/action-area.component';
-import { OrdersPageComponent } from './orders-page/orders-page.component';
-import { ActionsButtonsComponent } from './actions-buttons/actions-buttons.component';
-import { HttpClientModule } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
-import { PaginatorComponent } from './paginator/paginator.component';
-import { UsersPageComponent } from './users-page/users-page.component';
-import { FormsModule } from '@angular/forms';
-
+import {
+  HttpClient,
+  provideHttpClient,
+  withInterceptors,
+} from '@angular/common/http';
+import { RouterModule } from '@angular/router';
+import { rootRoutes } from './app.routes';
+import { IconsModule } from './modules/icons.module';
+import {
+  TranslateLoader,
+  TranslateModule,
+  TranslateService,
+} from '@ngx-translate/core';
+import { LoadingInterceptor } from './modules/shared/intercepters/loading.interceptor';
+import { SharedModule } from './modules/shared/shared.module';
+let counter = 0;
+// export function loggingInterceptor(
+//   req: HttpRequest<unknown>,
+//   next: HttpHandlerFn
+// ): Observable<HttpEvent<unknown>> {
+//   inject(ProgressService).setLoading(counter++);
+//   return next(req);
+// }
+export function HttpLoaderFactory(http: any): TranslateHttpLoader {
+  return new TranslateHttpLoader(http, '../../../assets/i18n/');
+}
+import { PaginatorComponent } from 'exam-management-library';
 @NgModule({
-  declarations: [
-    AppComponent,
-    HeaderComponent,
-    SidebarComponent,
-    ActionAreaComponent,
-    UsersPageComponent,
-    OrdersPageComponent,
-    ActionsButtonsComponent,
-    PaginatorComponent,
-  ],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    MaterialModule,
-    PortalModule,
-    HttpClientModule,
-    CommonModule,
-    FormsModule,
+    RouterModule.forRoot(rootRoutes),
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [HttpClient],
+      },
+      defaultLanguage: 'en',
+    }),
+    IconsModule,
+    SharedModule,
+    PaginatorComponent,
   ],
-  providers: [],
+  providers: [provideHttpClient(withInterceptors([LoadingInterceptor]))],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private translateService: TranslateService) {
+    this.translateService.addLangs(['ar', 'en']);
+    this.translateService.use('en');
+  }
+}

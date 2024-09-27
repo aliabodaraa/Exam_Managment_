@@ -1,13 +1,15 @@
 const path = require("path");
-
+import { Request, Response, NextFunction } from "express";
 import express from "express";
 import bodyParser from "body-parser";
 import { get404 } from "./controllers/error";
-import { sequelize } from "./util/database";
-//apply the relationships
 import { User } from "./models/user";
 import { Department } from "./models/departmant";
 import { Faculty } from "./models/faculty";
+import CustomError from "./utils/CustomError";
+import globalErrorHandler from './controllers/errorController';
+import authRoutes from './routes/auth';
+import userRoutes from './routes/user';
 
 const app = express();
 
@@ -20,10 +22,10 @@ app.use((req: any, res, next) => {
         next();
     });
 });
-const adminRoutes = require("./routes/admin");
-const shopRoutes = require("./routes/shop");
-const userRoutes = require("./routes/user");
+
+
 app.use(bodyParser.urlencoded({ extended: false }));
+
 app.use(express.static(path.join(__dirname, "public")));
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -32,8 +34,16 @@ app.use((req, res, next) => {
     next();
 });
 app.use("/users", userRoutes);
+app.use("/users", authRoutes);
 
 // app.use(shopRoutes);
+app.all('*', (req: Request,
+    res: Response,
+    next: NextFunction) => {
+    const err = new CustomError(`Can't find ${req.originalUrl} on the server!`, 404);
+    next(err);
+});
+app.use(globalErrorHandler);
 
 app.use(get404);
 
@@ -69,18 +79,5 @@ Faculty.hasMany(Department);
 // Product.belongsToMany(Order, {through : OrderItem}) //make you call `product.getOrders()`
 
 // // sequelize.sync({force:true}).    //reconsidering the relationship that we newly setup
-console.log("--------55555s5555--------");
-
-sequelize
-    .sync()
-    .then((result) => {
-        return User.findByPk(2, { include: ["faculty", "department"] });
-    })
-    .then((result) => {
-        console.log(result);
-        // console.log(result.faculty.id, result.department.id)
-    })
-    .then(() => {
-        app.listen(80);
-    })
-    .catch((err) => console.log(err)); //look at all the models that you defined and then create tables for them
+console.log("--------ali abodaraa--------");
+export default app
