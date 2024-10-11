@@ -33,8 +33,8 @@ app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
     next();
 });
+app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
-app.use("/users", authRoutes);
 
 // app.use(shopRoutes);
 app.all('*', (req: Request,

@@ -3,6 +3,7 @@ import sequelize from "../util/database";
 import CustomError from "../utils/CustomError";
 import { USER_PROPERTIES, USER_ROLES, USER_TEMPORARY_ROLES } from "../util/constansts";
 import bcrypt from "bcrypt";
+import { hashPassword } from "../utils/hash";
 
 export const User = sequelize.define(
     "user",
@@ -84,7 +85,14 @@ export const User = sequelize.define(
         },
         passwordChangedAt:{
             type:DataTypes.DATE,
-            defaultValue: new Date(),
+            allowNull:true
+        },
+        passwordResetToken:{
+            type:DataTypes.STRING,
+            allowNull:true
+        },
+        passwordResetTokenExpires:{
+            type:DataTypes.DATE,
             allowNull:true
         }
     },
@@ -97,8 +105,8 @@ User.beforeSave(async (instance)=>{
     instance.password=await bcrypt.hash(instance.password,12);
     console.log("beforeSave",instance)
 });
-User.prototype.comparePassworsInDb=async(password:string, passwordDb:string)=>{
-    return await bcrypt.compare(password, passwordDb);
+User.prototype.comparePassworsInDb=async function(password:string){
+    return await bcrypt.compare(password, this.password);
 }
 User.prototype.isPasswordsChanged=function(JWTTimestamp:number){
     let shouldDeletePassword=false;
@@ -108,4 +116,27 @@ User.prototype.isPasswordsChanged=function(JWTTimestamp:number){
         // console.log("JWTTimestamp",passwordChangedAtMs,JWTTimestamp)
     }
     return shouldDeletePassword;
+}
+User.prototype.createResetPasswordToken=async function(){
+    const resetToken=crypto.randomUUID();
+    // this.passwordResetToken=await bcrypt.hash(resetToken, await bcrypt.genSalt(12));
+    this.passwordResetToken=(await hashPassword(resetToken)).hash.toString('hex');
+    this.passwordResetTokenExpires=Date.now()+10*60*1000;
+    console.log(resetToken,"----1----",this.passwordResetToken)
+    await this.save();
+    return resetToken;
+}
+User.prototype.resetPasswordTokenRejection=async function(){
+    this.passwordResetToken=null;
+    this.passwordResetTokenExpires=null;
+    await this.save();
+}
+User.prototype.changePassword=async function(password:string, confirm_password:string){
+    this.password=password
+    this.confirm_password=confirm_password
+    this.passwordChangedAt=Date.now();
+    this.passwordResetToken=null;
+    this.passwordResetTokenExpires=null;
+    
+    await this.save();
 }

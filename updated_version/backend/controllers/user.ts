@@ -4,6 +4,7 @@ import { ITEMS_PER_PAGE, getModelDataWithPagination } from "../util/paginator";
 import CustomError from "../utils/CustomError";
 import { ValidationErrorItem } from "sequelize";
 import jwt from 'jsonwebtoken';
+import { signToken } from "../utils/jwt";
 
 export const getRoles = async (
     req: Request,
@@ -106,9 +107,6 @@ export const getUser = async (
         return next(err);
     }
 };
-const signToken=(id:string)=>{
-    return jwt.sign({ id }, process.env.JWT_SECRET_STR, {expiresIn:process.env.JWT_LOGIN_EXPIRES})
-}
 export const storeUser = async (
     req: Request,
     res: Response,
